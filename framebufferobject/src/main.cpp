@@ -65,7 +65,7 @@ Point3D p1 = Point3D(5,5,5),
         p13 = Point3D(0,10,0),
         p14 = Point3D(0,0,10),
         p15 = Point3D(0,0,0);   // Coordinate axes
-#if 0
+#if 1
 Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),RGB_RED),
             tri2 = Triangle( p2,p3,p4,Vector3D(0,0,1),RGB_RED),
             tri3 = Triangle( p5,p6,p7,Vector3D(0,0,-1),RGB_RED),
@@ -543,15 +543,15 @@ void updatePixels(GLubyte* dst, int size)
 		rot = rmxyz;
 	}
           
-	#if 1
-	tri13.SetTexture(box,boxtexwidth);
+	#if 0
+	//tri13.SetTexture(box,boxtexwidth);
     tri13.Translate( o2w );
     tri13.TransformToScreen(tm);
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (int x = 0; x<SIZE_X;x++) {
 			z_buffer[x] = 0.0;
 		}
-        tri13.DrawTexturedZbuffer(y);
+        tri13.DrawFilledZbuffer(y);
     } 
     tri13.Translate ( -o2w );
     tri13.Rotate( rot );

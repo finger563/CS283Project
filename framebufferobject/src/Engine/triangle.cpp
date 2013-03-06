@@ -12,7 +12,7 @@ void Triangle::Rotate( const Matrix& m ) {
     normal = m*normal;
 }
 
-void Triangle::Translate( const Vector& v) {
+void Triangle::Translate( const Vector3D& v) {
     a = a+v;
     b = b+v;
     c = c+v;
@@ -40,26 +40,45 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     s3.y = (s3.y)/s3.z;
 
     // sort by y
-    Point t1 = s1, t2 = s2, t3 = s3;
-	Point tmp;
+    Point3D t1 = s1, t2 = s2, t3 = s3;
+	Point2D tex1 = u, tex2 = v, tex3 = w;
+	Point3D tmp;
+	Point2D tex;
     if ( t1.y < s2.y ) {
         t1 = s2;
         t2 = s1;
+		tex1 = v;
+		tex2 = u;
     }
     if ( t1.y < s3.y ) {
         t3 = t1;
         t1 = s3;
+		tex3 = tex1;
+		tex1 = w;
     }
     if ( t2.y < t3.y ) {
         tmp = t2;
         t2 = t3;
         t3 = tmp;
+		tex = tex2;
+		tex2 = tex3;
+		tex3 = tex;
     }
     s1 = t1;
     s2 = t2;
     s3 = t3;
+	u1 = tex1;
+	u2 = tex2;
+	u3 = tex3;
+	
+	l12 = magnitude(Point3D(s1.x*s1.z,s1.y*s1.z,s1.z) -
+					Point3D(s2.x*s2.z,s2.y*s2.z,s2.z));
+	l13 = magnitude(Point3D(s1.x*s1.z,s1.y*s1.z,s1.z) -
+					Point3D(s3.x*s3.z,s3.y*s3.z,s3.z));
+	l23 = magnitude(Point3D(s2.x*s2.z,s2.y*s2.z,s2.z) -
+					Point3D(s3.x*s3.z,s3.y*s3.z,s3.z));
 
-    s1 = m*s1;
+    s1 = m*s1;		// PERFORM THE TRANSFORMATION
     s2 = m*s2;
     s3 = m*s3;
     m12 = (s2.x-s1.x)/(s2.y-s1.y);   // inverse slope between t1 & t2
@@ -361,6 +380,158 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
         if ( zi > z_buffer[x] ) {
             z_buffer[x] = zi;
             display_buffer[ x + y*SIZE_X ] = color;
+        }
+        zi += dzx;
+    }
+}
+
+// Pass in the Global to screen space transform
+void Triangle::DrawTexturedZbuffer ( const int y ) {
+    if ( normal.z > 0 || 
+		s1.y < y || s3.y > y )
+        return;
+
+    float dy = y - s1.y;
+    float zi;
+	float sdiff,ediff;
+	
+    switch ( type ) {
+    case FLAT_TOP_RIGHT:
+		sz -= dz13;
+		ez -= dz23;
+
+        sx = s1.x + (dy)*m13;
+        ex = s2.x + (dy)*m23;
+
+		sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+		ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s2.x*s2.z,s2.y*s2.z,s2.z))/l23;
+		stx = sdiff * (u3.x-u1.x) + u1.x;
+		sty = sdiff * (u3.y-u1.y) + u1.y;
+		etx = ediff * (u3.x-u2.x) + u2.x;
+		ety = ediff * (u3.y-u2.y) + u2.y;
+        break;
+    case FLAT_TOP_LEFT:
+		sz -= dz23;
+		ez -= dz13;
+
+        sx = s2.x + (dy)*m23;
+        ex = s1.x + (dy)*m13;
+		
+		sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s2.x*s2.z,s2.y*s2.z,s2.z))/l23;
+		ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+		stx = sdiff * (u3.x-u2.x) + u2.x;
+		sty = sdiff * (u3.y-u2.y) + u2.y;
+		etx = ediff * (u3.x-u1.x) + u1.x;
+		ety = ediff * (u3.y-u1.y) + u1.y;
+        break;
+    case FLAT_BOTTOM_RIGHT:
+		sz -= dz13;
+		ez -= dz12;
+
+        sx = s1.x + (dy)*m13;
+        ex = s1.x + (dy)*m12;
+
+		sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+		ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l12;
+		stx = sdiff * (u3.x-u1.x) + u1.x;
+		sty = sdiff * (u3.y-u1.y) + u1.y;
+		etx = ediff * (u2.x-u1.x) + u1.x;
+		ety = ediff * (u2.y-u1.y) + u1.y;
+        break;
+    case FLAT_BOTTOM_LEFT:
+		sz -= dz12;
+		ez -= dz13;
+
+        sx = s1.x + (dy)*m12;
+        ex = s1.x + (dy)*m13;
+
+		sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l12;
+		ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+		stx = sdiff * (u2.x-u1.x) + u1.x;
+		sty = sdiff * (u2.y-u1.y) + u1.y;
+		etx = ediff * (u3.x-u1.x) + u1.x;
+		ety = ediff * (u3.y-u1.y) + u1.y;
+        break;
+    case NORMAL_RIGHT:
+        if ( s4.y <= y ) { 
+			sz -= dz14;
+			ez -= dz12;
+
+            sx = s1.x + (dy)*m13;
+            ex = s1.x + (dy)*m12;
+
+			sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+			ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l12;
+			stx = sdiff * (u2.x-u1.x) + u1.x;
+			sty = sdiff * (u2.y-u1.y) + u1.y;
+			etx = ediff * (u3.x-u1.x) + u1.x;
+			ety = ediff * (u3.y-u1.y) + u1.y;
+        }
+        else {
+            dy = y - s4.y;
+			sz -= dz43;
+			ez -= dz23;
+
+            sx = s4.x + (dy)*m13;
+            ex = s2.x + (dy)*m23;
+
+			sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+			ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s2.x*s2.z,s2.y*s2.z,s2.z))/l23;
+			stx = sdiff * (u3.x-u1.x) + u1.x;
+			sty = sdiff * (u3.y-u1.y) + u1.y;
+			etx = ediff * (u3.x-u2.x) + u2.x;
+			ety = ediff * (u3.y-u2.y) + u2.y;
+        }
+        break;
+    case NORMAL_LEFT:
+        if ( s4.y <= y ) {
+			sz -= dz12;
+			ez -= dz14;
+
+            sx = s1.x + (dy)*m12;
+            ex = s1.x + (dy)*m13;
+
+			sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l12;
+			ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+			stx = sdiff * (u2.x-u1.x) + u1.x;
+			sty = sdiff * (u2.y-u1.y) + u1.y;
+			etx = ediff * (u3.x-u1.x) + u1.x;
+			ety = ediff * (u3.y-u1.y) + u1.y;
+        }
+        else {
+            dy = y - s2.y;
+			sz -= dz23;
+			ez -= dz43;
+
+            sx = s2.x + (dy)*m23;
+            ex = s4.x + (dy)*m13;
+
+			sdiff = magnitude(Point3D(sx/sz,dy/sz,1/sz)-Point3D(s2.x*s2.z,s2.y*s2.z,s2.z))/l23;
+			ediff = magnitude(Point3D(ex/ez,dy/ez,1/ez)-Point3D(s1.x*s1.z,s1.y*s1.z,s1.z))/l13;
+			stx = sdiff * (u3.x-u2.x) + u2.x;
+			sty = sdiff * (u3.y-u2.y) + u2.y;
+			etx = ediff * (u3.x-u1.x) + u1.x;
+			ety = ediff * (u3.y-u1.y) + u1.y;
+        }
+        break;
+    default:
+        break;
+    }
+	
+	dzx = (ez-sz)/(ex - sx);
+	zi = sz;
+
+	float tx=stx,ty=sty;
+	float dtx,dty;
+	dtx = (ez-sz)/(etx - stx);
+	dty = (ez-sz)/(ety - sty);
+
+    for (int x = sx;x<=ex;x++) {
+        if ( zi > z_buffer[x] ) {
+            z_buffer[x] = zi;
+			tx += dtx;
+			ty += dty;
+			display_buffer[ x + y*SIZE_X ] = texture[0];
         }
         zi += dzx;
     }

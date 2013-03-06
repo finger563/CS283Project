@@ -26,7 +26,7 @@ public:
     Matrix operator+ (const Matrix& rhs) const;
     Matrix operator- (const Matrix& rhs) const;
     
-    Vector operator* (const Vector rhs) const;
+    Vector3D operator* (const Vector3D rhs) const;
 };
 
 #endif
