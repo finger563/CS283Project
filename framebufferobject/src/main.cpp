@@ -37,6 +37,7 @@ using std::ends;
 
 #include "main.h"
 #include "Engine\triangle.h"
+#include "Sprites\box.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
@@ -47,38 +48,42 @@ int  rotx = 1,
 	 roty = 1,
 	 rotz = 1;
 
-Point p1 = Point(5,5,5),
-        p2 = Point(5,-5,5),
-        p3 = Point(-5,5,5),
-        p4 = Point(-5,-5,5),
-        p5 = Point(5,5,-5),
-        p6 = Point(5,-5,-5),
-        p7 = Point(-5,5,-5),
-        p8 = Point(-5,-5,-5), // Cube
+Point3D p1 = Point3D(5,5,5),
+        p2 = Point3D(5,-5,5),
+        p3 = Point3D(-5,5,5),
+        p4 = Point3D(-5,-5,5),
+        p5 = Point3D(5,5,-5),
+        p6 = Point3D(5,-5,-5),
+        p7 = Point3D(-5,5,-5),
+        p8 = Point3D(-5,-5,-5), // Cube
           
-        p9 = Point(5,-5,0),
-        p10 = Point(-5,-5,0),
-        p11 = Point(0,7,0),   // Triangle
+        p9 = Point3D(5,-5,0),
+        p10 = Point3D(-5,-5,0),
+        p11 = Point3D(0,7,0),   // Triangle
           
-        p12 = Point(10,0,0),
-        p13 = Point(0,10,0),
-        p14 = Point(0,0,10),
-        p15 = Point(0,0,0);   // Coordinate axes
-Triangle tri1 = Triangle( p1,p2,p3,Vector(0,0,1),RGB_RED),
-            tri2 = Triangle( p2,p3,p4,Vector(0,0,1),RGB_RED),
-            tri3 = Triangle( p5,p6,p7,Vector(0,0,-1),RGB_RED),
-            tri4 = Triangle( p6,p7,p8,Vector(0,0,-1),RGB_RED),
-            tri5 = Triangle( p5,p1,p2,Vector(1,0,0),RGB_GREEN),
-            tri6 = Triangle( p5,p6,p2,Vector(1,0,0),RGB_GREEN),
-            tri7 = Triangle( p7,p3,p8,Vector(-1,0,0),RGB_GREEN),
-            tri8 = Triangle( p3,p4,p8,Vector(-1,0,0),RGB_GREEN),
-            tri9 = Triangle( p1,p3,p5,Vector(0,1,0),RGB_BLUE),
-            tri10 = Triangle( p7,p3,p5,Vector(0,1,0),RGB_BLUE),
-            tri11 = Triangle( p2,p6,p8,Vector(0,-1,0),RGB_BLUE),
-            tri12 = Triangle( p2,p4,p8,Vector(0,-1,0),RGB_BLUE),
+        p12 = Point3D(10,0,0),
+        p13 = Point3D(0,10,0),
+        p14 = Point3D(0,0,10),
+        p15 = Point3D(0,0,0);   // Coordinate axes
+#if 0
+Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),RGB_RED),
+            tri2 = Triangle( p2,p3,p4,Vector3D(0,0,1),RGB_RED),
+            tri3 = Triangle( p5,p6,p7,Vector3D(0,0,-1),RGB_RED),
+            tri4 = Triangle( p6,p7,p8,Vector3D(0,0,-1),RGB_RED),
+            tri5 = Triangle( p5,p1,p2,Vector3D(1,0,0),RGB_GREEN),
+            tri6 = Triangle( p5,p6,p2,Vector3D(1,0,0),RGB_GREEN),
+            tri7 = Triangle( p7,p3,p8,Vector3D(-1,0,0),RGB_GREEN),
+            tri8 = Triangle( p3,p4,p8,Vector3D(-1,0,0),RGB_GREEN),
+            tri9 = Triangle( p1,p3,p5,Vector3D(0,1,0),RGB_BLUE),
+            tri10 = Triangle( p7,p3,p5,Vector3D(0,1,0),RGB_BLUE),
+            tri11 = Triangle( p2,p6,p8,Vector3D(0,-1,0),RGB_BLUE),
+            tri12 = Triangle( p2,p4,p8,Vector3D(0,-1,0),RGB_BLUE),
              
-            tri13 = Triangle( p9,p10,p11,Vector(0,0,-1),RGB_GREEN);
-          
+            tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),RGB_GREEN);
+#else
+Triangle tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),Point2D(0,512),Point2D(512,0),Point2D(0,0));
+#endif
+
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
         rmx = Matrix(),
@@ -87,7 +92,7 @@ Matrix rmz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
 Matrix tm = Matrix();
-Vector o2w = Vector(0,0,20);
+Vector3D o2w = Vector3D(0,0,20);
 
 
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
@@ -538,14 +543,15 @@ void updatePixels(GLubyte* dst, int size)
 		rot = rmxyz;
 	}
           
-	#if 0
+	#if 1
+	tri13.SetTexture(box,boxtexwidth);
     tri13.Translate( o2w );
     tri13.TransformToScreen(tm);
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (int x = 0; x<SIZE_X;x++) {
 			z_buffer[x] = 0.0;
 		}
-        tri13.DrawFilledZbuffer(y);
+        tri13.DrawTexturedZbuffer(y);
     } 
     tri13.Translate ( -o2w );
     tri13.Rotate( rot );
