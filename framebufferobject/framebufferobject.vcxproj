@@ -99,6 +99,13 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Engine\geometricobject.h" />
+    <ClInclude Include="src\Engine\matrix.h" />
+    <ClInclude Include="src\Engine\point.h" />
+    <ClInclude Include="src\Engine\triangle.h" />
+    <ClInclude Include="src\Sprites\box.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
