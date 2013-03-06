@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\Engine\triangle.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\point.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\matrix.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\geometricobject.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glInfo.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Timer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\pixeldirdifambspec.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\pixeldirdifambspec.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\color.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\color.frag">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{f8079fd5-94be-4d44-b306-c467c9d026ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{9669dd5e-dacd-4257-b691-05dc26e314f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{fced578d-deda-4199-b22d-ec6352773de6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Textures">
+      <UniqueIdentifier>{504e4e03-04b5-435f-894f-ad9d688fa868}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine">
+      <UniqueIdentifier>{c9fd02b5-84c4-49ac-b747-cfe2e00231eb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Engine\geometricobject.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\matrix.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\point.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\triangle.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprites\box.h">
+      <Filter>src\Textures</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
