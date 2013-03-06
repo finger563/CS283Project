@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL
+END
+vsMathLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vsMathLib.h
+END
+vsResModelLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vsResModelLib.h
+END
+vsGLInfoLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vsGLInfoLib.h
+END
+vsLogLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vsLogLib.h
+END
+vslibs.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vslibs.h
+END
+vsFontLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vsFontLib.h
+END
+vsShaderLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vsShaderLib.h
+END
+vsResourceLib.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/light3d/!svn/ver/223/StandAloneProjects/framebufferobject/include/VSL/vsResourceLib.h
+END
