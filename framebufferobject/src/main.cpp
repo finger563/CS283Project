@@ -57,9 +57,9 @@ Point3D p1 = Point3D(5,5,5),
         p7 = Point3D(-5,5,-5),
         p8 = Point3D(-5,-5,-5), // Cube
           
-        p9 = Point3D(5,-5,0),
-        p10 = Point3D(-5,-5,0),
-        p11 = Point3D(0,7,0),   // Triangle
+        p9 = Point3D(7.07,-3,0),
+        p10 = Point3D(-7.07,-3,0),
+        p11 = Point3D(0,4.07,0),   // Triangle, converted to be a right triangle for texturing
           
         p12 = Point3D(10,0,0),
         p13 = Point3D(0,10,0),
