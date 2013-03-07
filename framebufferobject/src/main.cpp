@@ -557,7 +557,7 @@ void updatePixels(GLubyte* dst, int size)
         tri13.DrawTexturedZbuffer(y);
     } 
     tri13.Translate ( -o2w );
-    tri13.Rotate( rot );
+    tri13.Rotate( rmz );
     #else
     tri3.Translate ( o2w ); //object to world
     tri4.Translate ( o2w );
