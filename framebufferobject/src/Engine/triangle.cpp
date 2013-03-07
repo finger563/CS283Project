@@ -95,8 +95,12 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 			ex = s2.x;
 			sz = 1/s1.z;
 			ez = 1/s2.z;
-			lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
-			rydiff = 1/(s3.y*s3.z-s2.y*s2.z);
+			ldiff = magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,
+							 s3.y*s3.z-s1.y*s1.z,
+							 s3.z - s1.z));
+			rdiff = magnitude(Vector3D(s3.x*s3.z-s2.x*s2.z,
+							 s3.y*s3.z-s2.y*s2.z,
+							 s3.z - s2.z));
         }
         else {
 			sx = s2.x;
@@ -104,8 +108,12 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 			sz = 1/s2.z;
 			ez = 1/s1.z;
             type = FLAT_TOP_LEFT;
-			lydiff = 1/(s3.y*s3.z-s2.y*s2.z);
-			rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
+			ldiff = magnitude(Vector3D(s3.x*s3.z-s2.x*s2.z,
+							 s3.y*s3.z-s2.y*s2.z,
+							 s3.z - s2.z));
+			rdiff = magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,
+							 s3.y*s3.z-s1.y*s1.z,
+							 s3.z - s1.z));
         }
     }
     else {
@@ -116,25 +124,41 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
         if ( abs(s2.y - s3.y) < EPSILON ) {   // Flat Bottom
             if ( s3.x < s2.x ) {
                 type = FLAT_BOTTOM_RIGHT;
-				lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
-				rydiff = 1/(s2.y*s2.z-s1.y*s1.z);
+				ldiff = magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,
+								 s3.y*s3.z-s1.y*s1.z,
+								 s3.z - s1.z));
+				rdiff = magnitude(Vector3D(s2.x*s2.z-s1.x*s1.z,
+								 s2.y*s2.z-s1.y*s1.z,
+								 s2.z - s1.z));
             }
             else {
                 type = FLAT_BOTTOM_LEFT;
-				lydiff = 1/(s2.y*s2.z-s1.y*s1.z);
-				rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
+				ldiff = magnitude(Vector3D(s2.x*s2.z-s1.x*s1.z,
+								 s2.y*s2.z-s1.y*s1.z,
+								 s2.z - s1.z));
+				rdiff = magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,
+								 s3.y*s3.z-s1.y*s1.z,
+								 s3.z - s1.z));
             }
         }
         else {      // Normal triangle
             if ( s2.x > s4.x ) {
                 type = NORMAL_RIGHT;
-				lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
-				rydiff = 1/(s2.y*s2.z-s1.y*s1.z);
+				ldiff = magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,
+								 s3.y*s3.z-s1.y*s1.z,
+								 s3.z - s1.z));
+				rdiff = magnitude(Vector3D(s2.x*s2.z-s1.x*s1.z,
+								 s2.y*s2.z-s1.y*s1.z,
+								 s2.z - s1.z));
             }
             else {
                 type = NORMAL_LEFT;
-				lydiff = 1/(s2.y*s2.z-s1.y*s1.z);
-				rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
+				ldiff = magnitude(Vector3D(s2.x*s2.z-s1.x*s1.z,
+								 s2.y*s2.z-s1.y*s1.z,
+								 s2.z - s1.z));
+				rdiff = magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,
+								 s3.y*s3.z-s1.y*s1.z,
+								 s3.z - s1.z));
             }
         }
     }
@@ -408,10 +432,15 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m13;
         ex = s2.x + (dy)*m23;
 
-		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-		etu = (u3.x - u2.x)*(y/ez-s2.y*s2.z)*rydiff + u2.x;
-		etv = (u3.y - u2.y)*(y/ez-s2.y*s2.z)*rydiff + u2.y;
+		tempdiff = magnitude(Vector3D(sx/sz - s1.x*s1.z, y/sz-s1.y*s1.z, 1/sz - s1.z));
+
+		stu = (u3.x - u1.x) * tempdiff / ldiff + u1.x;
+		stv = (u3.y - u1.y) * tempdiff / ldiff + u1.y;
+
+		tempdiff = magnitude(Vector3D(ex/ez - s2.x*s2.z, y/ez-s2.y*s2.z, 1/ez - s2.z));
+
+		etu = (u3.x - u2.x) * tempdiff / rdiff + u2.x;
+		etv = (u3.y - u2.y) * tempdiff / rdiff + u2.y;
         break;
     case FLAT_TOP_LEFT:
 		sz -= dz23;
@@ -420,10 +449,15 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s2.x + (dy)*m23;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u3.x - u2.x)*(y/sz-s2.y*s2.z)*lydiff + u2.x;
-		stv = (u3.y - u2.y)*(y/sz-s2.y*s2.z)*lydiff + u2.y;
-		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+		tempdiff = magnitude(Vector3D(sx/sz - s2.x*s2.z, y/sz-s2.y*s2.z, 1/sz - s2.z));
+
+		stu = (u3.x - u2.x) * tempdiff / ldiff + u2.x;
+		stv = (u3.y - u2.y) * tempdiff / ldiff + u2.y;
+
+		tempdiff = magnitude(Vector3D(ex/ez - s1.x*s1.z, y/ez-s1.y*s1.z, 1/ez - s1.z));
+
+		etu = (u3.x - u1.x) * tempdiff / rdiff + u1.x;
+		etv = (u3.y - u1.y) * tempdiff / rdiff + u1.y;
         break;
     case FLAT_BOTTOM_RIGHT:
 		sz -= dz13;
@@ -431,11 +465,16 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 
         sx = s1.x + (dy)*m13;
         ex = s1.x + (dy)*m12;
+		
+		tempdiff = magnitude(Vector3D(sx/sz - s1.x*s1.z, y/sz-s1.y*s1.z, 1/sz - s1.z));
 
-		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-		etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-		etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+		stu = (u3.x - u1.x) * tempdiff / ldiff + u1.x;
+		stv = (u3.y - u1.y) * tempdiff / ldiff + u1.y;
+
+		tempdiff = magnitude(Vector3D(ex/ez - s1.x*s1.z, y/ez-s1.y*s1.z, 1/ez - s1.z));
+
+		etu = (u2.x - u1.x) * tempdiff / rdiff + u1.x;
+		etv = (u2.y - u1.y) * tempdiff / rdiff + u1.y;
         break;
     case FLAT_BOTTOM_LEFT:
 		sz -= dz12;
@@ -444,10 +483,15 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m12;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-		stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+		tempdiff = magnitude(Vector3D(sx/sz - s1.x*s1.z, y/sz-s1.y*s1.z, 1/sz - s1.z));
+		
+		stu = (u2.x - u1.x) * tempdiff / ldiff + u1.x;
+		stv = (u2.y - u1.y) * tempdiff / ldiff + u1.y;
+
+		tempdiff = magnitude(Vector3D(ex/ez - s1.x*s1.z, y/ez-s1.y*s1.z, 1/ez - s1.z));
+
+		etu = (u3.x - u1.x) * tempdiff / rdiff + u1.x;
+		etv = (u3.y - u1.y) * tempdiff / rdiff + u1.y;
         break;
     case NORMAL_RIGHT:
         if ( s4.y <= y ) { 
@@ -456,11 +500,16 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 
             sx = s1.x + (dy)*m13;
             ex = s1.x + (dy)*m12;
+		
+			tempdiff = magnitude(Vector3D(sx/sz - s1.x*s1.z, y/sz-s1.y*s1.z, 1/sz - s1.z));
 
-			stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-			stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-			etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-			etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+			stu = (u3.x - u1.x) * tempdiff / ldiff + u1.x;
+			stv = (u3.y - u1.y) * tempdiff / ldiff + u1.y;
+
+			tempdiff = magnitude(Vector3D(ex/ez - s1.x*s1.z, y/ez-s1.y*s1.z, 1/ez - s1.z));
+
+			etu = (u2.x - u1.x) * tempdiff / rdiff + u1.x;
+			etv = (u2.y - u1.y) * tempdiff / rdiff + u1.y;
         }
         else {
             dy = y - s4.y;
@@ -469,11 +518,20 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 
             sx = s4.x + (dy)*m13;
             ex = s2.x + (dy)*m23;
+		
+			tempdiff = magnitude(Vector3D(sx/sz - s1.x*s1.z, y/sz-s1.y*s1.z, 1/sz - s1.z));
 
-			stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-			stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
-			etu = (u3.x - u2.x)*(y/ez-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.x;
-			etv = (u3.y - u2.y)*(y/ez-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.y;
+			stu = (u3.x - u1.x) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,  s3.y*s3.z-s1.y*s1.z, s3.z - s1.z)) + u1.x;
+			stv = (u3.y - u1.y) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,  s3.y*s3.z-s1.y*s1.z, s3.z - s1.z)) + u1.y;
+
+			tempdiff = magnitude(Vector3D(ex/ez - s2.x*s2.z, y/ez-s2.y*s2.z, 1/ez - s2.z));
+
+			etu = (u3.x - u2.x) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s2.x*s2.z,  s3.y*s3.z-s2.y*s2.z, s3.z - s2.z)) + u2.x;
+			etv = (u3.y - u2.y) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s2.x*s2.z,  s3.y*s3.z-s2.y*s2.z, s3.z - s2.z)) + u2.y;
         }
         break;
     case NORMAL_LEFT:
@@ -483,11 +541,16 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 
             sx = s1.x + (dy)*m12;
             ex = s1.x + (dy)*m13;
+		
+			tempdiff = magnitude(Vector3D(sx/sz - s1.x*s1.z, y/sz-s1.y*s1.z, 1/sz - s1.z));
 			
-			stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-			stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff+ u1.y;
-			etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-			etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+			stu = (u2.x - u1.x) * tempdiff / ldiff + u1.x;
+			stv = (u2.y - u1.y) * tempdiff / ldiff + u1.y;
+
+			tempdiff = magnitude(Vector3D(ex/ez - s1.x*s1.z, y/ez-s1.y*s1.z, 1/ez - s1.z));
+
+			etu = (u3.x - u1.x) * tempdiff / rdiff + u1.x;
+			etv = (u3.y - u1.y) * tempdiff / rdiff + u1.y;
         }
         else {
             dy = y - s2.y;
@@ -496,11 +559,20 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 
             sx = s2.x + (dy)*m23;
             ex = s4.x + (dy)*m13;
+		
+			tempdiff = magnitude(Vector3D(sx/sz - s2.x*s2.z, y/sz-s2.y*s2.z, 1/sz - s2.z));
 			
-			stu = (u3.x - u2.x)*(y/sz-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.x;
-			stv = (u3.y - u2.y)*(y/sz-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.y;
-			etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-			etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
+			stu = (u3.x - u2.x) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s2.x*s2.z,  s3.y*s3.z-s2.y*s2.z, s3.z - s2.z)) + u2.x;
+			stv = (u3.y - u2.y) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s2.x*s2.z,  s3.y*s3.z-s2.y*s2.z, s3.z - s2.z)) + u2.y;
+
+			tempdiff = magnitude(Vector3D(ex/ez - s1.x*s1.z, y/ez-s1.y*s1.z, 1/ez - s1.z));
+
+			etu = (u3.x - u1.x) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,  s3.y*s3.z-s1.y*s1.z, s3.z - s1.z)) + u1.x;
+			etv = (u3.y - u1.y) * tempdiff / 
+				magnitude(Vector3D(s3.x*s3.z-s1.x*s1.z,  s3.y*s3.z-s1.y*s1.z, s3.z - s1.z)) + u1.y;
         }
         break;
     default:
@@ -513,12 +585,16 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	float tx=stu,ty=stv;
 	xdiff = 1/(ex/ez - sx/sz);
 
+	tempdiff = magnitude(Vector3D( ex/ez - sx/sz, 
+								   y/ez - y/sz,
+								   1/ez - 1/sz));
+
     for (int x = sx;x<=ex;x++) {
         if ( zi > z_buffer[x] ) {
             z_buffer[x] = zi;
-			tx = (etu - stu)*(x/zi - sx/sz)*xdiff + stu;
-			ty = (etv - stv)*(x/zi - sx/sz)*xdiff + stv;
-			int index = tx + texwidth*((int)ty);
+			tx = magnitude(Vector3D(x/zi - sx/sz,y/zi - y/sz, 1/zi-1/sz))/tempdiff * (etu - stu) + stu;
+			ty = magnitude(Vector3D(x/zi - sx/sz,y/zi - y/sz, 1/zi-1/sz))/tempdiff * (etv - stv) + stv;
+			int index = (int)tx + texwidth*((int)ty);
 			if ( index < 0 ) 
 				index = 0;
 			display_buffer[ x + y*SIZE_X ] = texture[index%(texwidth*texwidth)];

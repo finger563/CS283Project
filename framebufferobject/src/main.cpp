@@ -560,7 +560,17 @@ void updatePixels(GLubyte* dst, int size)
 	}
           
 	#if TEXTUREMAP
-	tri13.SetTexture(box,boxtexwidth);
+	//tri13.SetTexture(box,boxtexwidth);
+	//tri13.Translate( o2w );
+	//tri13.TransformToScreen(tm);
+	//for (int y=SIZE_Y-1;y>=0;y--) {
+	//	for (int x = 0; x<SIZE_X;x++) {
+	//		z_buffer[x] = 0.0;
+	//	}
+	//	tri13.DrawTexturedZbuffer(y);
+	//} 
+	//tri13.Translate ( -o2w );
+	//tri13.Rotate( rot );
 	tri1.SetTexture(box,boxtexwidth);
 	tri2.SetTexture(box,boxtexwidth);
 	tri3.SetTexture(box,boxtexwidth);
@@ -573,16 +583,6 @@ void updatePixels(GLubyte* dst, int size)
 	tri10.SetTexture(box,boxtexwidth);
 	tri11.SetTexture(box,boxtexwidth);
 	tri12.SetTexture(box,boxtexwidth);
-  //  tri13.Translate( o2w );
-  //  tri13.TransformToScreen(tm);
-  //  for (int y=SIZE_Y-1;y>=0;y--) {
-		//for (int x = 0; x<SIZE_X;x++) {
-		//	z_buffer[x] = 0.0;
-		//}
-  //      tri13.DrawTexturedZbuffer(y);
-  //  } 
-  //  tri13.Translate ( -o2w );
-  //  tri13.Rotate( rot );
     tri3.Translate ( o2w ); //object to world
     tri4.Translate ( o2w );
     tri1.Translate ( o2w );

@@ -33,7 +33,8 @@ public:
 	int texwidth;					// width of texture
 	Point2D u1,u2,u3;				// screen space coordinates for texture
 	float stu,stv,etu,etv;			// start and end x & y texture coordinates per scanline
-	float lydiff,rydiff,xdiff;		// demoninators for computation
+	float ldiff,rdiff,xdiff;		// demoninators for computation
+	float tempdiff;
 
     Triangle(){a=b=c=Point3D();normal=Vector3D();}
     Triangle(const Point3D _a,
