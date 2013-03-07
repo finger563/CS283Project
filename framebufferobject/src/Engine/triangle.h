@@ -26,15 +26,13 @@ public:
     float sx,ex;				// start and end x-pixel coordinates
 	float sz,ez;				// start and end 1/z world coordinates of object (per scanline)
     float dzx,dz13,dz12,dz23,dz14,dz43;    // z-slopes for 1/z-buffering
-
-	float l13,l12,l23;			// scalar distances between screen-space vertices
 	
 	// Variables for Texturing
 	Point2D u,v,w;					// texture coords for each point 
 	const unsigned short* texture;	// for texturing
 	int texwidth;					// width of texture
-	Point2D u1,u2,u3,u4;			// screen space coordinates for texture
-	float stx,sty,etx,ety;			// start and end x & y texture coordinates per scanline
+	Point2D u1,u2,u3;				// screen space coordinates for texture
+	float stu,stv,etu,etv;			// start and end x & y texture coordinates per scanline
 
     Triangle(){a=b=c=Point3D();normal=Vector3D();}
     Triangle(const Point3D _a,

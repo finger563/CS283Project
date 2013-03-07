@@ -65,7 +65,12 @@ Point3D p1 = Point3D(5,5,5),
         p13 = Point3D(0,10,0),
         p14 = Point3D(0,0,10),
         p15 = Point3D(0,0,0);   // Coordinate axes
-#if 1
+
+#define TEXTUREMAP	1
+
+#if TEXTUREMAP
+Triangle tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),Point2D(0,512),Point2D(512,0),Point2D(0,0));
+#else
 Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),RGB_RED),
             tri2 = Triangle( p2,p3,p4,Vector3D(0,0,1),RGB_RED),
             tri3 = Triangle( p5,p6,p7,Vector3D(0,0,-1),RGB_RED),
@@ -80,8 +85,6 @@ Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),RGB_RED),
             tri12 = Triangle( p2,p4,p8,Vector3D(0,-1,0),RGB_BLUE),
              
             tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),RGB_GREEN);
-#else
-Triangle tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),Point2D(0,512),Point2D(512,0),Point2D(0,0));
 #endif
 
 Matrix rmz = Matrix(), 
@@ -91,7 +94,7 @@ Matrix rmz = Matrix(),
 		rmxz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
-Matrix tm = Matrix();
+Matrix tm = Matrix();				// transformation matrix (scale to screen)
 Vector3D o2w = Vector3D(0,0,20);
 
 
@@ -195,10 +198,10 @@ int main(int argc, char **argv)
     rmxyz = rmz*rmxy;
         
     tm.SetIdentity();
-    tm.data[0][3] = SIZE_X/2;
-    tm.data[1][3] = SIZE_Y/2;
-    tm.data[0][0] = SIZE_X/2; // for the distance from eye to screen
-    tm.data[1][1] = SIZE_Y/2; // same
+    tm.data[0][3] = SIZE_X/2;	// how much to translate x?
+    tm.data[1][3] = SIZE_Y/2;	// how much to translate y?
+    tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
+    tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
 
     initSharedMem();
 
@@ -543,15 +546,15 @@ void updatePixels(GLubyte* dst, int size)
 		rot = rmxyz;
 	}
           
-	#if 0
-	//tri13.SetTexture(box,boxtexwidth);
+	#if TEXTUREMAP
+	tri13.SetTexture(box,boxtexwidth);
     tri13.Translate( o2w );
     tri13.TransformToScreen(tm);
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (int x = 0; x<SIZE_X;x++) {
 			z_buffer[x] = 0.0;
 		}
-        tri13.DrawFilledZbuffer(y);
+        tri13.DrawTexturedZbuffer(y);
     } 
     tri13.Translate ( -o2w );
     tri13.Rotate( rot );
