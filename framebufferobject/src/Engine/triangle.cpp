@@ -69,7 +69,7 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     s3 = t3;
 	u1 = tex1;
 	u2 = tex2;
-	u3 = tex3;
+	u3 = tex3;		// Sort the texture points along with polygon points
 
     s1 = m*s1;		// PERFORM THE TRANSFORMATION
     s2 = m*s2;
@@ -95,6 +95,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 			ex = s2.x;
 			sz = 1/s1.z;
 			ez = 1/s2.z;
+			lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
+			rydiff = 1/(s3.y*s3.z-s2.y*s2.z);
         }
         else {
 			sx = s2.x;
@@ -102,6 +104,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 			sz = 1/s2.z;
 			ez = 1/s1.z;
             type = FLAT_TOP_LEFT;
+			lydiff = 1/(s3.y*s3.z-s2.y*s2.z);
+			rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
         }
     }
     else {
@@ -112,17 +116,25 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
         if ( abs(s2.y - s3.y) < EPSILON ) {   // Flat Bottom
             if ( s3.x < s2.x ) {
                 type = FLAT_BOTTOM_RIGHT;
+				lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
+				rydiff = 1/(s2.y*s2.z-s1.y*s1.z);
             }
             else {
                 type = FLAT_BOTTOM_LEFT;
+				lydiff = 1/(s2.y*s2.z-s1.y*s1.z);
+				rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
             }
         }
         else {      // Normal triangle
             if ( s2.x > s4.x ) {
                 type = NORMAL_RIGHT;
+				lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
+				rydiff = 1/(s2.y*s2.z-s1.y*s1.z);
             }
             else {
                 type = NORMAL_LEFT;
+				lydiff = 1/(s2.y*s2.z-s1.y*s1.z);
+				rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
             }
         }
     }
@@ -396,10 +408,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m13;
         ex = s2.x + (dy)*m23;
 
-		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
-		etu = (u3.x - u2.x)*(y/ez-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.x;
-		etv = (u3.y - u2.y)*(y/ez-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.y;
+		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
+		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
+		etu = (u3.x - u2.x)*(y/ez-s2.y*s2.z)*rydiff + u2.x;
+		etv = (u3.y - u2.y)*(y/ez-s2.y*s2.z)*rydiff + u2.y;
         break;
     case FLAT_TOP_LEFT:
 		sz -= dz23;
@@ -408,10 +420,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s2.x + (dy)*m23;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u3.x - u2.x)*(y/sz-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.x;
-		stv = (u3.y - u2.y)*(y/sz-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.y;
-		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
+		stu = (u3.x - u2.x)*(y/sz-s2.y*s2.z)*lydiff + u2.x;
+		stv = (u3.y - u2.y)*(y/sz-s2.y*s2.z)*lydiff + u2.y;
+		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
+		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
         break;
     case FLAT_BOTTOM_RIGHT:
 		sz -= dz13;
@@ -420,10 +432,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m13;
         ex = s1.x + (dy)*m12;
 
-		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
-		etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.x;
-		etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.y;
+		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
+		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
+		etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
+		etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
         break;
     case FLAT_BOTTOM_LEFT:
 		sz -= dz12;
@@ -432,10 +444,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m12;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.x;
-		stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.y;
-		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
+		stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
+		stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
+		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
+		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
         break;
     case NORMAL_RIGHT:
         if ( s4.y <= y ) { 
@@ -445,10 +457,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s1.x + (dy)*m13;
             ex = s1.x + (dy)*m12;
 
-			stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-			stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
-			etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.x;
-			etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.y;
+			stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
+			stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
+			etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
+			etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
         }
         else {
             dy = y - s4.y;
@@ -472,10 +484,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s1.x + (dy)*m12;
             ex = s1.x + (dy)*m13;
 			
-			stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.x;
-			stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)/(s2.y*s2.z-s1.y*s1.z) + u1.y;
-			etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-			etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
+			stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
+			stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff+ u1.y;
+			etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
+			etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
         }
         else {
             dy = y - s2.y;
@@ -503,9 +515,12 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
     for (int x = sx;x<=ex;x++) {
         if ( zi > z_buffer[x] ) {
             z_buffer[x] = zi;
-			tx = (etu - stu)*(x/zi - sx/sz)/(ex/ez - sx/sz) + stu;
-			ty = (etv - stv)*(x/zi - sx/sz)/(ex/ez - sx/sz) + stv;
-			display_buffer[ x + y*SIZE_X ] = texture[(int)tx + texwidth*((int)ty)];
+			tx = (ex/ez - sx/sz) != 0 ? (etu - stu)*(x/zi - sx/sz)/(ex/ez - sx/sz) + stu : stu;
+			ty = (ex/ez - sx/sz) != 0 ? (etv - stv)*(x/zi - sx/sz)/(ex/ez - sx/sz) + stv : stv;
+			int index = tx + texwidth*((int)ty);
+			if ( index < 0 ) 
+				index = 0;
+			display_buffer[ x + y*SIZE_X ] = texture[index%(texwidth*texwidth)];
         }
         zi += dzx;
     }

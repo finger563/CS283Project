@@ -69,7 +69,20 @@ Point3D p1 = Point3D(5,5,5),
 #define TEXTUREMAP	1
 
 #if TEXTUREMAP
-Triangle tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),Point2D(0,512),Point2D(512,0),Point2D(0,0));
+Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),Point2D(0,0),Point2D(0,512),Point2D(512,0)),
+            tri2 = Triangle( p2,p3,p4,Vector3D(0,0,1),Point2D(0,512),Point2D(512,0),Point2D(512,512)),
+            tri3 = Triangle( p5,p6,p7,Vector3D(0,0,-1),Point2D(512,0),Point2D(512,512),Point2D(0,0)),
+            tri4 = Triangle( p6,p7,p8,Vector3D(0,0,-1),Point2D(512,512),Point2D(0,0),Point2D(0,512)),
+            tri5 = Triangle( p5,p1,p2,Vector3D(1,0,0),Point2D(0,0),Point2D(512,0),Point2D(512,512)),
+            tri6 = Triangle( p5,p6,p2,Vector3D(1,0,0),Point2D(0,0),Point2D(0,512),Point2D(512,512)),
+            tri7 = Triangle( p7,p3,p8,Vector3D(-1,0,0),Point2D(512,0),Point2D(0,0),Point2D(512,512)),
+            tri8 = Triangle( p3,p4,p8,Vector3D(-1,0,0),Point2D(0,0),Point2D(0,512),Point2D(512,512)),
+            tri9 = Triangle( p1,p3,p5,Vector3D(0,1,0),Point2D(512,0),Point2D(0,0),Point2D(512,512)),
+            tri10 = Triangle( p7,p3,p5,Vector3D(0,1,0),Point2D(0,512),Point2D(0,0),Point2D(512,512)),
+            tri11 = Triangle( p2,p6,p8,Vector3D(0,-1,0),Point2D(512,512),Point2D(512,0),Point2D(0,0)),
+            tri12 = Triangle( p2,p4,p8,Vector3D(0,-1,0),Point2D(512,512),Point2D(0,512),Point2D(0,0)),
+			
+			tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),Point2D(0,512),Point2D(512,0),Point2D(0,0));
 #else
 Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),RGB_RED),
             tri2 = Triangle( p2,p3,p4,Vector3D(0,0,1),RGB_RED),
@@ -548,16 +561,93 @@ void updatePixels(GLubyte* dst, int size)
           
 	#if TEXTUREMAP
 	tri13.SetTexture(box,boxtexwidth);
-    tri13.Translate( o2w );
-    tri13.TransformToScreen(tm);
+	tri1.SetTexture(box,boxtexwidth);
+	tri2.SetTexture(box,boxtexwidth);
+	tri3.SetTexture(box,boxtexwidth);
+	tri4.SetTexture(box,boxtexwidth);
+	tri5.SetTexture(box,boxtexwidth);
+	tri6.SetTexture(box,boxtexwidth);
+	tri7.SetTexture(box,boxtexwidth);
+	tri8.SetTexture(box,boxtexwidth);
+	tri9.SetTexture(box,boxtexwidth);
+	tri10.SetTexture(box,boxtexwidth);
+	tri11.SetTexture(box,boxtexwidth);
+	tri12.SetTexture(box,boxtexwidth);
+  //  tri13.Translate( o2w );
+  //  tri13.TransformToScreen(tm);
+  //  for (int y=SIZE_Y-1;y>=0;y--) {
+		//for (int x = 0; x<SIZE_X;x++) {
+		//	z_buffer[x] = 0.0;
+		//}
+  //      tri13.DrawTexturedZbuffer(y);
+  //  } 
+  //  tri13.Translate ( -o2w );
+  //  tri13.Rotate( rot );
+    tri3.Translate ( o2w ); //object to world
+    tri4.Translate ( o2w );
+    tri1.Translate ( o2w );
+    tri2.Translate ( o2w );
+    tri5.Translate ( o2w );
+    tri6.Translate ( o2w );
+    tri7.Translate ( o2w );
+    tri8.Translate ( o2w );
+    tri9.Translate ( o2w );
+    tri10.Translate ( o2w );
+    tri11.Translate ( o2w );
+    tri12.Translate ( o2w );
+    tri3.TransformToScreen( tm );
+    tri4.TransformToScreen( tm );
+    tri1.TransformToScreen( tm );
+    tri2.TransformToScreen( tm );
+    tri5.TransformToScreen( tm );
+    tri6.TransformToScreen( tm );
+    tri7.TransformToScreen( tm );
+    tri8.TransformToScreen( tm );
+    tri9.TransformToScreen( tm );
+    tri10.TransformToScreen( tm );
+    tri11.TransformToScreen( tm );
+    tri12.TransformToScreen( tm );
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (int x = 0; x<SIZE_X;x++) {
 			z_buffer[x] = 0.0;
 		}
-        tri13.DrawTexturedZbuffer(y);
-    } 
-    tri13.Translate ( -o2w );
-    tri13.Rotate( rmz );
+        tri3.DrawTexturedZbuffer(y);
+        tri4.DrawTexturedZbuffer(y);
+        tri1.DrawTexturedZbuffer(y);
+        tri2.DrawTexturedZbuffer(y);
+        tri5.DrawTexturedZbuffer(y);
+        tri6.DrawTexturedZbuffer(y);
+        tri7.DrawTexturedZbuffer(y);
+        tri8.DrawTexturedZbuffer(y);
+        tri9.DrawTexturedZbuffer(y);
+        tri10.DrawTexturedZbuffer(y);
+        tri11.DrawTexturedZbuffer(y);
+        tri12.DrawTexturedZbuffer(y);
+    }       
+    tri3.Translate ( -o2w );
+    tri4.Translate ( -o2w );
+    tri1.Translate ( -o2w );
+    tri2.Translate ( -o2w );
+    tri5.Translate ( -o2w );
+    tri6.Translate ( -o2w );
+    tri7.Translate ( -o2w );
+    tri8.Translate ( -o2w );
+    tri9.Translate ( -o2w );
+    tri10.Translate ( -o2w );
+    tri11.Translate ( -o2w );
+    tri12.Translate ( -o2w );
+    tri3.Rotate( rot );
+    tri4.Rotate( rot );
+    tri1.Rotate( rot );
+    tri2.Rotate( rot );
+    tri5.Rotate( rot );
+    tri6.Rotate( rot );
+    tri7.Rotate( rot );
+    tri8.Rotate( rot );
+    tri9.Rotate( rot );
+    tri10.Rotate( rot );
+    tri11.Rotate( rot );
+    tri12.Rotate( rot );
     #else
     tri3.Translate ( o2w ); //object to world
     tri4.Translate ( o2w );
