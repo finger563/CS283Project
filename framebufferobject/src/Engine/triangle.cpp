@@ -511,12 +511,13 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	zi = sz;
 
 	float tx=stu,ty=stv;
+	xdiff = 1/(ex/ez - sx/sz);
 
     for (int x = sx;x<=ex;x++) {
         if ( zi > z_buffer[x] ) {
             z_buffer[x] = zi;
-			tx = (ex/ez - sx/sz) != 0 ? (etu - stu)*(x/zi - sx/sz)/(ex/ez - sx/sz) + stu : stu;
-			ty = (ex/ez - sx/sz) != 0 ? (etv - stv)*(x/zi - sx/sz)/(ex/ez - sx/sz) + stv : stv;
+			tx = (etu - stu)*(x/zi - sx/sz)*xdiff + stu;
+			ty = (etv - stv)*(x/zi - sx/sz)*xdiff + stv;
 			int index = tx + texwidth*((int)ty);
 			if ( index < 0 ) 
 				index = 0;
