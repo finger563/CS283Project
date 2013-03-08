@@ -10,8 +10,8 @@ Object::Object()
 }
 
 //Alternate Constructor
-Object::Object(Triangle poly, const unsigned short* texture, Vector3D vel = Vector3D(), 
-		Vector3D head = Vector3D(), Point3D pos = Point3D())
+Object::Object(Triangle poly, const unsigned short* texture, Vector3D vel, 
+		Vector3D head, Point3D pos)
 {
 	velocity = vel;
 	position = pos; 
@@ -36,6 +36,8 @@ bool Object::updateList()
 {
 	//makes copy to temp
 	std::copy (master.begin(), master.end(), temp.begin());
+
+	return true;
 }
 
 //add polygon to lists
@@ -46,7 +48,7 @@ void Object::add(Triangle poly)
 }
 
 //generates cube
-void Object::generateCube(float size = 5)
+void Object::generateCube(float size)
 {
 	Triangle tri1 = Triangle( Point3D(size, size, size),Point3D(size, -size, size), 
 					Point3D(-size, size, size), Vector3D(0,0,1),Point2D(0,0),Point2D(0,512),Point2D(512,0)),
@@ -102,26 +104,31 @@ void Object::generateCube(float size = 5)
 }
 
 //generates tetrahedron
-void Object::generateTetra(float size = 5)
+void Object::generateTetra(float size)
 {
 
 }
 bool Object::Update(int time)
-{}
+{
+	return true;
+}
 
 bool Object::setVel(Vector3D vector)
 {
 	velocity = vector;
+	return true;
 }
 
 bool Object::setHead(Vector3D head)
 {
 	heading = head;
+	return true;
 }
 
 bool Object::setPosition(Point3D pos)
 {
 	position = pos;
+	return true;
 }
 
 //assumes that only the temp list is being passed through
