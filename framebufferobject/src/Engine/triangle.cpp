@@ -82,11 +82,11 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     s4.x = s1.x + (s2.y-s1.y)*m13;
 	s4.z = 1/(-(s3.y*s3.z - s1.y*s1.z) + (s3.z - s1.z)*(s1.y + (s2.y - s1.y))) * ((s3.z-s1.z)*s1.y*s1.z - (s3.z*s3.y - s1.y*s1.z)*s1.z);
 
-	dz12 = (s2.z-s1.z) / ((s2.z-s1.z)*s2.y*s2.z - (s2.y*s2.z-s1.y*s1.z)*s2.z);
-	dz13 = (s3.z-s1.z) / ((s3.z-s1.z)*s3.y*s3.z - (s3.y*s3.z-s1.y*s1.z)*s3.z);
-	dz14 = (s4.z-s1.z) / ((s4.z-s1.z)*s4.y*s4.z - (s4.y*s4.z-s1.y*s1.z)*s4.z);
-	dz23 = (s3.z-s2.z) / ((s3.z-s2.z)*s3.y*s3.z - (s3.y*s3.z-s2.y*s2.z)*s3.z);
-	dz43 = (s3.z-s4.z) / ((s3.z-s4.z)*s3.y*s3.z - (s3.y*s3.z-s4.y*s4.z)*s3.z);
+	dz12 = (s2.z-s1.z) / ((s2.z-s1.z)*s1.y*s1.z - (s2.y*s2.z-s1.y*s1.z)*s1.z);
+	dz13 = (s3.z-s1.z) / ((s3.z-s1.z)*s1.y*s1.z - (s3.y*s3.z-s1.y*s1.z)*s1.z);
+	dz14 = (s4.z-s1.z) / ((s4.z-s1.z)*s1.y*s1.z - (s4.y*s4.z-s1.y*s1.z)*s1.z);
+	dz23 = (s3.z-s2.z) / ((s3.z-s2.z)*s2.y*s2.z - (s3.y*s3.z-s2.y*s2.z)*s2.z);
+	dz43 = (s3.z-s4.z) / ((s3.z-s4.z)*s4.y*s4.z - (s3.y*s3.z-s4.y*s4.z)*s4.z);
 
     if ( abs(s1.y - s2.y) < EPSILON ) {   // Flat top
         if ( s1.x < s2.x ) {
@@ -95,8 +95,6 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 			ex = s2.x;
 			sz = 1/s1.z;
 			ez = 1/s2.z;
-			lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
-			rydiff = 1/(s3.y*s3.z-s2.y*s2.z);
         }
         else {
 			sx = s2.x;
@@ -104,8 +102,6 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 			sz = 1/s2.z;
 			ez = 1/s1.z;
             type = FLAT_TOP_LEFT;
-			lydiff = 1/(s3.y*s3.z-s2.y*s2.z);
-			rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
         }
     }
     else {
@@ -116,25 +112,17 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
         if ( abs(s2.y - s3.y) < EPSILON ) {   // Flat Bottom
             if ( s3.x < s2.x ) {
                 type = FLAT_BOTTOM_RIGHT;
-				lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
-				rydiff = 1/(s2.y*s2.z-s1.y*s1.z);
             }
             else {
                 type = FLAT_BOTTOM_LEFT;
-				lydiff = 1/(s2.y*s2.z-s1.y*s1.z);
-				rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
             }
         }
         else {      // Normal triangle
             if ( s2.x > s4.x ) {
                 type = NORMAL_RIGHT;
-				lydiff = 1/(s3.y*s3.z-s1.y*s1.z);
-				rydiff = 1/(s2.y*s2.z-s1.y*s1.z);
             }
             else {
                 type = NORMAL_LEFT;
-				lydiff = 1/(s2.y*s2.z-s1.y*s1.z);
-				rydiff = 1/(s3.y*s3.z-s1.y*s1.z);
             }
         }
     }
@@ -292,14 +280,14 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
 		s1.y < y || s3.y > y )
         return;
 
-    float dy = y - s1.y;
+    float dy = y - s1.y;	// dy is negative!
     float zi;
 	
     switch ( type ) {
     case FLAT_TOP_RIGHT:
 		//sz = 1/s1.z + (dy) * dz13;
 		//ez = 1/s2.z + (dy) * dz23;
-		sz -= dz13;
+		sz -= dz13;			// because dy < 0, we decrement!
 		ez -= dz23;
 
         sx = s1.x + (dy)*m13;
@@ -377,8 +365,8 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
     default:
         break;
     }
-	
-	dzx = (ez-sz)/(ex - sx);
+
+	dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 	zi = sz;
 
     for (int x = sx;x<=ex;x++) {
@@ -396,22 +384,20 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		s1.y < y || s3.y > y )
         return;
 
-    float dy = y - s1.y;
-    float zi;
-	float sdiff,ediff;
+    float dy = y - s1.y;	// dy is negative!
 	
     switch ( type ) {
     case FLAT_TOP_RIGHT:
-		sz -= dz13;
+		sz -= dz13;			// because dy < 0, we decrement
 		ez -= dz23;
 
         sx = s1.x + (dy)*m13;
         ex = s2.x + (dy)*m23;
 
-		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-		etu = (u3.x - u2.x)*(y/ez-s2.y*s2.z)*rydiff + u2.x;
-		etv = (u3.y - u2.y)*(y/ez-s2.y*s2.z)*rydiff + u2.y;
+		stu = (u3.x - u1.x)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+		stv = (u3.y - u1.y)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
+		etu = (u3.x - u2.x)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
+		etv = (u3.y - u2.y)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
         break;
     case FLAT_TOP_LEFT:
 		sz -= dz23;
@@ -420,10 +406,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s2.x + (dy)*m23;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u3.x - u2.x)*(y/sz-s2.y*s2.z)*lydiff + u2.x;
-		stv = (u3.y - u2.y)*(y/sz-s2.y*s2.z)*lydiff + u2.y;
-		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+		stu = (u3.x - u2.x)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
+		stv = (u3.y - u2.y)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
+		etu = (u3.x - u1.x)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+		etv = (u3.y - u1.y)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
         break;
     case FLAT_BOTTOM_RIGHT:
 		sz -= dz13;
@@ -432,10 +418,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m13;
         ex = s1.x + (dy)*m12;
 
-		stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-		stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-		etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-		etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+		stu = (u3.x - u1.x)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+		stv = (u3.y - u1.y)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
+		etu = (u2.x - u1.x)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
+		etv = (u2.y - u1.y)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
         break;
     case FLAT_BOTTOM_LEFT:
 		sz -= dz12;
@@ -444,10 +430,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m12;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-		stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-		etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-		etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+		stu = (u2.x - u1.x)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
+		stv = (u2.y - u1.y)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
+		etu = (u3.x - u1.x)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+		etv = (u3.y - u1.y)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
         break;
     case NORMAL_RIGHT:
         if ( s4.y <= y ) { 
@@ -457,10 +443,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s1.x + (dy)*m13;
             ex = s1.x + (dy)*m12;
 
-			stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-			stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff + u1.y;
-			etu = (u2.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-			etv = (u2.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+			stu = (u3.x - u1.x)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+			stv = (u3.y - u1.y)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
+			etu = (u2.x - u1.x)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
+			etv = (u2.y - u1.y)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
         }
         else {
             dy = y - s4.y;
@@ -470,10 +456,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s4.x + (dy)*m13;
             ex = s2.x + (dy)*m23;
 
-			stu = (u3.x - u1.x)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-			stv = (u3.y - u1.y)*(y/sz-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
-			etu = (u3.x - u2.x)*(y/ez-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.x;
-			etv = (u3.y - u2.y)*(y/ez-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.y;
+			stu = (u3.x - u1.x)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+			stv = (u3.y - u1.y)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
+			etu = (u3.x - u2.x)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
+			etv = (u3.y - u2.y)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
         }
         break;
     case NORMAL_LEFT:
@@ -484,10 +470,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s1.x + (dy)*m12;
             ex = s1.x + (dy)*m13;
 			
-			stu = (u2.x - u1.x)*(y/sz-s1.y*s1.z)*lydiff + u1.x;
-			stv = (u2.y - u1.y)*(y/sz-s1.y*s1.z)*lydiff+ u1.y;
-			etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)*rydiff + u1.x;
-			etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)*rydiff + u1.y;
+			stu = (u2.x - u1.x)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
+			stv = (u2.y - u1.y)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
+			etu = (u3.x - u1.x)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+			etv = (u3.y - u1.y)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
         }
         else {
             dy = y - s2.y;
@@ -497,32 +483,34 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s2.x + (dy)*m23;
             ex = s4.x + (dy)*m13;
 			
-			stu = (u3.x - u2.x)*(y/sz-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.x;
-			stv = (u3.y - u2.y)*(y/sz-s2.y*s2.z)/(s3.y*s3.z-s2.y*s2.z) + u2.y;
-			etu = (u3.x - u1.x)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.x;
-			etv = (u3.y - u1.y)*(y/ez-s1.y*s1.z)/(s3.y*s3.z-s1.y*s1.z) + u1.y;
+			stu = (u3.x - u2.x)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
+			stv = (u3.y - u2.y)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
+			etu = (u3.x - u1.x)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
+			etv = (u3.y - u1.y)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
         }
         break;
     default:
         break;
     }
 	
-	dzx = (ez-sz)/(ex - sx);
-	zi = sz;
+	dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
+    float zi = sz;
 
 	float tx=stu,ty=stv;
-	xdiff = 1/(ex/ez - sx/sz);
+	float uscale,vscale;
+	uscale = (etu-stu)/(ex/ez - sx/sz);
+	vscale = (etv-stv)/(ex/ez - sx/sz);
 
     for (int x = sx;x<=ex;x++) {
         if ( zi > z_buffer[x] ) {
             z_buffer[x] = zi;
-			tx = (etu - stu)*(x/zi - sx/sz)*xdiff + stu;
-			ty = (etv - stv)*(x/zi - sx/sz)*xdiff + stv;
-			int index = tx + texwidth*((int)ty);
+			tx = (x/zi - sx/sz) * uscale + stu;
+			ty = (x/zi - sx/sz) * vscale + stv;
+			int index = (int)tx + texwidth*((int)ty);
 			if ( index < 0 ) 
 				index = 0;
 			display_buffer[ x + y*SIZE_X ] = texture[index%(texwidth*texwidth)];
         }
-        zi += dzx;
+        zi += dzx;		// because dx > 0, we increment
     }
 }
