@@ -104,6 +104,7 @@
     <ClInclude Include="src\Engine\matrix.h" />
     <ClInclude Include="src\Engine\point.h" />
     <ClInclude Include="src\Engine\triangle.h" />
+    <ClInclude Include="src\main.h" />
     <ClInclude Include="src\Sprites\box.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

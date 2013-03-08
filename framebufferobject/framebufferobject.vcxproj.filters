@@ -70,5 +70,8 @@
     <ClInclude Include="src\Engine\object.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="src\main.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

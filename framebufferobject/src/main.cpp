@@ -41,12 +41,17 @@ using std::ends;
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
+// THESE ARE DEBUGGING/TEST DEFINES:
+#define TEXTUREMAP			1
+
 short display_buffer[SIZE_X*SIZE_Y];
 float z_buffer[SIZE_X*SIZE_Y];
 
-int  rotx = 1, 
-	 roty = 1,
-	 rotz = 1;
+// These are all values toggled by user input
+int  rotx = 1,		// rotation about x axis, toggled by 'x'
+	 roty = 1,		// rotation about y axis, toggled by 'y'
+	 rotz = 1,		// rotation about z axis, toggled by 'z'
+	 display_z_buffer = 1;		// render z-buffer instead of display-buffer, toggled by 'b'
 
 Point3D p1 = Point3D(5,5,5),
         p2 = Point3D(5,-5,5),
@@ -65,8 +70,6 @@ Point3D p1 = Point3D(5,5,5),
         p13 = Point3D(0,10,0),
         p14 = Point3D(0,0,10),
         p15 = Point3D(0,0,0);   // Coordinate axes
-
-#define TEXTUREMAP	1
 
 #if TEXTUREMAP
 Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),Point2D(0,0),Point2D(0,512),Point2D(512,0)),
@@ -734,9 +737,16 @@ void updatePixels(GLubyte* dst, int size)
     {
         for(int j = 0; j < IMAGE_WIDTH; ++j)
         {	// 0xAARRGGBB
-			*ptr = ((int)RED_RGB(display_buffer[j+i*SIZE_X]) << 16) 
-				+ ((int)GRN_RGB(display_buffer[j+i*SIZE_X]) << 8)
-				+ (int)BLU_RGB(display_buffer[j+i*SIZE_X]);
+			if (display_z_buffer) {
+				*ptr = ((int)(1/z_buffer[j+i*SIZE_X]) << 16) 
+					+ ((int)(1/z_buffer[j+i*SIZE_X]) << 8)
+					+ (int)(1/z_buffer[j+i*SIZE_X]);
+			}
+			else {
+				*ptr = ((int)RED_RGB(display_buffer[j+i*SIZE_X]) << 16) 
+					+ ((int)GRN_RGB(display_buffer[j+i*SIZE_X]) << 8)
+					+ (int)BLU_RGB(display_buffer[j+i*SIZE_X]);
+			}
             ++ptr;
         }
     }
@@ -1087,6 +1097,11 @@ void keyboardCB(unsigned char key, int x, int y)
             pboMode = ++pboMode % 3;
         cout << "PBO mode: " << pboMode << endl;
          break;
+	
+	case 'b':
+	case 'B':
+		display_z_buffer = !display_z_buffer;
+		break;
 
 	case 'x':
 	case 'X':
