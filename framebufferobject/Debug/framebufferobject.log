@@ -1,0 +1,100 @@
+﻿Build started 3/6/2013 3:52:12 PM.
+     1>Project "C:\Users\Owner\Documents\CS 283\Final Project Files\CS283Project\framebufferobject\framebufferobject.vcxproj" on node 2 (build target(s)).
+     1>PrepareForBuild:
+         Creating directory "C:\Users\Owner\Documents\CS 283\Final Project Files\CS283Project\Debug\".
+       InitializeBuildStatus:
+         Creating "Debug\framebufferobject.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Iinclude /Iinclude/VSL/ /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt src\Engine\geometricobject.cpp src\Engine\matrix.cpp src\Engine\point.cpp src\Engine\triangle.cpp src\glInfo.cpp src\main.cpp src\Timer.cpp
+         Timer.cpp
+         main.cpp
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(71): warning C4309: 'argument' : truncation of constant value
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(72): warning C4309: 'argument' : truncation of constant value
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(73): warning C4309: 'argument' : truncation of constant value
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(74): warning C4309: 'argument' : truncation of constant value
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(80): warning C4309: 'argument' : truncation of constant value
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(150): warning C4005: 'glGenBuffersARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6422) : see previous definition of 'glGenBuffersARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(151): warning C4005: 'glBindBufferARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6418) : see previous definition of 'glBindBufferARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(152): warning C4005: 'glBufferDataARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6419) : see previous definition of 'glBufferDataARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(153): warning C4005: 'glBufferSubDataARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6420) : see previous definition of 'glBufferSubDataARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(154): warning C4005: 'glDeleteBuffersARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6421) : see previous definition of 'glDeleteBuffersARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(155): warning C4005: 'glGetBufferParameterivARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6423) : see previous definition of 'glGetBufferParameterivARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(156): warning C4005: 'glMapBufferARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6427) : see previous definition of 'glMapBufferARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(157): warning C4005: 'glUnmapBufferARB' : macro redefinition
+                 c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\include\gl\glew.h(6428) : see previous definition of 'glUnmapBufferARB'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(172): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(173): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(174): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(175): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(177): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(178): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(179): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(180): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(182): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(183): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(184): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(185): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(862): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(891): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(908): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(916): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(1038): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(1039): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(1069): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(1070): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\main.cpp(1078): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+         glInfo.cpp
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\glinfo.cpp(80): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(197) : see declaration of 'strtok'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\glinfo.cpp(84): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(197) : see declaration of 'strtok'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\glinfo.cpp(96): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(197) : see declaration of 'strtok'
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\glinfo.cpp(100): warning C4996: 'strtok': This function or variable may be unsafe. Consider using strtok_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 c:\program files (x86)\microsoft visual studio 10.0\vc\include\string.h(197) : see declaration of 'strtok'
+         triangle.cpp
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(125): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(128): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(142): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(145): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(159): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(162): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(176): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(179): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(193): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(196): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(210): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(213): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(227): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(230): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(244): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(247): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\owner\documents\cs 283\final project files\cs283project\framebufferobject\src\engine\triangle.cpp(360): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+         point.cpp
+         matrix.cpp
+         geometricobject.cpp
+         Generating Code...
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Owner\Documents\CS 283\Final Project Files\CS283Project\Debug\framebufferobject.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:libcmt.lib /MANIFEST:NO /DEBUG /PDB:"C:\Users\Owner\Documents\CS 283\Final Project Files\CS283Project\Debug\framebufferobject.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Owner\Documents\CS 283\Final Project Files\CS283Project\Debug\framebufferobject.lib" /MACHINE:X86 Debug\geometricobject.obj
+         Debug\matrix.obj
+         Debug\point.obj
+         Debug\triangle.obj
+         Debug\glInfo.obj
+         Debug\main.obj
+         Debug\Timer.obj
+         framebufferobject.vcxproj -> C:\Users\Owner\Documents\CS 283\Final Project Files\CS283Project\Debug\framebufferobject.exe
+       FinalizeBuildStatus:
+         Deleting file "Debug\framebufferobject.unsuccessfulbuild".
+         Touching "Debug\framebufferobject.lastbuildstate".
+     1>Done Building Project "C:\Users\Owner\Documents\CS 283\Final Project Files\CS283Project\framebufferobject\framebufferobject.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:13.86
