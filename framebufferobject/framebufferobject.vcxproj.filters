@@ -10,9 +10,6 @@
     <ClCompile Include="src\Engine\matrix.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\geometricobject.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -21,6 +18,9 @@
     </ClCompile>
     <ClCompile Include="src\Timer.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\object.cpp">
+      <Filter>src\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,9 +55,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Engine\geometricobject.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Engine\matrix.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -69,6 +66,9 @@
     </ClInclude>
     <ClInclude Include="src\Sprites\box.h">
       <Filter>src\Textures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\object.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
