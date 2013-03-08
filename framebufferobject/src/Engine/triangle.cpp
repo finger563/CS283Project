@@ -487,8 +487,9 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	float uscale,vscale;
 	uscale = (etu-stu)/(ex/ez - sx/sz);
 	vscale = (etv-stv)/(ex/ez - sx/sz);
-
-    for (int x = sx;x<=ex;x++) {
+	int x = sx;
+	zi += (x - sx)*dzx;
+    for (x = sx;x<=ex;x++) {
         if ( zi > z_buffer[ x + y*SIZE_X ] ) {
             z_buffer[ x + y*SIZE_X ] = zi;
 			tx = (x/zi - sx/sz) * uscale + stu;
