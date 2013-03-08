@@ -290,8 +290,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
     case FLAT_TOP_RIGHT:
 		sz = 1/s1.z + (dy) * dz13;
 		ez = 1/s2.z + (dy) * dz23;
-		//sz -= dz13;			// because dy < 0, we decrement!
-		//ez -= dz23;
 
         sx = s1.x + (dy)*m13;
         ex = s2.x + (dy)*m23;
@@ -299,8 +297,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
     case FLAT_TOP_LEFT:
 		sz = 1/s2.z + (dy) * dz23;
 		ez = 1/s1.z + (dy) * dz13;
-		//sz -= dz23;
-		//ez -= dz13;
 
         sx = s2.x + (dy)*m23;
         ex = s1.x + (dy)*m13;
@@ -308,8 +304,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
     case FLAT_BOTTOM_RIGHT:
 		sz = 1/s1.z + (dy) * dz13;
 		ez = 1/s1.z + (dy) * dz12;
-		//sz -= dz13;
-		//ez -= dz12;
 
         sx = s1.x + (dy)*m13;
         ex = s1.x + (dy)*m12;
@@ -317,8 +311,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
     case FLAT_BOTTOM_LEFT:
 		sz = 1/s1.z + (dy) * dz12;
 		ez = 1/s1.z + (dy) * dz13;
-		//sz -= dz12;
-		//ez -= dz13;
 
         sx = s1.x + (dy)*m12;
         ex = s1.x + (dy)*m13;
@@ -327,8 +319,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
         if ( s4.y <= y ) { 
 			sz = 1/s1.z + (dy) * dz14;
 			ez = 1/s1.z + (dy) * dz12;
-			//sz -= dz14;
-			//ez -= dz12;
 
             sx = s1.x + (dy)*m13;
             ex = s1.x + (dy)*m12;
@@ -337,8 +327,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
             dy = y - s4.y;
 			sz = 1/s4.z + (dy) * dz43;
 			ez = 1/s2.z + (dy) * dz23;
-			//sz -= dz43;
-			//ez -= dz23;
 
             sx = s4.x + (dy)*m13;
             ex = s2.x + (dy)*m23;
@@ -348,8 +336,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
         if ( s4.y <= y ) {
 			sz = 1/s1.z + (dy) * dz12;
 			ez = 1/s1.z + (dy) * dz14;
-			//sz -= dz12;
-			//ez -= dz14;
 
             sx = s1.x + (dy)*m12;
             ex = s1.x + (dy)*m13;
@@ -358,8 +344,6 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
             dy = y - s2.y;
 			sz = 1/s2.z + (dy) * dz23;
 			ez = 1/s4.z + (dy) * dz43;
-			//sz -= dz23;
-			//ez -= dz43;
 
             sx = s2.x + (dy)*m23;
             ex = s4.x + (dy)*m13;
@@ -391,8 +375,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	
     switch ( type ) {
     case FLAT_TOP_RIGHT:
-		//sz -= dz13;			// because dy < 0, we decrement
-		//ez -= dz23;
 		sz = 1/s1.z + (dy) * dz13;
 		ez = 1/s2.z + (dy) * dz23;
 
@@ -405,8 +387,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		etv = (u3.y - u2.y)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
         break;
     case FLAT_TOP_LEFT:
-		//sz -= dz23;
-		//ez -= dz13;
 		sz = 1/s2.z + (dy) * dz23;
 		ez = 1/s1.z + (dy) * dz13;
 
@@ -419,8 +399,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		etv = (u3.y - u1.y)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
         break;
     case FLAT_BOTTOM_RIGHT:
-		//sz -= dz13;
-		//ez -= dz12;
 		sz = 1/s1.z + (dy) * dz13;
 		ez = 1/s1.z + (dy) * dz12;
 
@@ -433,8 +411,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		etv = (u2.y - u1.y)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
         break;
     case FLAT_BOTTOM_LEFT:
-		//sz -= dz12;
-		//ez -= dz13;
 		sz = 1/s1.z + (dy) * dz12;
 		ez = 1/s1.z + (dy) * dz13;
 
@@ -448,8 +424,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         break;
     case NORMAL_RIGHT:
         if ( s4.y <= y ) { 
-			//sz -= dz14;
-			//ez -= dz12;
 			sz = 1/s1.z + (dy) * dz14;
 			ez = 1/s1.z + (dy) * dz12;
 
@@ -463,8 +437,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         }
         else {
             dy = y - s4.y;
-			//sz -= dz43;
-			//ez -= dz23;
 			sz = 1/s4.z + (dy) * dz43;
 			ez = 1/s2.z + (dy) * dz23;
 
@@ -479,8 +451,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         break;
     case NORMAL_LEFT:
         if ( s4.y <= y ) {
-			//sz -= dz12;
-			//ez -= dz14;
 			sz = 1/s1.z + (dy) * dz12;
 			ez = 1/s1.z + (dy) * dz14;
 
@@ -494,8 +464,6 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         }
         else {
             dy = y - s2.y;
-			//sz -= dz23;
-			//ez -= dz43;
 			sz = 1/s2.z + (dy) * dz23;
 			ez = 1/s4.z + (dy) * dz43;
 

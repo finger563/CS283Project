@@ -51,7 +51,7 @@ float z_buffer[SIZE_X*SIZE_Y];
 int  rotx = 1,		// rotation about x axis, toggled by 'x'
 	 roty = 1,		// rotation about y axis, toggled by 'y'
 	 rotz = 1,		// rotation about z axis, toggled by 'z'
-	 display_z_buffer = 1;		// render z-buffer instead of display-buffer, toggled by 'b'
+	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
 Point3D p1 = Point3D(5,5,5),
         p2 = Point3D(5,-5,5),
