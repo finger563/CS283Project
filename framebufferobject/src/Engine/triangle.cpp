@@ -39,7 +39,7 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     s3.x = (s3.x)/s3.z;
     s3.y = (s3.y)/s3.z;
 
-    // sort by y
+    // sort vertices and associated texture coords by y
     Point3D t1 = s1, t2 = s2, t3 = s3;
 	Point2D tex1 = u, tex2 = v, tex3 = w;
 	Point3D tmp;
@@ -82,7 +82,7 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     s4.x = s1.x + (s2.y-s1.y)*m13;
 	s4.z = 1/(-(s3.y*s3.z - s1.y*s1.z) + (s3.z - s1.z)*(s1.y + (s2.y - s1.y))) * ((s3.z-s1.z)*s1.y*s1.z - (s3.z*s3.y - s1.y*s1.z)*s1.z);
 
-	dz12 = (s2.z-s1.z) / ((s2.z-s1.z)*s1.y*s1.z - (s2.y*s2.z-s1.y*s1.z)*s1.z);
+	dz12 = (s2.z-s1.z) / ((s2.z-s1.z)*s1.y*s1.z - (s2.y*s2.z-s1.y*s1.z)*s1.z);	// slopes for z-buffering
 	dz13 = (s3.z-s1.z) / ((s3.z-s1.z)*s1.y*s1.z - (s3.y*s3.z-s1.y*s1.z)*s1.z);
 	dz14 = (s4.z-s1.z) / ((s4.z-s1.z)*s1.y*s1.z - (s4.y*s4.z-s1.y*s1.z)*s1.z);
 	dz23 = (s3.z-s2.z) / ((s3.z-s2.z)*s2.y*s2.z - (s3.y*s3.z-s2.y*s2.z)*s2.z);
@@ -90,6 +90,21 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 
 	u4.x = u1.x + (u3.x - u1.x) * (s4.y*s4.z-s1.y*s1.z) / (s3.y*s3.z - s1.y*s1.z);
 	u4.y = u1.y + (u3.y - u1.y) * (s4.y*s4.z-s1.y*s1.z) / (s3.y*s3.z - s1.y*s1.z);
+
+	dtx13 = (u3.x - u1.x)/(s3.y*s3.z - s1.y*s1.z);		// slopes for texture coordinates
+	dty13 = (u3.y - u1.y)/(s3.y*s3.z - s1.y*s1.z);
+
+	dtx12 = (u2.x - u1.x)/(s2.y*s2.z - s1.y*s1.z);
+	dty12 = (u2.y - u1.y)/(s2.y*s2.z - s1.y*s1.z);
+
+	dtx23 = (u3.x - u2.x)/(s3.y*s3.z - s2.y*s2.z);
+	dty23 = (u3.y - u2.y)/(s3.y*s3.z - s2.y*s2.z);
+
+	dtx14 = (u4.x - u1.x)/(s4.y*s4.z - s1.y*s1.z);
+	dty14 = (u4.y - u1.y)/(s4.y*s4.z - s1.y*s1.z);
+
+	dtx43 = (u3.x - u4.x)/(s3.y*s3.z - s4.y*s4.z);
+	dty43 = (u3.y - u4.y)/(s3.y*s3.z - s4.y*s4.z);
 
     if ( abs(s1.y - s2.y) < EPSILON ) {   // Flat top
         if ( s1.x < s2.x ) {
@@ -150,7 +165,7 @@ void Triangle::DrawFilled ( void ) {
     switch ( type ) {
     case FLAT_TOP_RIGHT:
         for (int y=s1.y;y>=s3.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -167,7 +182,7 @@ void Triangle::DrawFilled ( void ) {
         break;
     case FLAT_TOP_LEFT:
         for (int y=s1.y;y>=s3.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -184,7 +199,7 @@ void Triangle::DrawFilled ( void ) {
         break;
     case FLAT_BOTTOM_RIGHT:
         for (int y=s1.y;y>=s3.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -201,7 +216,7 @@ void Triangle::DrawFilled ( void ) {
         break;
     case FLAT_BOTTOM_LEFT:
         for (int y=s1.y;y>=s3.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -218,7 +233,7 @@ void Triangle::DrawFilled ( void ) {
         break;
     case NORMAL_RIGHT:
         for (int y=s1.y;y>=s2.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -235,7 +250,7 @@ void Triangle::DrawFilled ( void ) {
         sx = s4.x;
         ex = s2.x;
         for (int y=s4.y;y>=s3.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -252,7 +267,7 @@ void Triangle::DrawFilled ( void ) {
         break;
     case NORMAL_LEFT:
         for (int y=s1.y;y>=s2.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -269,7 +284,7 @@ void Triangle::DrawFilled ( void ) {
         sx = s2.x;
         ex = s4.x;
         for (int y=s4.y;y>=s3.y;y--) {
-			dzx = (ez-sz)/(ex - sx);
+			dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 			zi = sz;
 			for (int x = sx;x<=ex;x++) {
 				if ( zi > z_buffer[ x + y*SIZE_X ] ) {
@@ -367,8 +382,10 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
 
 	dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
 	zi = sz;
+	int x = sx;
+	zi += (x - sx)*dzx;
 
-    for (int x = sx;x<=ex;x++) {
+    for (x = sx;x<=ex;x++) {
         if ( zi > z_buffer[x + y*SIZE_X] ) {
             z_buffer[x + y*SIZE_X] = zi;
             display_buffer[ x + y*SIZE_X ] = color;
@@ -393,10 +410,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m13;
         ex = s2.x + (dy)*m23;
 
-		stu = (u3.x - u1.x)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
-		stv = (u3.y - u1.y)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
-		etu = (u3.x - u2.x)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
-		etv = (u3.y - u2.y)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
+		stu = (y/sz - s1.y*s1.z)*dtx13 + u1.x;
+		stv = (y/sz - s1.y*s1.z)*dty13 + u1.y;
+		etu = (y/ez - s2.y*s2.z)*dtx23 + u2.x;
+		etv = (y/ez - s2.y*s2.z)*dty23 + u2.y;
         break;
     case FLAT_TOP_LEFT:
 		sz = 1/s2.z + (dy) * dz23;
@@ -405,10 +422,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s2.x + (dy)*m23;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u3.x - u2.x)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
-		stv = (u3.y - u2.y)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
-		etu = (u3.x - u1.x)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
-		etv = (u3.y - u1.y)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
+		stu = (y/sz - s2.y*s2.z)*dtx23 + u2.x;
+		stv = (y/sz - s2.y*s2.z)*dty23 + u2.y;
+		etu = (y/ez - s1.y*s1.z)*dtx13 + u1.x;
+		etv = (y/ez - s1.y*s1.z)*dty13 + u1.y;
         break;
     case FLAT_BOTTOM_RIGHT:
 		sz = 1/s1.z + (dy) * dz13;
@@ -417,10 +434,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m13;
         ex = s1.x + (dy)*m12;
 
-		stu = (u3.x - u1.x)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
-		stv = (u3.y - u1.y)*(y/sz - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
-		etu = (u2.x - u1.x)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
-		etv = (u2.y - u1.y)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
+		stu = (y/sz - s1.y*s1.z)*dtx13 + u1.x;
+		stv = (y/sz - s1.y*s1.z)*dty13 + u1.y;
+		etu = (y/ez - s1.y*s1.z)*dtx12 + u1.x;
+		etv = (y/ez - s1.y*s1.z)*dty12 + u1.y;
         break;
     case FLAT_BOTTOM_LEFT:
 		sz = 1/s1.z + (dy) * dz12;
@@ -429,10 +446,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         sx = s1.x + (dy)*m12;
         ex = s1.x + (dy)*m13;
 		
-		stu = (u2.x - u1.x)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
-		stv = (u2.y - u1.y)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
-		etu = (u3.x - u1.x)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.x;
-		etv = (u3.y - u1.y)*(y/ez - s1.y*s1.z)/(s3.y*s3.z - s1.y*s1.z) + u1.y;
+		stu = (y/sz - s1.y*s1.z)*dtx12 + u1.x;
+		stv = (y/sz - s1.y*s1.z)*dty12 + u1.y;
+		etu = (y/ez - s1.y*s1.z)*dtx13 + u1.x;
+		etv = (y/ez - s1.y*s1.z)*dty13 + u1.y;
         break;
     case NORMAL_RIGHT:
         if ( s4.y <= y ) { 
@@ -442,10 +459,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s1.x + (dy)*m13;
             ex = s1.x + (dy)*m12;
 
-			stu = (u4.x - u1.x)*(y/sz - s1.y*s1.z)/(s4.y*s4.z - s1.y*s1.z) + u1.x;
-			stv = (u4.y - u1.y)*(y/sz - s1.y*s1.z)/(s4.y*s4.z - s1.y*s1.z) + u1.y;
-			etu = (u2.x - u1.x)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
-			etv = (u2.y - u1.y)*(y/ez - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
+			stu = (y/sz - s1.y*s1.z)*dtx14 + u1.x;
+			stv = (y/sz - s1.y*s1.z)*dty14 + u1.y;
+			etu = (y/ez - s1.y*s1.z)*dtx12 + u1.x;
+			etv = (y/ez - s1.y*s1.z)*dty12 + u1.y;
         }
         else {
             dy = y - s4.y;
@@ -455,10 +472,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s4.x + (dy)*m13;
             ex = s2.x + (dy)*m23;
 
-			stu = (u3.x - u4.x)*(y/sz - s4.y*s4.z)/(s3.y*s3.z - s4.y*s4.z) + u4.x;
-			stv = (u3.y - u4.y)*(y/sz - s4.y*s4.z)/(s3.y*s3.z - s4.y*s4.z) + u4.y;
-			etu = (u3.x - u2.x)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
-			etv = (u3.y - u2.y)*(y/ez - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
+			stu = (y/sz - s4.y*s4.z)*dtx43 + u4.x;
+			stv = (y/sz - s4.y*s4.z)*dty43 + u4.y;
+			etu = (y/ez - s2.y*s2.z)*dtx23 + u2.x;
+			etv = (y/ez - s2.y*s2.z)*dty23 + u2.y;
         }
         break;
     case NORMAL_LEFT:
@@ -469,10 +486,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s1.x + (dy)*m12;
             ex = s1.x + (dy)*m13;
 			
-			stu = (u2.x - u1.x)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.x;
-			stv = (u2.y - u1.y)*(y/sz - s1.y*s1.z)/(s2.y*s2.z - s1.y*s1.z) + u1.y;
-			etu = (u4.x - u1.x)*(y/ez - s1.y*s1.z)/(s4.y*s4.z - s1.y*s1.z) + u1.x;
-			etv = (u4.y - u1.y)*(y/ez - s1.y*s1.z)/(s4.y*s4.z - s1.y*s1.z) + u1.y;
+			stu = (y/sz - s1.y*s1.z)*dtx12 + u1.x;
+			stv = (y/sz - s1.y*s1.z)*dty12 + u1.y;
+			etu = (y/ez - s1.y*s1.z)*dtx14 + u1.x;
+			etv = (y/ez - s1.y*s1.z)*dty14 + u1.y;
         }
         else {
             dy = y - s2.y;
@@ -482,10 +499,10 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
             sx = s2.x + (dy)*m23;
             ex = s4.x + (dy)*m13;
 			
-			stu = (u3.x - u2.x)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.x;
-			stv = (u3.y - u2.y)*(y/sz - s2.y*s2.z)/(s3.y*s3.z - s2.y*s2.z) + u2.y;
-			etu = (u3.x - u4.x)*(y/ez - s4.y*s4.z)/(s3.y*s3.z - s4.y*s4.z) + u4.x;
-			etv = (u3.y - u4.y)*(y/ez - s4.y*s4.z)/(s3.y*s3.z - s4.y*s4.z) + u4.y;
+			stu = (y/sz - s2.y*s2.z)*dtx23 + u2.x;
+			stv = (y/sz - s2.y*s2.z)*dty23 + u2.y;
+			etu = (y/ez - s4.y*s4.z)*dtx43 + u4.x;
+			etv = (y/ez - s4.y*s4.z)*dty43 + u4.y;
         }
         break;
     default:
