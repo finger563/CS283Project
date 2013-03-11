@@ -98,12 +98,20 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 			ex = s2.x;
 			sz = 1/s1.z;
 			ez = 1/s2.z;
+			stu = u1.x;
+			stv = u1.y;
+			etu = u2.x;
+			etv = u2.y;
         }
         else {
 			sx = s2.x;
 			ex = s1.x;
 			sz = 1/s2.z;
 			ez = 1/s1.z;
+			stu = u2.x;
+			stv = u2.y;
+			etu = u1.x;
+			etv = u1.y;
             type = FLAT_TOP_LEFT;
         }
     }
@@ -112,6 +120,10 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 		ex = s1.x;
 		sz = 1/s1.z;
 		ez = 1/s1.z;
+		stu = u1.x;
+		stv = u1.y;
+		etu = u1.x;
+		etv = u1.y;
         if ( abs(s2.y - s3.y) < EPSILON ) {   // Flat Bottom
             if ( s3.x < s2.x ) {
                 type = FLAT_BOTTOM_RIGHT;
