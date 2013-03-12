@@ -517,16 +517,19 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	uscale = (etu-stu)/(ex/ez - sx/sz);
 	vscale = (etv-stv)/(ex/ez - sx/sz);
 	int x = sx;
+	float startx = sx/sz;
 	zi += (x - sx)*dzx;
     for (x = sx;x<=ex;x++) {
         if ( zi > z_buffer[ x + y*SIZE_X ] ) {
             z_buffer[ x + y*SIZE_X ] = zi;
-			tx = (x/zi - sx/sz) * uscale + stu;
-			ty = (x/zi - sx/sz) * vscale + stv;
+			tx = (x/zi - startx) * uscale + stu;
+			ty = (x/zi - startx) * vscale + stv;
 			int index = (int)tx + texwidth*((int)ty);
 			if ( index < 0 ) 
 				index = 0;
-			display_buffer[ x + y*SIZE_X ] = texture[index%(texwidth*texwidth)];
+			if ( index > texwidth*texwidth )
+				index = 0;
+			display_buffer[ x + y*SIZE_X ] = texture[index];
         }
         zi += dzx;		// because dx > 0, we increment
     }
