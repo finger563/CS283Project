@@ -112,6 +112,7 @@ Matrix rmz = Matrix(),
         rmxyz = Matrix();
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
 Vector3D o2w = Vector3D(0,0,20);
+float rot_angle = 3.141/1200;
 
 
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
@@ -193,20 +194,20 @@ int main(int argc, char **argv)
 	rmyz.SetIdentity();
     rmxyz.SetIdentity();
     
-    rmz.data[0][0] = cos(3.141/1200);
-    rmz.data[0][1] = -sin(3.141/1200);
-    rmz.data[1][0] = sin(3.141/1200);
-    rmz.data[1][1] = cos(3.141/1200);
+    rmz.data[0][0] = cos(rot_angle);
+    rmz.data[0][1] = -sin(rot_angle);
+    rmz.data[1][0] = sin(rot_angle);
+    rmz.data[1][1] = cos(rot_angle);
     
-    rmy.data[0][0] = cos(3.141/1200);
-    rmy.data[0][2] = -sin(3.141/1200);
-    rmy.data[2][0] = sin(3.141/1200);
-    rmy.data[2][2] = cos(3.141/1200);
+    rmy.data[0][0] = cos(rot_angle);
+    rmy.data[0][2] = -sin(rot_angle);
+    rmy.data[2][0] = sin(rot_angle);
+    rmy.data[2][2] = cos(rot_angle);
     
-    rmx.data[1][1] = cos(3.141/1200);
-    rmx.data[1][2] = -sin(3.141/1200);
-    rmx.data[2][1] = sin(3.141/1200);
-    rmx.data[2][2] = cos(3.141/1200);
+    rmx.data[1][1] = cos(rot_angle);
+    rmx.data[1][2] = -sin(rot_angle);
+    rmx.data[2][1] = sin(rot_angle);
+    rmx.data[2][2] = cos(rot_angle);
     
     rmxy = rmx*rmy;
 	rmxz = rmx*rmz;
