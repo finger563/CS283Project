@@ -88,7 +88,7 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	dz23 = (s3.z-s2.z) / ((s3.z-s2.z)*s2.y*s2.z - (s3.y*s3.z-s2.y*s2.z)*s2.z);
 	dz43 = (s3.z-s4.z) / ((s3.z-s4.z)*s4.y*s4.z - (s3.y*s3.z-s4.y*s4.z)*s4.z);
 
-	u4.x = u1.x + (u3.x - u1.x) * (s4.y*s4.z-s1.y*s1.z) / (s3.y*s3.z - s1.y*s1.z);
+	u4.x = u1.x + (u3.x - u1.x) * (s4.y*s4.z-s1.y*s1.z) / (s3.y*s3.z - s1.y*s1.z);	// Intermediate texture coords
 	u4.y = u1.y + (u3.y - u1.y) * (s4.y*s4.z-s1.y*s1.z) / (s3.y*s3.z - s1.y*s1.z);
 
 	dtx13 = (u3.x - u1.x)/(s3.y*s3.z - s1.y*s1.z);		// slopes for texture coordinates
