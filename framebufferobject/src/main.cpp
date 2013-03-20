@@ -104,7 +104,7 @@ Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),RGB_RED),
             tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),RGB_GREEN);
 #endif
 
-Object testobj = Object();
+Object testobj = Object(box,boxtexwdith);
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -663,13 +663,15 @@ void updatePixels(GLubyte* dst, int size)
 	testobj.updateList();
 	testobj.Translate( o2w );
 	testobj.TransformToScreen( tm );
-	
+	std::list<Triangle> renderlist = testobj.getRenderList();
+
     for (int y=SIZE_Y-1;y>=0;y--) {
-		for (int x = 0; x<SIZE_X;x++) {
-			z_buffer[x] = 0.0;
+		for (std::list<Triangle>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
+			it->DrawTexturedZbuffer(y);
 		}
-        tri3.DrawTexturedZbuffer(y);
 	}
+
+	testobj.Rotate( rot );
 
     #else
     tri3.Translate ( o2w ); //object to world
