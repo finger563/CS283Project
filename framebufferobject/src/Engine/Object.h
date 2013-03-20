@@ -15,9 +15,13 @@ public:
 	Object();
 
 	//Alternate Constructor
-	Object(Triangle poly, const unsigned short* texture, Vector3D vel = Vector3D(), 
-		Vector3D head = Vector3D(), Point3D pos = Point3D());
-	
+	Object(const unsigned short* texture, const int texWid, Vector3D vel, 
+		Vector3D head, Point3D pos);
+
+	//Alternate Constructor
+	Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel, 
+		Vector3D head, Point3D pos);
+
 	//Destructor
 	~Object();
 
@@ -74,6 +78,7 @@ private:
 	Vector3D heading, velocity; 
 	Point3D position;
 	const unsigned short* tex;
+	int texWidth;
 	//Object* next;
 
 };

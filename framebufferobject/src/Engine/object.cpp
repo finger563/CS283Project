@@ -10,15 +10,27 @@ Object::Object()
 }
 
 //Alternate texture, veloctity, heading, position
-
+Object::Object(const unsigned short* texture, const int texWid, Vector3D vel= Vector3D(0,0,0), 
+		Vector3D head = Vector3D(0,0,0), Point3D pos= Vector3D(0,0,0))
+	{
+		velocity = vel;
+		position = pos; 
+		heading = head;
+		tex = texture;
+		texWidth = texWid;
+	}
 //Alternate Constructor
-Object::Object(Triangle poly, const unsigned short* texture, Vector3D vel, 
-		Vector3D head, Point3D pos)
+Object::Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel, 
+		Vector3D head = Vector3D(0,0,0), Point3D pos = Vector3D(0,0,0))
 {
 	velocity = vel;
 	position = pos; 
 	heading = head;
-	poly.texture = texture;
+	tex = texture;
+	texWidth = texWid;
+
+	//use Set Texture command instead...
+	poly.SetTexture(texture, texWidth);
 	tex = texture;
 	master.push_back(poly);
 	temp.push_back(poly);
@@ -85,10 +97,7 @@ bool Object::updateList(std::list<Triangle> poly)
 void Object::clearTemp()
 {
 	//empties temp list
-	std::list<Triangle>::iterator start, end;
-	start = temp.begin();
-	end = temp.end();
-	temp.erase(start, end);
+	temp.clear();
 }
 
 //add polygon to lists
@@ -101,6 +110,8 @@ void Object::add(Triangle poly)
 //generates cube
 void Object::generateCube(float size)
 {
+
+	//assume texture is set and set texture 
 	Triangle tri1 = Triangle( Point3D(size, size, size),Point3D(size, -size, size), 
 					Point3D(-size, size, size), Vector3D(0,0,1),Point2D(0,0),Point2D(0,512),Point2D(512,0)),
 
@@ -136,7 +147,8 @@ void Object::generateCube(float size)
 
 			tri12 = Triangle( Point3D(size, -size, size),Point3D(-size, -size, size),
 					Point3D(-size, -size, -size),Vector3D(0,-1,0),Point2D(512,512),Point2D(0,512),Point2D(0,0));
-	
+	  master.clear();
+
 	//stores in objects master list
 		master.push_back(tri1);
 		master.push_back(tri2);
@@ -150,6 +162,11 @@ void Object::generateCube(float size)
 		master.push_back(tri10);
 		master.push_back(tri11);
 		master.push_back(tri12);
+
+		for(std::list<Triangle>::iterator it = master.begin(); it != master.end(); ++it)
+		{
+			it->SetTexture(tex, texWidth);
+		}
 
 		updateList(); 
 }
