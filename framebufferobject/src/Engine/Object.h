@@ -24,6 +24,12 @@ public:
 	//Updates Temp last with any changes to the master list
 	bool updateList();
 
+	//Updates Temp list to whatever list is passed (i.e. Render list)
+	bool updateList(std::list<Triangle> poly);
+
+	//Clears Temp list
+	void Object::clearTemp();
+
 	//add polygon to lists
 	void add(Triangle poly);
 
@@ -57,6 +63,9 @@ public:
 	//assumes that only the temp list is being passed through
 	//may need to add return feature to TransformtoScreen()
 	std::list<Triangle> TransformToScreen(std::list<Triangle> poly, Matrix& m);
+
+	//returns final render list
+	std::list<Triangle> getRenderList();
 
 private:
 
