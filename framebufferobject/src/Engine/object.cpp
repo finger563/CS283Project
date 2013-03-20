@@ -9,6 +9,8 @@ Object::Object()
 	position = Point3D(0,0,0);
 }
 
+//Alternate texture, veloctity, heading, position
+
 //Alternate Constructor
 Object::Object(Triangle poly, const unsigned short* texture, Vector3D vel, 
 		Vector3D head, Point3D pos)
@@ -168,7 +170,7 @@ void Object::generateTetra(float size)
 					Point3D(-size, -size, -size), Vector3D(0,0,-1),Point2D(512,512),Point2D(0,0),Point2D(0,512));
 }
 
-bool Object::Update(int time)
+bool Object::updateTime(int time)
 {
 	return true;
 }
@@ -192,37 +194,37 @@ bool Object::setPosition(Point3D pos)
 }
 
 //assumes that only the temp list is being passed through
-std::list<Triangle> Object::Rotate(std::list<Triangle> poly, Matrix& m)
+std::list<Triangle> Object::Rotate(Matrix& m)
 {
-	for(std::list<Triangle>::iterator it = poly.begin(); it != poly.end(); ++it)
+	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->Rotate(m);
 	}
 
-	return poly;
+	return temp;
 }
 
 //assumes that only the temp list is being passed through
-std::list<Triangle> Object::Translate(std::list<Triangle> poly, Vector3D& v)
+std::list<Triangle> Object::Translate(Vector3D& v)
 {
-	for(std::list<Triangle>::iterator it = poly.begin(); it != poly.end(); ++it)
+	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->Translate(v);
 	}
 
-	return poly;
+	return temp;
 }
 
 //Assumes only temp list is being passed
 //returns modified polygon list
-std::list<Triangle> Object::TransformToScreen(std::list<Triangle> poly, Matrix& m)
+std::list<Triangle> Object::TransformToScreen(Matrix& m)
 {
-	for(std::list<Triangle>::iterator it = poly.begin(); it != poly.end(); ++it)
+	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->TransformToScreen(m);
 	}
 
-	return poly;
+	return temp;
 }
 
 //returns final render list

@@ -42,7 +42,7 @@ public:
 	void generateTetra(float size = 5);
 
 	//fileParser()<-- future function
-	bool Update(int time);
+	bool updateTime(int time);
 
 	//sets velocity
 	bool setVel(Vector3D vector);
@@ -54,15 +54,15 @@ public:
 	bool setPosition(Point3D pos);
 
 	//assumes that only the temp list is being passed through
-	std::list<Triangle> Rotate(std::list<Triangle> poly, Matrix& m);
+	std::list<Triangle> Rotate(Matrix& m);
 
 	//assumes that only the temp list is being passed through
-	std::list<Triangle> Translate(std::list<Triangle> poly, Vector3D& v);
+	std::list<Triangle> Translate(Vector3D& v);
 
 	//transforms polygons to screen
 	//assumes that only the temp list is being passed through
 	//may need to add return feature to TransformtoScreen()
-	std::list<Triangle> TransformToScreen(std::list<Triangle> poly, Matrix& m);
+	std::list<Triangle> TransformToScreen(Matrix& m);
 
 	//returns final render list
 	std::list<Triangle> getRenderList();
