@@ -5,27 +5,23 @@
 Object::Object()
 {
 	velocity = Vector3D(0,0,0);
-	heading = Vector3D(0,0,0);
 	position = Point3D(0,0,0);
 }
 
 //Alternate texture, veloctity, heading, position
-Object::Object(const unsigned short* texture, const int texWid, Vector3D vel, 
-		Vector3D head, Point3D pos)
+Object::Object(const unsigned short* texture, const int texWid, Vector3D vel, Point3D pos)
 	{
 		velocity = vel;
-		position = pos; 
-		heading = head;
+		position = pos;
 		tex = texture;
 		texWidth = texWid;
 	}
 //Alternate Constructor
 Object::Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel, 
-		Vector3D head, Point3D pos)
+		Point3D pos)
 {
 	velocity = vel;
-	position = pos; 
-	heading = head;
+	position = pos;
 	tex = texture;
 	texWidth = texWid;
 
@@ -198,12 +194,6 @@ bool Object::setVel(Vector3D vector)
 	return true;
 }
 
-bool Object::setHead(Vector3D head)
-{
-	heading = head;
-	return true;
-}
-
 bool Object::setPosition(Point3D pos)
 {
 	position = pos;
@@ -213,10 +203,12 @@ bool Object::setPosition(Point3D pos)
 //assumes that only the temp list is being passed through
 std::list<Triangle> Object::Rotate(Matrix& m)
 {
-	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
+	for(std::list<Triangle>::iterator it = master.begin(); it != master.end(); ++it)
 	{
 		it->Rotate(m);
 	}
+
+	updateList();
 
 	return temp;
 }

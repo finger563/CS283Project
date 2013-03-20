@@ -16,11 +16,11 @@ public:
 
 	//Alternate Constructor
 	Object(const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
-		Vector3D head = Vector3D(0,0,0), Point3D pos = Point3D(0,0,0));
+		Point3D pos = Point3D(0,0,0));
 
 	//Alternate Constructor
 	Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
-		Vector3D head = Vector3D(0,0,0), Point3D pos = Point3D(0,0,0));
+		Point3D pos = Point3D(0,0,0));
 
 	//Destructor
 	~Object();
@@ -50,9 +50,6 @@ public:
 
 	//sets velocity
 	bool setVel(Vector3D vector);
-	
-	//sets heading
-	bool setHead(Vector3D head);
 
 	//sets position
 	bool setPosition(Point3D pos);

@@ -977,16 +977,16 @@ void mouseMotionCB(int x, int y)
 {
     if(mouseLeftDown)
     {
-        cameraAngleY += (x - mouseX);
-        cameraAngleX += (y - mouseY);
+        //cameraAngleY += (x - mouseX);
+        //cameraAngleX += (y - mouseY);
         mouseX = x;
         mouseY = y;
     }
     if(mouseRightDown)
     {
-        cameraDistance += (y - mouseY) * 0.2f;
-        if(cameraDistance < 2.0f)
-            cameraDistance = 2.0f;
+        //cameraDistance += (y - mouseY) * 0.2f;
+        //if(cameraDistance < 2.0f)
+        //    cameraDistance = 2.0f;
 
         mouseY = y;
     }
