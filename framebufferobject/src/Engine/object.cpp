@@ -10,8 +10,8 @@ Object::Object()
 }
 
 //Alternate texture, veloctity, heading, position
-Object::Object(const unsigned short* texture, const int texWid, Vector3D vel= Vector3D(0,0,0), 
-		Vector3D head = Vector3D(0,0,0), Point3D pos= Vector3D(0,0,0))
+Object::Object(const unsigned short* texture, const int texWid, Vector3D vel, 
+		Vector3D head, Point3D pos)
 	{
 		velocity = vel;
 		position = pos; 
@@ -21,7 +21,7 @@ Object::Object(const unsigned short* texture, const int texWid, Vector3D vel= Ve
 	}
 //Alternate Constructor
 Object::Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel, 
-		Vector3D head = Vector3D(0,0,0), Point3D pos = Vector3D(0,0,0))
+		Vector3D head, Point3D pos)
 {
 	velocity = vel;
 	position = pos; 

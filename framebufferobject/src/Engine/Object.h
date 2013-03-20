@@ -15,12 +15,12 @@ public:
 	Object();
 
 	//Alternate Constructor
-	Object(const unsigned short* texture, const int texWid, Vector3D vel, 
-		Vector3D head, Point3D pos);
+	Object(const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
+		Vector3D head = Vector3D(0,0,0), Point3D pos = Point3D(0,0,0));
 
 	//Alternate Constructor
-	Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel, 
-		Vector3D head, Point3D pos);
+	Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
+		Vector3D head = Vector3D(0,0,0), Point3D pos = Point3D(0,0,0));
 
 	//Destructor
 	~Object();
