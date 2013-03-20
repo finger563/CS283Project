@@ -37,6 +37,7 @@ using std::ends;
 
 #include "main.h"
 #include "Engine\triangle.h"
+#include "Engine\Object.h"
 #include "Sprites\box.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
@@ -102,6 +103,8 @@ Triangle tri1 = Triangle( p1,p2,p3,Vector3D(0,0,1),RGB_RED),
              
             tri13 = Triangle( p9,p10,p11,Vector3D(0,0,-1),RGB_GREEN);
 #endif
+
+Object testobj = Object();
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -219,6 +222,8 @@ int main(int argc, char **argv)
     tm.data[1][3] = SIZE_Y/2;	// how much to translate y?
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
     tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
+
+	testobj.generateCube();
 
     initSharedMem();
 
@@ -564,6 +569,7 @@ void updatePixels(GLubyte* dst, int size)
 	}
           
 	#if TEXTUREMAP
+#if 0
 	//tri13.SetTexture(box,boxtexwidth);
 	//tri13.Translate( o2w );
 	//tri13.TransformToScreen(tm);
@@ -611,6 +617,7 @@ void updatePixels(GLubyte* dst, int size)
     tri10.TransformToScreen( tm );
     tri11.TransformToScreen( tm );
     tri12.TransformToScreen( tm );
+
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (int x = 0; x<SIZE_X;x++) {
 			z_buffer[x] = 0.0;
@@ -652,6 +659,18 @@ void updatePixels(GLubyte* dst, int size)
     tri10.Rotate( rot );
     tri11.Rotate( rot );
     tri12.Rotate( rot );
+#endif
+	testobj.updateList();
+	testobj.Translate( o2w );
+	testobj.TransformToScreen( tm );
+	
+    for (int y=SIZE_Y-1;y>=0;y--) {
+		for (int x = 0; x<SIZE_X;x++) {
+			z_buffer[x] = 0.0;
+		}
+        tri3.DrawTexturedZbuffer(y);
+	}
+
     #else
     tri3.Translate ( o2w ); //object to world
     tri4.Translate ( o2w );
