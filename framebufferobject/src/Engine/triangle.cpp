@@ -396,7 +396,8 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
 
 // Pass in the Global to screen space transform
 void Triangle::DrawTexturedZbuffer ( const int y ) {
-    if ( normal.z > 0 || 
+    if ( 
+	//	normal.z > 0 || 
 		s1.y < y || s3.y > y )
         return;
 

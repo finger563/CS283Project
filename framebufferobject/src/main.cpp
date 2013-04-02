@@ -1,16 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////
-// main.cpp
-// ========
-// testing Pixel Buffer Object for unpacking (uploading) pixel data to PBO
-// using GL_ARB_pixel_buffer_object extension
-// It uses 2 PBOs to optimize uploading pipeline; application to PBO, and PBO to
-// texture object.
-//
-//  AUTHOR: Song Ho Ahn (song.ahn@gmail.com)
-// CREATED: 2007-10-22
-// UPDATED: 2012-06-07
-///////////////////////////////////////////////////////////////////////////////
-
 // in order to get function prototypes from glext.h, define GL_GLEXT_PROTOTYPES before including glext.h
 #define GL_GLEXT_PROTOTYPES
 
@@ -54,7 +41,23 @@ int  rotx = 1,		// rotation about x axis, toggled by 'x'
 	 rotz = 1,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
+#if 1
+Point3D p1 = Point3D(-20,0,-20),
+		p2 = Point3D(-20,0,20),
+		p3 = Point3D(20,0,20),
+		p4 = Point3D(20,0,-20);
+#else
+Point3D p1 = Point3D(-10,-10,0),
+		p2 = Point3D(-10,10,0),
+		p3 = Point3D(10,10,0);
+#endif
+
+Triangle tri1 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
+		 tri2 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0));
+
 Object testobj = Object(box,boxtexwidth);
+Object testobj2 = Object(box,boxtexwidth);
+Object testobj3 = Object(tri1,box,boxtexwidth);
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -65,6 +68,8 @@ Matrix rmz = Matrix(),
         rmxyz = Matrix();
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
 Vector3D o2w = Vector3D(0,0,20);
+Vector3D o2w2 = Vector3D(10,10,30);
+Vector3D o2w3 = Vector3D(0,-10,40);
 float rot_angle = 3.141/1200;
 
 
@@ -173,7 +178,12 @@ int main(int argc, char **argv)
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
     tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
 
+
 	testobj.generateCube();
+	testobj2.generateCube();
+	tri1.SetTexture(box,boxtexwidth);
+	tri2.SetTexture(box,boxtexwidth);
+	testobj3.add(tri2);
 
     initSharedMem();
 
@@ -522,6 +532,19 @@ void updatePixels(GLubyte* dst, int size)
 	testobj.Translate( o2w );
 	testobj.TransformToScreen( tm );
 	std::list<Triangle> renderlist = testobj.getRenderList();
+	
+	testobj2.updateList();
+	testobj2.Translate( o2w2 );
+	testobj2.TransformToScreen( tm );
+	std::list<Triangle> templist = testobj2.getRenderList();
+	
+	testobj3.updateList();
+	testobj3.Translate( o2w3 );
+	testobj3.TransformToScreen( tm );
+	std::list<Triangle> templist2 = testobj3.getRenderList();
+
+	renderlist.splice(renderlist.end(), templist);
+	renderlist.splice(renderlist.end(), templist2);
 
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (std::list<Triangle>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
@@ -530,6 +553,8 @@ void updatePixels(GLubyte* dst, int size)
 	}
 
 	testobj.Rotate( rot );
+	testobj2.Rotate( rot );
+	//testobj3.Rotate( rot );
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i)

@@ -242,10 +242,10 @@ std::list<Triangle> Object::getRenderList()
 	std::list<Triangle> get;
 	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
-		if(it->normal.z <= 0)
-		{
+		//if(it->normal.z <= 0)
+		//{
 			get.push_back(*it);
-		}
+		//}
 	}
 
 	updateList(get);
