@@ -5,11 +5,12 @@
 // source bmp file : C:\Users\emfinger\Dropbox\Windows\framebufferobject\src\Sprites\AD7_MorgueFloor1a_cis.jpg
 // source pixel dept : 32
 // target name : C:\Users\emfinger\Dropbox\Windows\framebufferobject\src\Sprites\floor.h
-// target pixel dept : 16
+// target pixel dept : 16  (BGR : 565)
 // target width : 512
 // target height : 512
 // ############################################
-const unsigned short floor[] = 
+const int floortexwidth = 512;
+const unsigned short floortex[] = 
 {
 	0x1904,0x1082,0x0861,0x0841,0x10A3,0x4208,0x5AAB,0x3186,
 	0x1082,0x18E3,0x2966,0x39C7,0x4228,0x39E7,0x2945,0x1903,
