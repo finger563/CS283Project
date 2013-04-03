@@ -30,14 +30,34 @@ void Triangle::DrawWireframe ( const Matrix& m ) {
 // Pass in the view to screen space transform
 void Triangle::TransformToScreen ( const Matrix& m ) {
     s1 = a;
-    s1.x = (s1.x)/s1.z; // d should be contained in m
-    s1.y = (s1.y)/s1.z;
+	if ( s1.z > 0 ) {
+		s1.x = (s1.x)/s1.z; // d should be contained in m
+		s1.y = (s1.y)/s1.z;
+	}
+	else if (s1.z == 0) {
+	}
+	else {
+	}
+
     s2 = b;
-    s2.x = (s2.x)/s2.z;
-    s2.y = (s2.y)/s2.z;
+	if ( s2.z > 0 ) {
+		s2.x = (s2.x)/s2.z;
+		s2.y = (s2.y)/s2.z;
+	}
+	else if (s2.z == 0) {
+	}
+	else {
+	}
+
     s3 = c;
-    s3.x = (s3.x)/s3.z;
-    s3.y = (s3.y)/s3.z;
+	if ( s3.z > 0 ) {
+		s3.x = (s3.x)/s3.z;
+		s3.y = (s3.y)/s3.z;
+	}
+	else if (s3.z == 0) {
+	}
+	else {
+	}
 
     // sort vertices and associated texture coords by y
     Point3D t1 = s1, t2 = s2, t3 = s3;

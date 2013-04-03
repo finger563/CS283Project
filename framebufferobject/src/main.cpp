@@ -26,6 +26,7 @@ using std::ends;
 #include "Engine\triangle.h"
 #include "Engine\Object.h"
 #include "Sprites\box.h"
+#include "Sprites\floor.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
@@ -57,7 +58,7 @@ Triangle tri1 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Po
 
 Object testobj = Object(box,boxtexwidth);
 Object testobj2 = Object(box,boxtexwidth);
-Object testobj3 = Object(tri1,box,boxtexwidth);
+Object testobj3 = Object(tri1,floortex,floortexwidth);
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -69,7 +70,7 @@ Matrix rmz = Matrix(),
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
 Vector3D o2w = Vector3D(0,0,20);
 Vector3D o2w2 = Vector3D(10,10,30);
-Vector3D o2w3 = Vector3D(0,-10,40);
+Vector3D o2w3 = Vector3D(0,-10,30);
 float rot_angle = 3.141/1200;
 
 
@@ -181,8 +182,7 @@ int main(int argc, char **argv)
 
 	testobj.generateCube();
 	testobj2.generateCube();
-	tri1.SetTexture(box,boxtexwidth);
-	tri2.SetTexture(box,boxtexwidth);
+	tri2.SetTexture(floortex,floortexwidth);
 	testobj3.add(tri2);
 
     initSharedMem();

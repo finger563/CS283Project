@@ -108,6 +108,7 @@
     <ClInclude Include="src\Engine\triangle.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\Sprites\box.h" />
+    <ClInclude Include="src\Sprites\floor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
