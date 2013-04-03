@@ -69,7 +69,7 @@ Matrix rmz = Matrix(),
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
 Vector3D o2w = Vector3D(0,0,20);
 Vector3D o2w2 = Vector3D(10,10,30);
-Vector3D o2w3 = Vector3D(0,-10,40);
+Vector3D o2w3 = Vector3D(0,-10,30);
 float rot_angle = 3.141/1200;
 
 
