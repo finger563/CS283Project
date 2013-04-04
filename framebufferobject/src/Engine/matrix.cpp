@@ -18,6 +18,30 @@ void Matrix::SetIdentity() {
     }
 }
 
+void Matrix::SetRotation(float x, float y, float z) {
+	data[0][0] = cos(y)*cos(z);
+	data[0][1] = cos(x)*sin(z) + sin(x)*sin(y)*cos(z);
+	data[0][2] = sin(x)*sin(z) - cos(x)*sin(y)*cos(z);
+	data[1][0] = -cos(y)*sin(z);
+	data[1][1] = cos(x)*cos(z) - sin(x)*sin(y)*sin(z);
+	data[1][2] = sin(x)*cos(z) + cos(x)*sin(y)*sin(z);
+	data[2][0] = sin(y);
+	data[2][1] = -sin(x)*cos(y);
+	data[2][2] = cos(x)*cos(y);
+}
+
+void Matrix::SetRotation(float theta, Vector3D u) {
+	data[0][0] = cos(theta) + u.x*u.x*(1-cos(theta));
+	data[0][1] = u.x*u.y*(1-cos(theta)) - u.z*sin(theta);
+	data[0][2] = u.x*u.z*(1-cos(theta)) + u.y*sin(theta);
+	data[1][0] = u.y*u.x*(1-cos(theta)) + u.z*sin(theta);
+	data[1][1] = cos(theta) + u.y*u.y*(1-cos(theta));
+	data[1][2] = u.y*u.z*(1-cos(theta)) - u.x*sin(theta);
+	data[2][0] = u.z*u.x*(1-cos(theta)) - u.y*sin(theta);
+	data[2][1] = u.z*u.y*(1-cos(theta)) + u.x*sin(theta);
+	data[2][2] = cos(theta) + u.z*u.z*(1-cos(theta));
+}
+
 void Matrix::Clear() {
     for (int row=0;row<4;row++) {
         for (int col=0;col<4;col++) {

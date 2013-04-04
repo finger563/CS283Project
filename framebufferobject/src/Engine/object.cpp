@@ -200,6 +200,10 @@ bool Object::setPosition(Point3D pos)
 	return true;
 }
 
+Point3D Object::getPosition(void) {
+	return position;
+}
+
 //assumes that only the temp list is being passed through
 std::list<Triangle> Object::Rotate(Matrix& m)
 {
@@ -242,10 +246,14 @@ std::list<Triangle> Object::getRenderList()
 	std::list<Triangle> get;
 	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
-		//if(it->normal.z <= 0)
-		//{
+		if( //it->normal.z <= 0
+			it->a.z > 0 &&
+			it->b.z > 0 &&
+			it->c.z > 0
+			)
+		{
 			get.push_back(*it);
-		//}
+		}
 	}
 
 	updateList(get);

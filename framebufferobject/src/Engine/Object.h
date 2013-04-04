@@ -54,6 +54,9 @@ public:
 	//sets position
 	bool setPosition(Point3D pos);
 
+	//gets Position
+	Point3D getPosition(void);
+
 	//assumes that only the temp list is being passed through
 	std::list<Triangle> Rotate(Matrix& m);
 
