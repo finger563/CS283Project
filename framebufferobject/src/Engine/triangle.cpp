@@ -1,7 +1,7 @@
 #include "triangle.h"
 #include "../main.h"
 
-extern float z_buffer[SIZE_X];
+extern float z_buffer[SIZE_X*SIZE_Y];
 extern short display_buffer[SIZE_X*SIZE_Y];
 
 // Used for rotating the polygons in an object
@@ -623,9 +623,20 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		zi += dzx * (-sx);
 		sx = 0;
 	}
+	else if ( sx >= SIZE_X ) {
+		return;
+	}
+
 	if ( ex >= SIZE_X ) {
 		ex = SIZE_X - 1;
 	}
+	else if ( ex < 0 ) {
+		return;
+	}
+	if ( ex != ex || sx != sx || 
+		fabs(sx) == std::numeric_limits<float>::infinity() ||
+		fabs(ex) == std::numeric_limits<float>::infinity() )
+		return;
     for (x = sx;x<=ex;x++) {
 		if ( zi > z_buffer[ x + y*SIZE_X ] ) {
 			z_buffer[ x + y*SIZE_X ] = zi;
