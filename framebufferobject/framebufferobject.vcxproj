@@ -91,7 +91,6 @@
     <None Include="shaders\pixeldirdifambspec.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="camera.cpp" />
     <ClCompile Include="src\Engine\object.cpp" />
     <ClCompile Include="src\Engine\matrix.cpp" />
     <ClCompile Include="src\Engine\point.cpp" />

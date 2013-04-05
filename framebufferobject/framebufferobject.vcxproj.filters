@@ -1,17 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\Engine\triangle.cpp">
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\matrix.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\object.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\point.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\matrix.cpp">
+    <ClCompile Include="src\Engine\triangle.cpp">
       <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\glInfo.cpp">
       <Filter>src</Filter>
@@ -19,70 +22,54 @@
     <ClCompile Include="src\Timer.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\object.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\pixeldirdifambspec.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\pixeldirdifambspec.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\color.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\color.frag">
-      <Filter>Shaders</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{f8079fd5-94be-4d44-b306-c467c9d026ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers">
-      <UniqueIdentifier>{9669dd5e-dacd-4257-b691-05dc26e314f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{fced578d-deda-4199-b22d-ec6352773de6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Textures">
-      <UniqueIdentifier>{504e4e03-04b5-435f-894f-ad9d688fa868}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Engine">
-      <UniqueIdentifier>{c9fd02b5-84c4-49ac-b747-cfe2e00231eb}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\Engine\matrix.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\point.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\triangle.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Sprites\box.h">
-      <Filter>src\Textures</Filter>
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprites\floor.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\matrix.h">
+      <Filter>headers\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\object.h">
-      <Filter>Headers</Filter>
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\point.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\triangle.h">
+      <Filter>headers\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\main.h">
-      <Filter>Headers</Filter>
+      <Filter>headers</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="camera.h">
-      <Filter>Headers</Filter>
-=======
-    <ClInclude Include="src\Sprites\floor.h">
-      <Filter>src\Textures</Filter>
->>>>>>> 482f9e0161919eb52227acc7d23c81d4a3a66c96
+      <Filter>headers\Engine</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\color.frag" />
+    <None Include="shaders\color.vert" />
+    <None Include="shaders\pixeldirdifambspec.frag" />
+    <None Include="shaders\pixeldirdifambspec.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{dc0f41ae-d1e2-4845-8a0f-d1e175277086}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{3acb5e66-0f5b-4447-8e91-7fa418f727f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Engine">
+      <UniqueIdentifier>{e610f387-9a72-4c28-aa11-1b0115e7a259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Engine">
+      <UniqueIdentifier>{09fb05fa-ac66-4b33-b4a4-29e9adabb7c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Sprites">
+      <UniqueIdentifier>{ebc2d286-daf3-443d-9f40-82b9f8f55e06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
