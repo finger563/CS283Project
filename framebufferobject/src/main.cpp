@@ -37,28 +37,17 @@ short display_buffer[SIZE_X*SIZE_Y];
 float z_buffer[SIZE_X*SIZE_Y];
 
 // These are all values toggled by user input
-int  rotx = 1,		// rotation about x axis, toggled by 'x'
-	 roty = 1,		// rotation about y axis, toggled by 'y'
-	 rotz = 1,		// rotation about z axis, toggled by 'z'
+int  rotx = 0,		// rotation about x axis, toggled by 'x'
+	 roty = 0,		// rotation about y axis, toggled by 'y'
+	 rotz = 0,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
-#if 1
-Point3D p1 = Point3D(-20,0,-20),
-		p2 = Point3D(-20,0,20),
-		p3 = Point3D(20,0,20),
-		p4 = Point3D(20,0,-20);
-#else
-Point3D p1 = Point3D(-10,-10,0),
-		p2 = Point3D(-10,10,0),
-		p3 = Point3D(10,10,0);
-#endif
+Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
+Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
+Object testobj3 = Object(floortex,floortexwidth);
 
-Triangle tri1 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri2 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0));
-
-Object testobj = Object(box,boxtexwidth);
-Object testobj2 = Object(box,boxtexwidth);
-Object testobj3 = Object(tri1,floortex,floortexwidth);
+std::list<Object> objectlist;
+std::list<Triangle> renderlist;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -68,9 +57,7 @@ Matrix rmz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
-Vector3D o2w = Vector3D(0,0,20);
-Vector3D o2w2 = Vector3D(10,10,30);
-Vector3D o2w3 = Vector3D(0,-10,30);
+Point3D CameraPos = Point3D();
 float rot_angle = 3.141/1200;
 
 
@@ -80,6 +67,7 @@ void reshapeCB(int w, int h);
 void timerCB(int millisec);
 void idleCB();
 void keyboardCB(unsigned char key, int x, int y);
+void specialKeyCB(int key, int x, int y);
 void mouseCB(int button, int stat, int x, int y);
 void mouseMotionCB(int x, int y);
 
@@ -179,11 +167,12 @@ int main(int argc, char **argv)
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
     tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
 
-
 	testobj.generateCube();
 	testobj2.generateCube();
-	tri2.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri2);
+	testobj3.generateFloor(30,-10);
+	objectlist.push_back(testobj);
+	objectlist.push_back(testobj2);
+	objectlist.push_back(testobj3);
 
     initSharedMem();
 
@@ -304,6 +293,7 @@ int initGLUT(int argc, char **argv)
     glutIdleFunc(idleCB);                       // redraw only every given millisec
     glutReshapeFunc(reshapeCB);
     glutKeyboardFunc(keyboardCB);
+	glutSpecialFunc(specialKeyCB);			// used for the arrow keys etc.
     glutMouseFunc(mouseCB);
     glutMotionFunc(mouseMotionCB);
 
@@ -528,23 +518,15 @@ void updatePixels(GLubyte* dst, int size)
 		rot = rmxyz;
 	}
 
-	testobj.updateList();
-	testobj.Translate( o2w );
-	testobj.TransformToScreen( tm );
-	std::list<Triangle> renderlist = testobj.getRenderList();
-	
-	testobj2.updateList();
-	testobj2.Translate( o2w2 );
-	testobj2.TransformToScreen( tm );
-	std::list<Triangle> templist = testobj2.getRenderList();
-	
-	testobj3.updateList();
-	testobj3.Translate( o2w3 );
-	testobj3.TransformToScreen( tm );
-	std::list<Triangle> templist2 = testobj3.getRenderList();
+	renderlist.clear();
 
-	renderlist.splice(renderlist.end(), templist);
-	renderlist.splice(renderlist.end(), templist2);
+	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
+		it->updateList();
+		it->Translate( it->getPosition() + CameraPos );
+		it->TransformToScreen( tm );
+		std::list<Triangle> templist = it->getRenderList();
+		renderlist.splice(renderlist.end(), templist);
+	}
 
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (std::list<Triangle>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
@@ -555,6 +537,8 @@ void updatePixels(GLubyte* dst, int size)
 	testobj.Rotate( rot );
 	testobj2.Rotate( rot );
 	//testobj3.Rotate( rot );
+
+	//CameraPos = Point3D();
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i)
@@ -916,6 +900,22 @@ void keyboardCB(unsigned char key, int x, int y)
         exit(0);
         break;
 
+	case 'w': // Up
+		CameraPos = CameraPos + Vector3D(0,0,-1);
+		break;
+
+	case 's': // down
+		CameraPos = CameraPos + Vector3D(0,0,1);
+		break;
+
+	case 'a': // left
+		CameraPos = CameraPos + Vector3D(1,0,0);
+		break;
+
+	case 'd': // right
+		CameraPos = CameraPos + Vector3D(-1,0,0);
+		break;
+
     case ' ':
         if(pboSupported)
             pboMode = ++pboMode % 3;
@@ -942,8 +942,8 @@ void keyboardCB(unsigned char key, int x, int y)
 		rotz = !rotz;
 		break;
 
-    case 'd': // switch rendering modes (fill -> wire -> point)
-    case 'D':
+    case 'm': // switch rendering modes (fill -> wire -> point)
+    case 'M':
         drawMode = ++drawMode % 3;
         if(drawMode == 0)        // fill mode
         {
@@ -968,6 +968,28 @@ void keyboardCB(unsigned char key, int x, int y)
     default:
         ;
     }
+}
+
+void specialKeyCB(int key, int x, int y)
+{
+    switch(key)
+    {
+	case GLUT_KEY_UP: // Up
+		CameraPos = CameraPos + Vector3D(0,0,-1);
+		break;
+
+	case GLUT_KEY_DOWN: // down
+		CameraPos = CameraPos + Vector3D(0,0,1);
+		break;
+
+	case GLUT_KEY_LEFT: // left
+		CameraPos = CameraPos + Vector3D(1,0,0);
+		break;
+
+	case GLUT_KEY_RIGHT: // right
+		CameraPos = CameraPos + Vector3D(-1,0,0);
+		break;
+	}
 }
 
 

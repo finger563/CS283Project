@@ -12,7 +12,14 @@ void Triangle::Rotate( const Matrix& m ) {
     normal = m*normal;
 }
 
-void Triangle::Translate( const Vector3D& v) {
+void Triangle::Translate( const Vector3D& v ) {
+    a = a+v;
+    b = b+v;
+    c = c+v;
+}
+
+void Triangle::Translate( const float x, const float y, const float z ) {
+	Vector3D v = Vector3D(x,y,z);
     a = a+v;
     b = b+v;
     c = c+v;
@@ -37,6 +44,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	else if (s1.z == 0) {
 	}
 	else {
+		s1.x = (s1.x)/s1.z;
+		s1.y = (s1.y)/s1.z;
 	}
 
     s2 = b;
@@ -47,6 +56,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	else if (s2.z == 0) {
 	}
 	else {
+		s2.x = (s2.x)/s2.z;
+		s2.y = (s2.y)/s2.z;
 	}
 
     s3 = c;
@@ -57,6 +68,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	else if (s3.z == 0) {
 	}
 	else {
+		s3.x = (s3.x)/s3.z;
+		s3.y = (s3.y)/s3.z;
 	}
 
     // sort vertices and associated texture coords by y
@@ -98,33 +111,55 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     m13 = (s3.x-s1.x)/(s3.y-s1.y);   // inverse slope between t1 & t3
     m23 = (s3.x-s2.x)/(s3.y-s2.y);   // inverse slope between t2 & t3
 
+	float sy1 = s1.y, sx1 = s1.x,
+		  sy2 = s2.y, sx2 = s2.x,
+		  sy3 = s3.y, sx3 = s3.x;
+
+	if ( s1.z > 0 ) {
+		sy1 = s1.y*s1.z; 
+		sx1 = s1.x*s1.z;
+	}
+	if ( s2.z > 0 ) {
+		sy2 = s2.y*s2.z; 
+		sx2 = s2.x*s2.z;
+	}
+	if ( s3.z > 0 ) {
+		sy3 = s3.y*s3.z;
+		sx3 = s3.x*s3.z;
+	}
+
     s4.y = s2.y;
     s4.x = s1.x + (s2.y-s1.y)*m13;
-	s4.z = 1/(-(s3.y*s3.z - s1.y*s1.z) + (s3.z - s1.z)*(s1.y + (s2.y - s1.y))) * ((s3.z-s1.z)*s1.y*s1.z - (s3.z*s3.y - s1.y*s1.z)*s1.z);
+	s4.z = 1/(-(sy3 - sy1) + (s3.z - s1.z)*(s1.y + (s2.y - s1.y))) * ((s3.z-s1.z)*sy1 - (sy3 - sy1)*s1.z);
 
-	dz12 = (s2.z-s1.z) / ((s2.z-s1.z)*s1.y*s1.z - (s2.y*s2.z-s1.y*s1.z)*s1.z);	// slopes for z-buffering
-	dz13 = (s3.z-s1.z) / ((s3.z-s1.z)*s1.y*s1.z - (s3.y*s3.z-s1.y*s1.z)*s1.z);
-	dz14 = (s4.z-s1.z) / ((s4.z-s1.z)*s1.y*s1.z - (s4.y*s4.z-s1.y*s1.z)*s1.z);
-	dz23 = (s3.z-s2.z) / ((s3.z-s2.z)*s2.y*s2.z - (s3.y*s3.z-s2.y*s2.z)*s2.z);
-	dz43 = (s3.z-s4.z) / ((s3.z-s4.z)*s4.y*s4.z - (s3.y*s3.z-s4.y*s4.z)*s4.z);
+	float sy4 = s4.y;
+	if ( s4.z > 0 ) {
+		sy4 = s4.y*s4.z;
+	}
 
-	u4.x = u1.x + (u3.x - u1.x) * (s4.y*s4.z-s1.y*s1.z) / (s3.y*s3.z - s1.y*s1.z);	// Intermediate texture coords
-	u4.y = u1.y + (u3.y - u1.y) * (s4.y*s4.z-s1.y*s1.z) / (s3.y*s3.z - s1.y*s1.z);
+	dz12 = (s2.z-s1.z) / ((s2.z-s1.z)*sy1 - (sy2-sy1)*s1.z);	// slopes for z-buffering
+	dz13 = (s3.z-s1.z) / ((s3.z-s1.z)*sy1 - (sy3-sy1)*s1.z);
+	dz14 = (s4.z-s1.z) / ((s4.z-s1.z)*sy1 - (sy4-sy1)*s1.z);
+	dz23 = (s3.z-s2.z) / ((s3.z-s2.z)*sy2 - (sy3-sy2)*s2.z);
+	dz43 = (s3.z-s4.z) / ((s3.z-s4.z)*sy4 - (sy3-sy4)*s4.z);
 
-	dtx13 = (u3.x - u1.x)/(s3.y*s3.z - s1.y*s1.z);		// slopes for texture coordinates
-	dty13 = (u3.y - u1.y)/(s3.y*s3.z - s1.y*s1.z);
+	u4.x = u1.x + (u3.x - u1.x) * (sy4-sy1) / (sy3 - sy1);	// Intermediate texture coords
+	u4.y = u1.y + (u3.y - u1.y) * (sy4-sy1) / (sy3 - sy1);
 
-	dtx12 = (u2.x - u1.x)/(s2.y*s2.z - s1.y*s1.z);
-	dty12 = (u2.y - u1.y)/(s2.y*s2.z - s1.y*s1.z);
+	dtx13 = (u3.x - u1.x)/(sy3 - sy1);		// slopes for texture coordinates
+	dty13 = (u3.y - u1.y)/(sy3 - sy1);
 
-	dtx23 = (u3.x - u2.x)/(s3.y*s3.z - s2.y*s2.z);
-	dty23 = (u3.y - u2.y)/(s3.y*s3.z - s2.y*s2.z);
+	dtx12 = (u2.x - u1.x)/(sy2 - sy1);
+	dty12 = (u2.y - u1.y)/(sy2 - sy1);
 
-	dtx14 = (u4.x - u1.x)/(s4.y*s4.z - s1.y*s1.z);
-	dty14 = (u4.y - u1.y)/(s4.y*s4.z - s1.y*s1.z);
+	dtx23 = (u3.x - u2.x)/(sy3 - sy2);
+	dty23 = (u3.y - u2.y)/(sy3 - sy2);
 
-	dtx43 = (u3.x - u4.x)/(s3.y*s3.z - s4.y*s4.z);
-	dty43 = (u3.y - u4.y)/(s3.y*s3.z - s4.y*s4.z);
+	dtx14 = (u4.x - u1.x)/(sy4 - sy1);
+	dty14 = (u4.y - u1.y)/(sy4 - sy1);
+
+	dtx43 = (u3.x - u4.x)/(sy3 - sy4);
+	dty43 = (u3.y - u4.y)/(sy3 - sy4);
 
     if ( abs(s1.y - s2.y) < EPSILON ) {   // Flat top
         if ( s1.x < s2.x ) {
@@ -473,7 +508,7 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		etv = (y/ez - s1.y*s1.z)*dty13 + u1.y;
         break;
     case NORMAL_RIGHT:
-        if ( s4.y <= y ) { 
+        if ( s2.y <= y ) { 
 			sz = 1/s1.z + (dy) * dz14;
 			ez = 1/s1.z + (dy) * dz12;
 
@@ -486,7 +521,7 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 			etv = (y/ez - s1.y*s1.z)*dty12 + u1.y;
         }
         else {
-            dy = y - s4.y;
+            dy = y - s2.y;
 			sz = 1/s4.z + (dy) * dz43;
 			ez = 1/s2.z + (dy) * dz23;
 
@@ -500,7 +535,7 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         }
         break;
     case NORMAL_LEFT:
-        if ( s4.y <= y ) {
+        if ( s2.y <= y ) {
 			sz = 1/s1.z + (dy) * dz12;
 			ez = 1/s1.z + (dy) * dz14;
 
@@ -540,19 +575,24 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	int x = sx;
 	float startx = sx/sz;
 	zi += (x - sx)*dzx;
+	if ( sx < 0 ) {
+		zi += dzx * (-sx);
+		sx = 0;
+	}
+	if ( ex >= SIZE_X ) {
+		ex = SIZE_X - 1;
+	}
     for (x = sx;x<=ex;x++) {
-		if ( x >=0 && x < SIZE_X ) {
-			if ( zi > z_buffer[ x + y*SIZE_X ] ) {
-				z_buffer[ x + y*SIZE_X ] = zi;
-				tx = (x/zi - startx) * uscale + stu;
-				ty = (x/zi - startx) * vscale + stv;
-				int index = (int)tx + texwidth*((int)ty);
-				if ( index < 0 ) 
-					index = 0;
-				if ( index > texwidth*texwidth )
-					index = 0;
-				display_buffer[ x + y*SIZE_X ] = texture[index];
-			}
+		if ( zi > z_buffer[ x + y*SIZE_X ] ) {
+			z_buffer[ x + y*SIZE_X ] = zi;
+			tx = (x/zi - startx) * uscale + stu;
+			ty = (x/zi - startx) * vscale + stv;
+			int index = (int)tx + texwidth*((int)ty);
+			if ( index < 0 ) 
+				index = 0;
+			if ( index > texwidth*texwidth )
+				index = texwidth/2 + texwidth*texwidth/2;
+			display_buffer[ x + y*SIZE_X ] = texture[index];
 		}
         zi += dzx;		// because dx > 0, we increment
     }

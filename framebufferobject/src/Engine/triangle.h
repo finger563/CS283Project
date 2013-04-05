@@ -58,9 +58,10 @@ public:
 	void SetTexture(const unsigned short *tex, const int width) { texture = tex; texwidth = width; }
 
     void Rotate( const Matrix& m );
-    void Translate( const Vector3D& v);
+    void Translate( const Vector3D& v );
+    void Translate( const float x, const float y, const float z );
 
-    void TransformToScreen( const Matrix& m);
+    void TransformToScreen( const Matrix& m );
     void DrawFilledZbuffer( const int y );
     void DrawTexturedZbuffer( const int y );
     void DrawWireframe ( const Matrix& m );

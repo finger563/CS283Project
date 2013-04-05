@@ -143,44 +143,94 @@ void Object::generateCube(float size)
 
 			tri12 = Triangle( Point3D(size, -size, size),Point3D(-size, -size, size),
 					Point3D(-size, -size, -size),Vector3D(0,-1,0),Point2D(512,512),Point2D(0,512),Point2D(0,0));
-	  master.clear();
+	  
+	master.clear();
 
 	//stores in objects master list
-		master.push_back(tri1);
-		master.push_back(tri2);
-		master.push_back(tri3);
-		master.push_back(tri4);
-		master.push_back(tri5);
-		master.push_back(tri6);
-		master.push_back(tri7);
-		master.push_back(tri8);
-		master.push_back(tri9);
-		master.push_back(tri10);
-		master.push_back(tri11);
-		master.push_back(tri12);
+	master.push_back(tri1);
+	master.push_back(tri2);
+	master.push_back(tri3);
+	master.push_back(tri4);
+	master.push_back(tri5);
+	master.push_back(tri6);
+	master.push_back(tri7);
+	master.push_back(tri8);
+	master.push_back(tri9);
+	master.push_back(tri10);
+	master.push_back(tri11);
+	master.push_back(tri12);
 
-		for(std::list<Triangle>::iterator it = master.begin(); it != master.end(); ++it)
-		{
-			it->SetTexture(tex, texWidth);
-		}
+	for(std::list<Triangle>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->SetTexture(tex, texWidth);
+	}
 
-		updateList(); 
+	updateList(); 
 }
 
 //generates tetrahedron
 void Object::generateTetra(float size)
 {
-	Triangle tri1 = Triangle( Point3D(size, size, size),Point3D(size, -size, size), 
-					Point3D(-size, size, size), Vector3D(0,0,1),Point2D(0,0),Point2D(0,512),Point2D(512,0)),
+	Point3D p1 = Point3D(size,0,-size/sqrt(2.0)),
+			p2 = Point3D(-size,0,-size/sqrt(2.0)),
+			p3 = Point3D(0,size,size/sqrt(2.0)),
+			p4 = Point3D(0,-size,size/sqrt(2.0));
 
-			tri2 = Triangle(Point3D(size, -size, size), Point3D(-size, size, size),
-					Point3D(-size, -size, size), Vector3D(0,0,1),Point2D(0,512),Point2D(512,0),Point2D(512,512)),
+	Triangle tri1 = Triangle( p1, p2, p3, Vector3D(0,0,1),Point2D(0,0),Point2D(0,512),Point2D(512,0)),
 
-			tri3 = Triangle( Point3D(size, size, -size), Point3D(size, -size, -size),
-					Point3D(-size, size, -size), Vector3D(0,0,-1),Point2D(512,0),Point2D(512,512),Point2D(0,0)),
+			 tri2 = Triangle( p2, p3, p4, Vector3D(0,0,1),Point2D(0,512),Point2D(512,0),Point2D(512,512)),
 
-			tri4 = Triangle( Point3D(size, -size, -size),Point3D(-size, size, -size),
-					Point3D(-size, -size, -size), Vector3D(0,0,-1),Point2D(512,512),Point2D(0,0),Point2D(0,512));
+			 tri3 = Triangle( p3, p4, p1, Vector3D(0,0,-1),Point2D(512,0),Point2D(512,512),Point2D(0,0)),
+
+			 tri4 = Triangle( p1, p2, p4, Vector3D(0,0,-1),Point2D(512,512),Point2D(0,0),Point2D(0,512));
+	
+	master.clear();
+
+	//stores in objects master list
+	master.push_back(tri1);
+	master.push_back(tri2);
+	master.push_back(tri3);
+	master.push_back(tri4);
+
+	for(std::list<Triangle>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->SetTexture(tex, texWidth);
+	}
+
+	updateList(); 
+}
+
+//generates cube
+void Object::generateFloor(float length, float depth)
+{
+	float sl = 5;	// sidelength of the square
+	position = Point3D(0,depth,0);
+
+	Triangle tri1 = Triangle(Point3D(-sl,0,-sl),Point3D(-sl,0,sl),Point3D(sl,0,sl),
+							 Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
+			 tri2 = Triangle(Point3D(-sl,0,-sl),Point3D(sl,0,-sl),Point3D(sl,0,sl),
+							 Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0));
+	
+	master.clear();
+	tri1.Translate(-length/2,0,-length/2);	// move to back left	(x = -length,z=-length)
+	tri2.Translate(-length/2,0,-length/2);	// move to back left	(x = -length,z=-length)
+	for (int x = 0;x <= length/sl; x++) {
+		for (int z = 0; z <= length/sl; z++) {
+			master.push_back(tri1);
+			master.push_back(tri2);
+			tri1.Translate(0,0,sl);
+			tri2.Translate(0,0,sl);
+		}
+		tri1.Translate(sl,0,-length - sl);
+		tri2.Translate(sl,0,-length - sl);
+	}
+
+	for(std::list<Triangle>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->SetTexture(tex, texWidth);
+	}
+
+	updateList(); 
 }
 
 bool Object::updateTime(int time)
@@ -198,6 +248,10 @@ bool Object::setPosition(Point3D pos)
 {
 	position = pos;
 	return true;
+}
+
+Point3D Object::getPosition(void) {
+	return position;
 }
 
 //assumes that only the temp list is being passed through
@@ -242,10 +296,14 @@ std::list<Triangle> Object::getRenderList()
 	std::list<Triangle> get;
 	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
-		//if(it->normal.z <= 0)
-		//{
+		if( //it->normal.z <= 0
+			it->a.z > 0 &&
+			it->b.z > 0 &&
+			it->c.z > 0
+			)
+		{
 			get.push_back(*it);
-		//}
+		}
 	}
 
 	updateList(get);

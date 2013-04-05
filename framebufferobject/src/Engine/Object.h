@@ -45,6 +45,8 @@ public:
 	//Generates tetrahedron
 	void generateTetra(float size = 5);
 
+	void generateFloor(float length = 50, float depth = -10);
+
 	//fileParser()<-- future function
 	bool updateTime(int time);
 
@@ -53,6 +55,9 @@ public:
 
 	//sets position
 	bool setPosition(Point3D pos);
+
+	//gets Position
+	Point3D getPosition(void);
 
 	//assumes that only the temp list is being passed through
 	std::list<Triangle> Rotate(Matrix& m);
