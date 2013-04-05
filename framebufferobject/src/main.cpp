@@ -46,6 +46,9 @@ Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
 Object testobj3 = Object(floortex,floortexwidth);
 
+std::list<Object> objectlist;
+std::list<Triangle> renderlist;
+
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
         rmx = Matrix(),
@@ -167,6 +170,9 @@ int main(int argc, char **argv)
 	testobj.generateCube();
 	testobj2.generateCube();
 	testobj3.generateFloor(30,-10);
+	objectlist.push_back(testobj);
+	objectlist.push_back(testobj2);
+	objectlist.push_back(testobj3);
 
     initSharedMem();
 
@@ -512,23 +518,15 @@ void updatePixels(GLubyte* dst, int size)
 		rot = rmxyz;
 	}
 
-	testobj.updateList();
-	testobj.Translate( testobj.getPosition() + CameraPos );
-	testobj.TransformToScreen( tm );
-	std::list<Triangle> renderlist = testobj.getRenderList();
-	
-	testobj2.updateList();
-	testobj2.Translate( testobj2.getPosition() + CameraPos );
-	testobj2.TransformToScreen( tm );
-	std::list<Triangle> templist = testobj2.getRenderList();
-	
-	testobj3.updateList();
-	testobj3.Translate( testobj3.getPosition() + CameraPos );
-	testobj3.TransformToScreen( tm );
-	std::list<Triangle> templist2 = testobj3.getRenderList();
+	renderlist.clear();
 
-	renderlist.splice(renderlist.end(), templist);
-	renderlist.splice(renderlist.end(), templist2);
+	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
+		it->updateList();
+		it->Translate( it->getPosition() + CameraPos );
+		it->TransformToScreen( tm );
+		std::list<Triangle> templist = it->getRenderList();
+		renderlist.splice(renderlist.end(), templist);
+	}
 
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (std::list<Triangle>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {

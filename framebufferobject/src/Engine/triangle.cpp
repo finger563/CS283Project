@@ -508,7 +508,7 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		etv = (y/ez - s1.y*s1.z)*dty13 + u1.y;
         break;
     case NORMAL_RIGHT:
-        if ( s4.y <= y ) { 
+        if ( s2.y <= y ) { 
 			sz = 1/s1.z + (dy) * dz14;
 			ez = 1/s1.z + (dy) * dz12;
 
@@ -521,7 +521,7 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 			etv = (y/ez - s1.y*s1.z)*dty12 + u1.y;
         }
         else {
-            dy = y - s4.y;
+            dy = y - s2.y;
 			sz = 1/s4.z + (dy) * dz43;
 			ez = 1/s2.z + (dy) * dz23;
 
@@ -535,7 +535,7 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
         }
         break;
     case NORMAL_LEFT:
-        if ( s4.y <= y ) {
+        if ( s2.y <= y ) {
 			sz = 1/s1.z + (dy) * dz12;
 			ez = 1/s1.z + (dy) * dz14;
 
@@ -575,19 +575,24 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	int x = sx;
 	float startx = sx/sz;
 	zi += (x - sx)*dzx;
+	if ( sx < 0 ) {
+		zi += dzx * (-sx);
+		sx = 0;
+	}
+	if ( ex >= SIZE_X ) {
+		ex = SIZE_X - 1;
+	}
     for (x = sx;x<=ex;x++) {
-		if ( x >=0 && x < SIZE_X ) {
-			if ( zi > z_buffer[ x + y*SIZE_X ] ) {
-				z_buffer[ x + y*SIZE_X ] = zi;
-				tx = (x/zi - startx) * uscale + stu;
-				ty = (x/zi - startx) * vscale + stv;
-				int index = (int)tx + texwidth*((int)ty);
-				if ( index < 0 ) 
-					index = 0;
-				if ( index > texwidth*texwidth )
-					index = 0;
-				display_buffer[ x + y*SIZE_X ] = texture[index];
-			}
+		if ( zi > z_buffer[ x + y*SIZE_X ] ) {
+			z_buffer[ x + y*SIZE_X ] = zi;
+			tx = (x/zi - startx) * uscale + stu;
+			ty = (x/zi - startx) * vscale + stv;
+			int index = (int)tx + texwidth*((int)ty);
+			if ( index < 0 ) 
+				index = 0;
+			if ( index > texwidth*texwidth )
+				index = texwidth/2 + texwidth*texwidth/2;
+			display_buffer[ x + y*SIZE_X ] = texture[index];
 		}
         zi += dzx;		// because dx > 0, we increment
     }
