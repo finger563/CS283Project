@@ -27,6 +27,7 @@ using std::ends;
 #include "Engine\Object.h"
 #include "Sprites\box.h"
 #include "Sprites\floor.h"
+#include "Sprites\floorsmall.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
@@ -44,7 +45,7 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 
 Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(floortex,floortexwidth);
+Object testobj3 = Object(floortexsmall,floortexsmallwidth);
 
 std::list<Object> objectlist;
 std::list<Triangle> renderlist;

@@ -9,6 +9,7 @@
 // target width : 128
 // target height : 128
 // ############################################
+const int floortexsmallwidth = 128;
 const unsigned short floortexsmall[] = 
 {
 	0x0041,0x39E7,0x2124,0x31A6,0x31A6,0x31C7,0x4228,0x39E7,

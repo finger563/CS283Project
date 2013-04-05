@@ -19,6 +19,7 @@ public:
     Vector3D normal;
     short color;
     TriangleType type;  // for fast rendering, pre-compute
+	bool visible;		// for backface culling
 
     // Screen space variables for Z-buffering
     Point3D s1,s2,s3,s4;		// screen space coordinates for triangle (y-sorted)

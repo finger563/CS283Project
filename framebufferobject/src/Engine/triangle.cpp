@@ -36,6 +36,25 @@ void Triangle::DrawWireframe ( const Matrix& m ) {
 
 // Pass in the view to screen space transform
 void Triangle::TransformToScreen ( const Matrix& m ) {
+	visible = false;
+	Vector3D eye = Vector3D(0,0,-1);
+	Vector3D cull = eye-a;
+	float test = cull*normal;
+	if ( test < 0 ) {
+		return;	// Triangle isn't renderable, don't need to calculate anything else
+	}
+	//cull = eye-b;
+	//test = cull*normal;
+	//if ( test < 0 ) {
+	//	return;
+	//}
+	//cull = eye-c;
+	//test = cull*normal;
+	//if ( test < 0 ) {
+	//	return;
+	//}
+	visible = true;
+
     s1 = a;
 	if ( s1.z > 0 ) {
 		s1.x = (s1.x)/s1.z; // d should be contained in m

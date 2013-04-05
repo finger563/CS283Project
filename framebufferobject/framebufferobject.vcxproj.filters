@@ -48,6 +48,9 @@
     <ClInclude Include="camera.h">
       <Filter>headers\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\Sprites\floorsmall.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\color.frag" />
