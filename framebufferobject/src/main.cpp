@@ -171,8 +171,8 @@ int main(int argc, char **argv)
 	testobj2.generateCube();
 	testobj3.generateFloor(30,-10);
 	objectlist.push_back(testobj);
-	objectlist.push_back(testobj2);
-	objectlist.push_back(testobj3);
+	//objectlist.push_back(testobj2);
+	//objectlist.push_back(testobj3);
 
     initSharedMem();
 
@@ -914,7 +914,15 @@ void keyboardCB(unsigned char key, int x, int y)
 		CameraPos = CameraPos + Vector3D(-1,0,0);
 		break;
 
-    case ' ':
+	case ' ': // space
+		CameraPos = CameraPos + Vector3D(0,-1,0);
+		break;
+
+	case 'c': // c
+		CameraPos = CameraPos + Vector3D(0,1,0);
+		break;
+
+    case 'p':
         if(pboSupported)
             pboMode = ++pboMode % 3;
         cout << "PBO mode: " << pboMode << endl;
