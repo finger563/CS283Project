@@ -45,7 +45,7 @@ Object::~Object()
 bool Object::updateList()
 {
 
-	if(!temp.empty() || master.empty())
+	//if(!temp.empty() || master.empty())
 		clearTemp();
 
 	if(!master.empty())
@@ -69,7 +69,7 @@ bool Object::updateList()
 //Updates Temp list with any changes to the master list
 bool Object::updateList(std::list<Triangle> poly)
 {
-	if(!temp.empty() || poly.empty())
+	//if(!temp.empty() || poly.empty())
 		clearTemp();
 
 	if(!poly.empty())
