@@ -28,7 +28,8 @@ float t = 1-cos(a);
 double tX = x*(t*b.x*b.x+c) + y*(t*b.x*b.y-s*b.z) + z*(t*b.x*b.z+s*b.y);
 double tY = x*(t*b.x*b.y+s*b.z) + y*(t*b.y*b.y+c) + z*(t*b.y*b.z-s*b.x);
 double tZ = x*(t*b.x*b.z-s*b.y) + y*(t*b.y*b.z+s*b.x) + z*(t*b.z*b.z+c);
-//this multiplies the current matrix be a rotation matrix (thanks to delta again for the rotation matrix). It stores the values in 3 functions (which really should be a new vector, but whatever it's simpler this way)
+//this multiplies the current matrix be a rotation matrix (thanks to delta again for the rotation matrix). 
+//It stores the values in 3 functions (which really should be a new vector, but whatever it's simpler this way)
 x = tX;
 y = tY;
 z = tZ;
@@ -48,29 +49,42 @@ BACKWARD
 //if you dont know what an enum is look it up
 class Camera{
 private:
-Vector eye;
+Vector eye; //eye is the vector that specifys what direction the camera is facing.
+
+//Up is a vector perpendicular to eye, that specifys the top of the camera, 
+//by altering it you could like spin the screen or something for an effect if you want.
 Vector up;
-float x, y, z;
-//all values needed for gluLookAt, the ones to pay attention to are the 2 vectors. x,y,z are just the position of the camera, but the vectors are where the meat is at. eye is the vector that specifys what direction the camera is facing. Up is a vector perpendicular to eye, that specifys the top of the camera, by altering it you could like spin the screen or something for an effect if you want.
-float dist;
+
+float x, y, z; //x,y,z are just the position of the camera,
+//all values needed for gluLookAt, the ones to pay attention to are the 2 vectors. but the vectors are where the meat is at.  
+
 //just how far the visible range is. If it's 500, objects more than 500 pixels away wont be rendered on the screen
+//may help our math problem??
+float dist;
+
 public:
+
+//bleh constructor
 Camera():x(0.00),y(0.0),z(0.0),dist(1000){
 eye = *(new Vector(0.0, 0.0, -1.0));
 up = *(new Vector(0.0, 1.0, 0.0));
 }
-//bleh constructor
+
+//gluLookAt. Puts the camera at x,y,z and makes it face eye and the tiop is up. Simple enough.
+//Do we want to make our own gluLookAt()??
 void update(){
 gluLookAt(x , y , z,
 eye.x*dist, eye.y*dist, eye.z*dist,
 up.x, up.y, up.z);
 }
-//gluLookAt. Puts the camera at x,y,z and makes it face eye and the tiop is up. Simple enough.
-void rotate(direction dir, float deg){
+
 //this is a function to rotate the camera using the vector's ROTATE method
+void rotate(direction dir, float deg){
 if(dir==UP){
-Vector temp = eye.cross(up);
+
 //the temporary vector is perpendicular to both up and eye.
+Vector temp = eye.cross(up);
+
 eye.rotate(deg, temp);
 up.rotate(deg, temp);
 //then we rotate up and eye
@@ -96,7 +110,12 @@ up.rotate(-deg, temp);
 //same here
 }
 void move(direction dir, float dis){
-//this moves the camera forward or backward depending on it's current rotation. since the EYE vector has a length of 1 even after you rotate it, we just have to move X Y and Z by the eye vector * the speed. If you wanted, you could stick code for LEFT and RIGHT and move it based on the cross between up and eye too. Really simple if you think about it. UP and DOWN could be based off of the up vector even! The possibilities are endless
+//this moves the camera forward or backward depending on it's current rotation. 
+//since the EYE vector has a length of 1 even after you rotate it, 
+//we just have to move X Y and Z by the eye vector * the speed. 
+//If you wanted, you could stick code for LEFT and RIGHT and move it based on the cross between up and eye too. 
+//Really simple if you think about it. UP and DOWN could be based off of the up vector even! The possibilities are endless
+
 if(dir==FORWARD){
 x += eye.x*dis;
 y += eye.y*dis;
