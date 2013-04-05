@@ -42,31 +42,9 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 	 rotz = 0,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
-Point3D p1 = Point3D(-5,0,-5),
-		p2 = Point3D(-5,0,5),
-		p3 = Point3D(5,0,5),
-		p4 = Point3D(5,0,-5);
-
-Triangle tri1 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri2 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0)),
-		 tri3 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri4 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0)),
-		 tri5 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri6 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0)),
-		 tri7 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri8 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0)),
-		 tri9 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri10 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0)),
-		 tri11 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri12 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0)),
-		 tri13 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri14 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0)),
-		 tri15 = Triangle(p1,p2,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(0,0),Point2D(512,0)),
-		 tri16 = Triangle(p1,p4,p3,Vector3D(0,0,1),Point2D(0,512),Point2D(512,512),Point2D(512,0));
-
 Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(tri1,floortex,floortexwidth,Vector3D(),Point3D(0,-10,15));
+Object testobj3 = Object(floortex,floortexwidth);
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -186,53 +164,9 @@ int main(int argc, char **argv)
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
     tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
 
-
 	testobj.generateCube();
 	testobj2.generateCube();
-	tri2.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri2);
-	
-	tri3.Translate(Vector3D(5,0,0));
-	tri3.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri3);
-	tri4.Translate(Vector3D(5,0,0));
-	tri4.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri4);
-	
-	tri5.Translate(Vector3D(0,0,5));
-	tri5.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri5);
-	tri6.Translate(Vector3D(0,0,5));
-	tri6.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri6);
-	
-	tri7.Translate(Vector3D(5,0,5));
-	tri7.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri7);
-	tri8.Translate(Vector3D(5,0,5));
-	tri8.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri8);
-	
-	tri9.Translate(Vector3D(-5,0,0));
-	tri9.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri9);
-	tri10.Translate(Vector3D(-5,0,0));
-	tri10.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri10);
-	
-	tri11.Translate(Vector3D(0,0,10));
-	tri11.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri11);
-	tri12.Translate(Vector3D(0,0,10));
-	tri12.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri12);
-	
-	tri13.Translate(Vector3D(0,0,10));
-	tri13.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri13);
-	tri14.Translate(Vector3D(0,0,10));
-	tri14.SetTexture(floortex,floortexwidth);
-	testobj3.add(tri14);
+	testobj3.generateFloor(30,-10);
 
     initSharedMem();
 

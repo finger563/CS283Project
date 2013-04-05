@@ -12,7 +12,14 @@ void Triangle::Rotate( const Matrix& m ) {
     normal = m*normal;
 }
 
-void Triangle::Translate( const Vector3D& v) {
+void Triangle::Translate( const Vector3D& v ) {
+    a = a+v;
+    b = b+v;
+    c = c+v;
+}
+
+void Triangle::Translate( const float x, const float y, const float z ) {
+	Vector3D v = Vector3D(x,y,z);
     a = a+v;
     b = b+v;
     c = c+v;

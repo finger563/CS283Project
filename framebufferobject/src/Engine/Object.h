@@ -45,6 +45,8 @@ public:
 	//Generates tetrahedron
 	void generateTetra(float size = 5);
 
+	void generateFloor(float length = 50, float depth = -10);
+
 	//fileParser()<-- future function
 	bool updateTime(int time);
 
