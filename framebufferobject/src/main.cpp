@@ -534,11 +534,9 @@ void updatePixels(GLubyte* dst, int size)
 		}
 	}
 
-	testobj.Rotate( rot );
-	testobj2.Rotate( rot );
-	//testobj3.Rotate( rot );
-
-	//CameraPos = Point3D();
+	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
+		it->Rotate(rot);
+	}
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i)
