@@ -1,7 +1,7 @@
 #include "triangle.h"
 #include "../main.h"
 
-extern float z_buffer[SIZE_X];
+extern float z_buffer[SIZE_X*SIZE_Y];
 extern short display_buffer[SIZE_X*SIZE_Y];
 
 // Used for rotating the polygons in an object
@@ -36,6 +36,25 @@ void Triangle::DrawWireframe ( const Matrix& m ) {
 
 // Pass in the view to screen space transform
 void Triangle::TransformToScreen ( const Matrix& m ) {
+	visible = false;
+	Vector3D eye = Vector3D(0,0,-1);
+	Vector3D cull = eye-a;
+	float test = cull*normal;
+	if ( test < 0 ) {
+		return;	// Triangle isn't renderable, don't need to calculate anything else
+	}
+	//cull = eye-b;
+	//test = cull*normal;
+	//if ( test < 0 ) {
+	//	return;
+	//}
+	//cull = eye-c;
+	//test = cull*normal;
+	//if ( test < 0 ) {
+	//	return;
+	//}
+	visible = true;
+
     s1 = a;
 	if ( s1.z > 0 ) {
 		s1.x = (s1.x)/s1.z; // d should be contained in m
@@ -146,20 +165,40 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	u4.x = u1.x + (u3.x - u1.x) * (sy4-sy1) / (sy3 - sy1);	// Intermediate texture coords
 	u4.y = u1.y + (u3.y - u1.y) * (sy4-sy1) / (sy3 - sy1);
 
-	dtx13 = (u3.x - u1.x)/(sy3 - sy1);		// slopes for texture coordinates
-	dty13 = (u3.y - u1.y)/(sy3 - sy1);
+	dtx13 = (u3.x - u1.x)/(s3.z-s1.z);
+	dty13 = (u3.y - u1.y)/(s3.z-s1.z);
+	//if ( (sy3 - sy1) != 0 ) {
+		dtx13 = (u3.x - u1.x)/(sy3 - sy1);		// slopes for texture coordinates
+		dty13 = (u3.y - u1.y)/(sy3 - sy1);
+	//}
 
-	dtx12 = (u2.x - u1.x)/(sy2 - sy1);
-	dty12 = (u2.y - u1.y)/(sy2 - sy1);
+	dtx12 = (u2.x - u1.x)/(s2.z-s1.z);
+	dty12 = (u2.y - u1.y)/(s2.z-s1.z);
+	//if ( (sy2 - sy1) != 0 ) {
+		dtx12 = (u2.x - u1.x)/(sy2 - sy1);
+		dty12 = (u2.y - u1.y)/(sy2 - sy1);
+	//}
 
-	dtx23 = (u3.x - u2.x)/(sy3 - sy2);
-	dty23 = (u3.y - u2.y)/(sy3 - sy2);
+	dtx23 = (u3.x - u2.x)/(s3.z-s2.z);
+	dty23 = (u3.y - u2.y)/(s3.z-s2.z);
+	if ( (sy3 - sy2) != 0 ) {
+		dtx23 = (u3.x - u2.x)/(sy3 - sy2);
+		dty23 = (u3.y - u2.y)/(sy3 - sy2);
+	}
 
-	dtx14 = (u4.x - u1.x)/(sy4 - sy1);
-	dty14 = (u4.y - u1.y)/(sy4 - sy1);
+	dtx14 = (u4.x - u1.x)/(s4.z-s1.z);
+	dty14 = (u4.y - u1.y)/(s4.z-s1.z);
+	//if ( (sy4 - sy1) != 0 ) {
+		dtx14 = (u4.x - u1.x)/(sy4 - sy1);
+		dty14 = (u4.y - u1.y)/(sy4 - sy1);
+	//}
 
-	dtx43 = (u3.x - u4.x)/(sy3 - sy4);
-	dty43 = (u3.y - u4.y)/(sy3 - sy4);
+	dtx43 = (u3.x - u4.x)/(s3.z-s4.z);
+	dty43 = (u3.y - u4.y)/(s3.z-s4.z);
+	//if ( (sy3 - sy4) != 0 ) {
+		dtx43 = (u3.x - u4.x)/(sy3 - sy4);
+		dty43 = (u3.y - u4.y)/(sy3 - sy4);
+	//}
 
     if ( abs(s1.y - s2.y) < EPSILON ) {   // Flat top
         if ( s1.x < s2.x ) {
@@ -568,6 +607,11 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
     float zi = sz;
 
+	stu = abs(stu);
+	etu = abs(etu);
+	stv = abs(stv);
+	etv = abs(etv);
+
 	float tx=stu,ty=stv;
 	float uscale,vscale;
 	uscale = (etu-stu)/(ex/ez - sx/sz);
@@ -579,9 +623,20 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 		zi += dzx * (-sx);
 		sx = 0;
 	}
+	else if ( sx >= SIZE_X ) {
+		return;
+	}
+
 	if ( ex >= SIZE_X ) {
 		ex = SIZE_X - 1;
 	}
+	else if ( ex < 0 ) {
+		return;
+	}
+	if ( ex != ex || sx != sx || 
+		fabs(sx) == std::numeric_limits<float>::infinity() ||
+		fabs(ex) == std::numeric_limits<float>::infinity() )
+		return;
     for (x = sx;x<=ex;x++) {
 		if ( zi > z_buffer[ x + y*SIZE_X ] ) {
 			z_buffer[ x + y*SIZE_X ] = zi;

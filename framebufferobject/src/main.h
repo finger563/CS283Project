@@ -1,6 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <limits>
+
 // constants
 const int    SCREEN_WIDTH    = 400;
 const int    SCREEN_HEIGHT   = 300;

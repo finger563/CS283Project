@@ -27,6 +27,7 @@ using std::ends;
 #include "Engine\Object.h"
 #include "Sprites\box.h"
 #include "Sprites\floor.h"
+#include "Sprites\floorsmall.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
@@ -44,7 +45,7 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 
 Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(floortex,floortexwidth);
+Object testobj3 = Object(floortexsmall,floortexsmallwidth);
 
 std::list<Object> objectlist;
 std::list<Triangle> renderlist;
@@ -534,11 +535,9 @@ void updatePixels(GLubyte* dst, int size)
 		}
 	}
 
-	testobj.Rotate( rot );
-	testobj2.Rotate( rot );
-	//testobj3.Rotate( rot );
-
-	//CameraPos = Point3D();
+	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
+		it->Rotate(rot);
+	}
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i)
@@ -916,7 +915,15 @@ void keyboardCB(unsigned char key, int x, int y)
 		CameraPos = CameraPos + Vector3D(-1,0,0);
 		break;
 
-    case ' ':
+	case ' ': // space
+		CameraPos = CameraPos + Vector3D(0,-1,0);
+		break;
+
+	case 'c': // c
+		CameraPos = CameraPos + Vector3D(0,1,0);
+		break;
+
+    case 'p':
         if(pboSupported)
             pboMode = ++pboMode % 3;
         cout << "PBO mode: " << pboMode << endl;
