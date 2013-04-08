@@ -7,6 +7,12 @@
 #include "constants.h"
 #include "..\main.h"
 
+// Note: 3D and 2D (e.g. Point3D and Point2D) are with respect to world space
+// coordinates.  All types of points/vectors are stored in homogeneous coordinates
+// which encapsulates the 2/3D point in a higher dimension to become 3/4D.  
+// This is done for mathematical ease of use and correctness with respect to 
+// projection.  
+
 class Point3D
 {
 public:
