@@ -175,6 +175,16 @@ int main(int argc, char **argv)
 	tm.data[0][3] = 0;			// project x
 	tm.data[1][3] = 0;			// project y
 	tm.data[2][3] = 1;			// project z
+	
+    tm.data[3][0] = 0;	// translate x
+    tm.data[3][1] = 0;	// translate y
+	tm.data[3][2] = 0;			// translate z
+    tm.data[0][0] = SIZE_X/2;	// scale x
+    tm.data[1][1] = SIZE_Y/2;	// scale y
+	tm.data[2][2] = 1;			// scale z
+	tm.data[0][3] = SIZE_X/2;			// project x
+	tm.data[1][3] = SIZE_Y/2;			// project y
+	tm.data[2][3] = 1;			// project z
 
 	testobj.generateCube();
 	testobj2.generateCube();
