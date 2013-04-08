@@ -903,27 +903,27 @@ void keyboardCB(unsigned char key, int x, int y)
         break;
 
 	case 'w': // Up
-		CameraPos = CameraPos + Vector3D(0,0,-1);
+		camera.Translate(Vector3D(0,0,-1));
 		break;
 
 	case 's': // down
-		CameraPos = CameraPos + Vector3D(0,0,1);
+		camera.Translate(Vector3D(0,0,1));
 		break;
 
 	case 'a': // left
-		CameraPos = CameraPos + Vector3D(1,0,0);
+		camera.Translate(Vector3D(1,0,0));
 		break;
 
 	case 'd': // right
-		CameraPos = CameraPos + Vector3D(-1,0,0);
+		camera.Translate(Vector3D(-1,0,0));
 		break;
 
 	case ' ': // space
-		CameraPos = CameraPos + Vector3D(0,-1,0);
+		camera.Translate(Vector3D(0,-1,0));
 		break;
 
 	case 'c': // c
-		CameraPos = CameraPos + Vector3D(0,1,0);
+		camera.Translate(Vector3D(0,1,0));
 		break;
 
     case 'p':
@@ -985,19 +985,19 @@ void specialKeyCB(int key, int x, int y)
     switch(key)
     {
 	case GLUT_KEY_UP: // Up
-		CameraPos = CameraPos + Vector3D(0,0,-1);
+		camera.Translate(Vector3D(0,0,-1));
 		break;
 
 	case GLUT_KEY_DOWN: // down
-		CameraPos = CameraPos + Vector3D(0,0,1);
+		camera.Translate(Vector3D(0,0,1));
 		break;
 
 	case GLUT_KEY_LEFT: // left
-		CameraPos = CameraPos + Vector3D(1,0,0);
+		camera.Translate(Vector3D(1,0,0));
 		break;
 
 	case GLUT_KEY_RIGHT: // right
-		CameraPos = CameraPos + Vector3D(-1,0,0);
+		camera.Translate(Vector3D(-1,0,0));
 		break;
 	}
 }
