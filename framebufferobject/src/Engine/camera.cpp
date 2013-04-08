@@ -31,9 +31,9 @@ void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or sho
 	 rotation = m*rotation;
 	 
 	 //rotate each vector by rotation
-	 up = m * up;
-	 forward = m * forward;
-	 right = m * right;
+	 //up = m * up;
+	 //forward = m * forward;
+	 //right = m * right;
 	 //Normalize();
 }
 
@@ -44,9 +44,9 @@ void Camera::Rotate (float x, float y, float z)
 	 rotation = rotation*m;
 
 	 //rotate each vector by rotation
-	 up = m * up;
-	 forward = m * forward;
-	 right = m * right;
+	 //up = m * up;
+	 //forward = m * forward;
+	 //right = m * right;
 	 //Normalize();
 }
 
@@ -57,9 +57,9 @@ void Camera::Rotate (float x, Vector3D v)
 	 rotation = rotation*m;
 
 	 //rotate each vector by rotation
-	 up = m * up;
-	 forward = m * forward;
-	 right = m * right;
+	 //up = m * up;
+	 //forward = m * forward;
+	 //right = m * right;
 	 //Normalize();
 }
 
