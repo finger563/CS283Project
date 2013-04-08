@@ -4,6 +4,8 @@
 #include "point.h"
 #include "matrix.h"
 
+const float  CAMERA_DISTANCE = 2.0f;
+
 class Camera{
 
 private:
@@ -35,6 +37,8 @@ void Translate(Vector3D v);
 void Rotate (Matrix m);
 
 Matrix getRotation();
+
+
 
 
 ////this is a function to rotate the camera using the vector's ROTATE method
