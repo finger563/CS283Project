@@ -59,7 +59,6 @@ Matrix rmz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
-Point3D CameraPos = Point3D();
 float rot_angle = 3.141/1200;
 
 Camera camera;
@@ -135,15 +134,7 @@ PFNGLUNMAPBUFFERARBPROC pglUnmapBufferARB = 0;                   // unmap VBO pr
 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
-{
-    rmz.SetIdentity();
-    rmy.SetIdentity();
-    rmx.SetIdentity();
-    rmxy.SetIdentity();
-	rmxz.SetIdentity();
-	rmyz.SetIdentity();
-    rmxyz.SetIdentity();
-    
+{    
     rmz.data[0][0] = cos(rot_angle);
     rmz.data[0][1] = -sin(rot_angle);
     rmz.data[1][0] = sin(rot_angle);
@@ -163,8 +154,7 @@ int main(int argc, char **argv)
 	rmxz = rmx*rmz;
 	rmyz = rmy*rmz;
     rmxyz = rmz*rmxy;
-        
-    tm.SetIdentity();
+
     tm.data[0][3] = SIZE_X/2;	// how much to translate x?
     tm.data[1][3] = SIZE_Y/2;	// how much to translate y?
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
@@ -525,7 +515,7 @@ void updatePixels(GLubyte* dst, int size)
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		it->updateList();
-		it->Translate( it->getPosition() + CameraPos );
+		it->Translate( it->getPosition() + camera.getPosition() );
 		it->rotateTemp(camera.getRotation());
 		it->TransformToScreen( tm );
 		std::list<Triangle> templist = it->getRenderList();
@@ -902,28 +892,36 @@ void keyboardCB(unsigned char key, int x, int y)
         exit(0);
         break;
 
+	case 'q':	// rotate left
+		camera.Rotate(.1,Vector3D(0,1,0));
+		break;
+
+	case 'e':	// rotate right
+		camera.Rotate(-.1,Vector3D(0,1,0));
+		break;
+
 	case 'w': // Up
-		CameraPos = CameraPos + Vector3D(0,0,-1);
+		camera.Translate(Vector3D(0,0,-1));
 		break;
 
 	case 's': // down
-		CameraPos = CameraPos + Vector3D(0,0,1);
+		camera.Translate(Vector3D(0,0,1));
 		break;
 
 	case 'a': // left
-		CameraPos = CameraPos + Vector3D(1,0,0);
+		camera.Translate(Vector3D(1,0,0));
 		break;
 
 	case 'd': // right
-		CameraPos = CameraPos + Vector3D(-1,0,0);
+		camera.Translate(Vector3D(-1,0,0));
 		break;
 
 	case ' ': // space
-		CameraPos = CameraPos + Vector3D(0,-1,0);
+		camera.Translate(Vector3D(0,-1,0));
 		break;
 
 	case 'c': // c
-		CameraPos = CameraPos + Vector3D(0,1,0);
+		camera.Translate(Vector3D(0,1,0));
 		break;
 
     case 'p':
@@ -985,19 +983,19 @@ void specialKeyCB(int key, int x, int y)
     switch(key)
     {
 	case GLUT_KEY_UP: // Up
-		CameraPos = CameraPos + Vector3D(0,0,-1);
+		//CameraPos = CameraPos + Vector3D(0,0,-1);
 		break;
 
 	case GLUT_KEY_DOWN: // down
-		CameraPos = CameraPos + Vector3D(0,0,1);
+		//CameraPos = CameraPos + Vector3D(0,0,1);
 		break;
 
 	case GLUT_KEY_LEFT: // left
-		CameraPos = CameraPos + Vector3D(1,0,0);
+		//CameraPos = CameraPos + Vector3D(1,0,0);
 		break;
 
 	case GLUT_KEY_RIGHT: // right
-		CameraPos = CameraPos + Vector3D(-1,0,0);
+		//CameraPos = CameraPos + Vector3D(-1,0,0);
 		break;
 	}
 }

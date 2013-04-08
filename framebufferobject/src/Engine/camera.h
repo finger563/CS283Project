@@ -30,6 +30,8 @@ public:
 //bleh constructor
 Camera();
 
+void Normalize();
+
 void Translate(Vector3D v);
 
 void setRotation (Matrix m);
@@ -41,6 +43,8 @@ void Rotate (float x, float y, float z);
 void Rotate (float x, Vector3D v);
 
 Matrix getRotation();
+
+Point3D getPosition();
 
 
 
