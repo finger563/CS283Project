@@ -32,7 +32,13 @@ Camera();
 
 void Translate(Vector3D v);
 
+void setRotation (Matrix m);
+
 void Rotate (Matrix m);
+
+void Rotate (float x, float y, float z);
+
+void Rotate (float x, Vector3D v);
 
 Matrix getRotation();
 
