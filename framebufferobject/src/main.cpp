@@ -14,11 +14,13 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 #include "glInfo.h"                             // glInfo struct
 #include "Timer.h"
 
 using std::stringstream;
 using std::cout;
+using std::cin;
 using std::endl;
 using std::ends;
 
@@ -60,6 +62,8 @@ Matrix rmz = Matrix(),
         rmxyz = Matrix();
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
 float rot_angle = 3.141/1200;
+		
+Matrix rot;		// debug/testing for rotating objects
 
 Camera camera;
 
@@ -479,37 +483,6 @@ void updatePixels(GLubyte* dst, int size)
 			display_buffer[x + y*SIZE_X] = 0;
 			z_buffer[x + y*SIZE_X] = 0;
 		}
-		
-	Matrix rot;
-	switch ( rotx + roty*2 + rotz*4 )
-	{
-	case 0:
-		rot.SetIdentity();
-		break;
-	case 1:
-		rot = rmx;
-		break;
-	case 2:
-		rot = rmy;
-		break;
-	case 3:
-		rot = rmxy;
-		break;
-	case 4:
-		rot = rmz;
-		break;
-	case 5:
-		rot = rmxz;
-		break;
-	case 6:
-		rot = rmyz;
-		break;
-	case 7:
-		rot = rmxyz;
-		break;
-	default:
-		rot = rmxyz;
-	}
 
 	renderlist.clear();
 
@@ -976,6 +949,36 @@ void keyboardCB(unsigned char key, int x, int y)
     default:
         ;
     }
+
+	switch ( rotx + roty*2 + rotz*4 )
+	{
+	case 0:
+		rot.SetIdentity();
+		break;
+	case 1:
+		rot = rmx;
+		break;
+	case 2:
+		rot = rmy;
+		break;
+	case 3:
+		rot = rmxy;
+		break;
+	case 4:
+		rot = rmz;
+		break;
+	case 5:
+		rot = rmxz;
+		break;
+	case 6:
+		rot = rmyz;
+		break;
+	case 7:
+		rot = rmxyz;
+		break;
+	default:
+		rot = rmxyz;
+	}
 }
 
 void specialKeyCB(int key, int x, int y)
