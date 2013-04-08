@@ -66,6 +66,7 @@ bool Object::updateList()
 	return true;
 }
 
+
 //Updates Temp list with any changes to the master list
 bool Object::updateList(std::list<Triangle> poly)
 {
@@ -94,6 +95,15 @@ void Object::clearTemp()
 {
 	//empties temp list
 	temp.clear();
+}
+
+//Rotate Temp list
+void Object::rotateTemp(Matrix m)
+{
+	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
+	{
+		it->Rotate(m);
+	}
 }
 
 //add polygon to lists

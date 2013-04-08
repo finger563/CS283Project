@@ -19,6 +19,11 @@ void Camera::setRotation(Matrix m) //will we be passing the rotation matrix?? or
 void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or should I set a default matrix in the constructor?
 {
 	 rotation = rotation * m;
+	 
+	 //rotate each vector by rotation
+	 up = rotation * up;
+	 forward = rotation * forward;
+	 right = rotation * right;
 }
 
 void Camera::Rotate (float x, float y, float z) 
@@ -26,6 +31,11 @@ void Camera::Rotate (float x, float y, float z)
 	 Matrix m;
 	 m.SetRotation(x, y, z);
 	 rotation = rotation*m;
+
+	 //rotate each vector by rotation
+	 up = rotation * up;
+	 forward = rotation * forward;
+	 right = rotation * right;
 }
 
 void Camera::Rotate (float x, Vector3D v) 
@@ -33,6 +43,11 @@ void Camera::Rotate (float x, Vector3D v)
 	 Matrix m;
 	 m.SetRotation(x,v);
 	 rotation = rotation*m;
+
+	 //rotate each vector by rotation
+	 up = rotation * up;
+	 forward = rotation * forward;
+	 right = rotation * right;
 }
 
 Matrix Camera::getRotation()

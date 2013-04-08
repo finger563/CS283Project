@@ -8,7 +8,7 @@ class Matrix
 {
 public:
     float data[4][4];
-    Matrix() { Clear(); }
+    Matrix() { SetIdentity(); }
     Matrix(const Matrix& m);
     ~Matrix(){}
 

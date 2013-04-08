@@ -28,6 +28,7 @@ using std::ends;
 #include "Sprites\box.h"
 #include "Sprites\floor.h"
 #include "Sprites\floorsmall.h"
+#include "Engine\camera.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
@@ -61,6 +62,7 @@ Matrix tm = Matrix();				// transformation matrix (scale to screen)
 Point3D CameraPos = Point3D();
 float rot_angle = 3.141/1200;
 
+Camera camera;
 
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
 void displayCB();
@@ -524,6 +526,7 @@ void updatePixels(GLubyte* dst, int size)
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		it->updateList();
 		it->Translate( it->getPosition() + CameraPos );
+		it->rotateTemp(camera.getRotation());
 		it->TransformToScreen( tm );
 		std::list<Triangle> templist = it->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
