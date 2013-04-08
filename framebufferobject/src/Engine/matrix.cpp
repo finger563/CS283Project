@@ -133,9 +133,9 @@ Matrix Matrix::operator- (const Matrix& rhs) const {
 
 Vector3D Matrix::operator* (const Vector3D rhs) const {
     Vector3D v;
-    v.x = rhs.x*data[0][0] + rhs.y*data[0][1] + rhs.z*data[0][2] + data[0][3];
-    v.y = rhs.x*data[1][0] + rhs.y*data[1][1] + rhs.z*data[1][2] + data[1][3];
-    v.z = rhs.x*data[2][0] + rhs.y*data[2][1] + rhs.z*data[2][2] + data[2][3];
-    //v.w = rhs.x*data[3][0] + rhs.y*data[3][1] + rhs.z*data[3][2] + rhs.w*data[3][3];
+    v.x = rhs.x*data[0][0] + rhs.y*data[0][1] + rhs.z*data[0][2] + rhs.w*data[0][3];
+    v.y = rhs.x*data[1][0] + rhs.y*data[1][1] + rhs.z*data[1][2] + rhs.w*data[1][3];
+    v.z = rhs.x*data[2][0] + rhs.y*data[2][1] + rhs.z*data[2][2] + rhs.w*data[2][3];
+    v.w = rhs.x*data[3][0] + rhs.y*data[3][1] + rhs.z*data[3][2] + rhs.w*data[3][3];
     return v;
 }

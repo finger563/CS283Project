@@ -3,7 +3,7 @@
 
 #include <limits>
 
-//#define CLIPPING_TEST
+#define CLIPPING_TEST
 
 // constants
 const int    SCREEN_WIDTH    = 400;
