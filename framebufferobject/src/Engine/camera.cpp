@@ -5,6 +5,16 @@ Camera::Camera():up(0, 1, 0), forward(0, 0, 1), right(1, 0, 0), position(0, 0, 0
 
 }
 
+void Camera::Normalize() {
+	up = normalize(up);
+	forward = normalize(forward);
+	right = normalize(right);
+}
+
+Point3D Camera::getPosition() {
+	return position;
+}
+
 //sets position
 void Camera::Translate( Vector3D v)
 {
@@ -18,12 +28,13 @@ void Camera::setRotation(Matrix m) //will we be passing the rotation matrix?? or
 
 void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or should I set a default matrix in the constructor?
 {
-	 rotation = rotation * m;
+	 rotation = m*rotation;
 	 
 	 //rotate each vector by rotation
-	 up = rotation * up;
-	 forward = rotation * forward;
-	 right = rotation * right;
+	 up = m * up;
+	 forward = m * forward;
+	 right = m * right;
+	 //Normalize();
 }
 
 void Camera::Rotate (float x, float y, float z) 
@@ -33,9 +44,10 @@ void Camera::Rotate (float x, float y, float z)
 	 rotation = rotation*m;
 
 	 //rotate each vector by rotation
-	 up = rotation * up;
-	 forward = rotation * forward;
-	 right = rotation * right;
+	 up = m * up;
+	 forward = m * forward;
+	 right = m * right;
+	 //Normalize();
 }
 
 void Camera::Rotate (float x, Vector3D v) 
@@ -45,9 +57,10 @@ void Camera::Rotate (float x, Vector3D v)
 	 rotation = rotation*m;
 
 	 //rotate each vector by rotation
-	 up = rotation * up;
-	 forward = rotation * forward;
-	 right = rotation * right;
+	 up = m * up;
+	 forward = m * forward;
+	 right = m * right;
+	 //Normalize();
 }
 
 Matrix Camera::getRotation()

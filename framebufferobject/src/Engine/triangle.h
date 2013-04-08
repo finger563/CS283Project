@@ -25,7 +25,7 @@ public:
     Point3D s1,s2,s3,s4;		// screen space coordinates for triangle (y-sorted)
     float m12,m13,m23;			// screen space slopes (dx/dy)
     float sx,ex;				// start and end x-pixel coordinates
-	float syl,eyl,syr,eyr;		// start and end y-pixel coordinates
+	float syl,eyl,syr,eyr;		// start and end y-pixel coordinates (not currently used)
 	float sz,ez;				// start and end 1/z world coordinates of object (per scanline)
     float dzx,dz13,dz12,dz23,dz14,dz43;    // z-slopes for 1/z-buffering
 	
