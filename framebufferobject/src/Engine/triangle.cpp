@@ -43,16 +43,6 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	if ( test < 0 ) {
 		return;	// Triangle isn't renderable, don't need to calculate anything else
 	}
-	//cull = eye-b;
-	//test = cull*normal;
-	//if ( test < 0 ) {
-	//	return;
-	//}
-	//cull = eye-c;
-	//test = cull*normal;
-	//if ( test < 0 ) {
-	//	return;
-	//}
 	visible = true;
 
     s1 = a;
@@ -60,7 +50,7 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 		s1.x = (s1.x)/s1.z; // d should be contained in m
 		s1.y = (s1.y)/s1.z;
 	}
-	else if (s1.z == 0) {
+	else if (s1.z == 0) {	// screen-space coords are the same as world if z=0
 	}
 	else {
 		s1.x = (s1.x)/s1.z;
