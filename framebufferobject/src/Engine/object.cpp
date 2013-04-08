@@ -106,7 +106,6 @@ void Object::add(Triangle poly)
 //generates cube
 void Object::generateCube(float size)
 {
-
 	//assume texture is set and set texture 
 	Triangle tri1 = Triangle( Point3D(size, size, size),Point3D(size, -size, size), 
 					Point3D(-size, size, size), Vector3D(0,0,1),Point2D(0,0),Point2D(0,texWidth),Point2D(texWidth,0)),
@@ -206,6 +205,7 @@ void Object::generateFloor(float length, float depth)
 	float sl = 5;	// sidelength of the square
 	position = Point3D(0,depth,0);
 
+#ifndef CLIPPING_TEST
 	Triangle tri1 = Triangle(Point3D(-sl,0,-sl),Point3D(-sl,0,sl),Point3D(sl,0,sl),
 							 Vector3D(0,1,0),Point2D(0,texWidth),Point2D(0,0),Point2D(texWidth,0)),
 			 tri2 = Triangle(Point3D(-sl,0,-sl),Point3D(sl,0,-sl),Point3D(sl,0,sl),
@@ -224,6 +224,15 @@ void Object::generateFloor(float length, float depth)
 		tri1.Translate(sl,0,-length - sl);
 		tri2.Translate(sl,0,-length - sl);
 	}
+#else
+	Triangle tri1 = Triangle(Point3D(-length,0,-length),Point3D(-length,0,length),Point3D(length,0,length),
+							 Vector3D(0,1,0),Point2D(0,texWidth),Point2D(0,0),Point2D(texWidth,0)),
+			 tri2 = Triangle(Point3D(-length,0,-length),Point3D(length,0,-length),Point3D(length,0,length),
+							 Vector3D(0,1,0),Point2D(0,texWidth),Point2D(texWidth,texWidth),Point2D(texWidth,0));
+	master.clear();
+	master.push_back(tri1);
+	master.push_back(tri2);
+#endif
 
 	for(std::list<Triangle>::iterator it = master.begin(); it != master.end(); ++it)
 	{
@@ -296,10 +305,18 @@ std::list<Triangle> Object::getRenderList()
 	std::list<Triangle> get;
 	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
-		if( it->visible && 
+		if( it->visible &&
+#ifndef CLIPPING_TEST
 			it->a.z > 0 &&
 			it->b.z > 0 &&
 			it->c.z > 0
+#else
+				(
+				it->a.z > 0 ||
+				it->b.z > 0 ||
+				it->c.z > 0
+				)
+#endif
 			)
 		{
 			get.push_back(*it);

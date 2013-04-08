@@ -4,8 +4,6 @@
 #include "point.h"
 #include "matrix.h"
 
-const float  CAMERA_DISTANCE = 2.0f;
-
 class Camera{
 
 private:

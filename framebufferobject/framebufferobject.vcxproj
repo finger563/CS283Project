@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine\camera.h" />
+    <ClInclude Include="src\Engine\constants.h" />
     <ClInclude Include="src\Engine\object.h" />
     <ClInclude Include="src\Engine\matrix.h" />
     <ClInclude Include="src\Engine\point.h" />

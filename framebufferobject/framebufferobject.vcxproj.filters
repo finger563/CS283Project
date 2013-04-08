@@ -54,6 +54,9 @@
     <ClInclude Include="src\Sprites\floorsmall.h">
       <Filter>headers\Sprites</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\constants.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\color.frag" />

@@ -607,6 +607,9 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 	dzx =  (1/ez - 1/sz) / ((1/ez-1/sz)*ex/ez - (ex/ez - sx/sz)/ez);
     float zi = sz;
 
+	if ( 1/ez <= 0 && 1/sz <= 0 )
+		return;
+
 	stu = abs(stu);
 	etu = abs(etu);
 	stv = abs(stv);
@@ -650,5 +653,7 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 			display_buffer[ x + y*SIZE_X ] = texture[index];
 		}
         zi += dzx;		// because dx > 0, we increment
+		if ( 1/zi <= 0 )
+			break;
     }
 }
