@@ -22,6 +22,9 @@
     <ClCompile Include="src\Timer.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\camera.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -45,11 +48,9 @@
     <ClInclude Include="src\main.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="src\Sprites\floorsmall.h" />
     <ClInclude Include="src\Engine\camera.h">
       <Filter>headers\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprites\floorsmall.h">
-      <Filter>headers\Sprites</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
