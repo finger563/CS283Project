@@ -100,7 +100,7 @@
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="camera.h" />
+    <ClInclude Include="src\Engine\camera.h" />
     <ClInclude Include="src\Engine\object.h" />
     <ClInclude Include="src\Engine\matrix.h" />
     <ClInclude Include="src\Engine\point.h" />
