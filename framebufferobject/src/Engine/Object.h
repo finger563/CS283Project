@@ -32,7 +32,10 @@ public:
 	bool updateList(std::list<Triangle> poly);
 
 	//Clears Temp list
-	void Object::clearTemp();
+	void clearTemp();
+
+	//Rotate Temp list
+	void rotateTemp(Matrix m);
 
 	//add polygon to lists
 	void add(Triangle poly);
