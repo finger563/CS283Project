@@ -159,6 +159,13 @@ int main(int argc, char **argv)
 	rmyz = rmy*rmz;
     rmxyz = rmz*rmxy;
 
+	// Structure of a transformation matrix:
+	// ( r=rotation, p=projection, t=translation )
+	// | r r r p |
+	// | r r r p |
+	// | r r r p |
+	// | t t t s |
+
     tm.data[0][3] = SIZE_X/2;	// how much to translate x?
     tm.data[1][3] = SIZE_Y/2;	// how much to translate y?
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
