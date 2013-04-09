@@ -171,16 +171,19 @@ int main(int argc, char **argv)
 	// | r r r t | | y |   | y' |
 	// | r r r t | | z |   | z' |
 	// | p p p s | | w |   | w' |
+
+	// We use column vector notation
 	
-    tm.data[0][3] = SIZE_X/2;	// translate x
-    tm.data[1][3] = SIZE_Y/2;	// translate y
-	tm.data[2][3] = 1;			// translate z
+    tm.data[3][1] = SIZE_X/2;	// translate x
+    tm.data[3][2] = SIZE_Y/2;	// translate y
+	tm.data[3][3] = -1;			// translate z
     tm.data[0][0] = SIZE_X/2;	// scale x
     tm.data[1][1] = SIZE_Y/2;	// scale y
 	tm.data[2][2] = 1;			// scale z
-	tm.data[3][0] = 0;			// project x
-	tm.data[3][1] = 0;			// project y
-	tm.data[3][2] = 1;			// project z
+	tm.data[3][3] = 0;			// scale w
+	tm.data[0][3] = 0;			// project x
+	tm.data[1][3] = 0;			// project y
+	tm.data[2][3] = 1;			// project z
 
 	testobj.generateCube();
 	testobj2.generateCube();
@@ -498,7 +501,7 @@ void updatePixels(GLubyte* dst, int size)
 	
 	for (int y=0;y<SIZE_Y;y++)
 		for (int x = 0; x<SIZE_X;x++) {
-			display_buffer[x + y*SIZE_X] = 0;
+			display_buffer[x + y*SIZE_X] = BACKGROUND_COLOR;
 			z_buffer[x + y*SIZE_X] = 0;
 		}
 
@@ -506,9 +509,10 @@ void updatePixels(GLubyte* dst, int size)
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		it->updateList();
-		it->Translate( it->getPosition() + camera.getPosition() );
-		it->rotateTemp(camera.getRotation());
-		it->TransformToScreen( tm );
+		it->Translate( it->getPosition() + camera.getPosition() );	// translate world to camera
+		it->rotateTemp(camera.getRotation());	// rotate world to viewspace/camera
+		it->TransformToScreen( tm );			// transform viewspace/camera to screenspace
+		// TODO: Implement Frustum culling and clipping here
 		std::list<Triangle> templist = it->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
 	}

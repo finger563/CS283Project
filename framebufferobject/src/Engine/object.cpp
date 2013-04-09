@@ -297,13 +297,23 @@ std::list<Triangle> Object::Translate(Vector3D& v)
 	return temp;
 }
 
-//Assumes only temp list is being passed
 //returns modified polygon list
 std::list<Triangle> Object::TransformToScreen(Matrix& m)
 {
 	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->TransformToScreen(m);
+	}
+
+	return temp;
+}
+
+//returns modified polygon list
+std::list<Triangle> Object::TransformToScreenHomogeneous(Matrix& m)
+{
+	for(std::list<Triangle>::iterator it = temp.begin(); it != temp.end(); ++it)
+	{
+		it->TransformToScreenHomogeneous(m);
 	}
 
 	return temp;

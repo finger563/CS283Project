@@ -66,6 +66,10 @@ public:
     void TransformToScreen( const Matrix& m );
     void DrawFilledZbuffer( const int y );
     void DrawTexturedZbuffer( const int y );
+	// THIS IS FOR TESTING
+    void TransformToScreenHomogeneous( const Matrix& m );
+	void DrawTexturedZbufferHomogeneous( const int y );
+
     void DrawWireframe ( const Matrix& m );
     void DrawFilled ( void );
 };

@@ -69,9 +69,11 @@ public:
 	std::list<Triangle> Translate(Vector3D& v);
 
 	//transforms polygons to screen
-	//assumes that only the temp list is being passed through
-	//may need to add return feature to TransformtoScreen()
 	std::list<Triangle> TransformToScreen(Matrix& m);
+
+	// ONLY FOR HOMOGENEOUS TESTING
+	//transforms polygons to screen
+	std::list<Triangle> TransformToScreenHomogeneous(Matrix& m);
 
 	//returns final render list
 	std::list<Triangle> getRenderList();

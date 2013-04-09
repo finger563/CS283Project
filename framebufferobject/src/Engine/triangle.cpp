@@ -50,8 +50,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     s3 = c;
 
 	if ( s1.z > 0 ) {
-		s1.x = (s1.x)/s1.z; // d should be contained in m
-		s1.y = (s1.y)/s1.z;
+		s1.x = (s1.x)/(s1.z+1); // d should be contained in m
+		s1.y = (s1.y)/(s1.z+1);
 	}
 	else if (s1.z == 0) {	// screen-space coords are the same as world if z=0
 	}
@@ -61,8 +61,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	}
 
 	if ( s2.z > 0 ) {
-		s2.x = (s2.x)/s2.z;
-		s2.y = (s2.y)/s2.z;
+		s2.x = (s2.x)/(s2.z+1);
+		s2.y = (s2.y)/(s2.z+1);
 	}
 	else if (s2.z == 0) {
 	}
@@ -72,8 +72,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	}
 
 	if ( s3.z > 0 ) {
-		s3.x = (s3.x)/s3.z;
-		s3.y = (s3.y)/s3.z;
+		s3.x = (s3.x)/(s3.z+1);
+		s3.y = (s3.y)/(s3.z+1);
 	}
 	else if (s3.z == 0) {
 	}
@@ -158,40 +158,20 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	u4.x = u1.x + (u3.x - u1.x) * (sy4-sy1) / (sy3 - sy1);	// Intermediate texture coords
 	u4.y = u1.y + (u3.y - u1.y) * (sy4-sy1) / (sy3 - sy1);
 
-	//dtx13 = (u3.x - u1.x)/(s3.z-s1.z);
-	//dty13 = (u3.y - u1.y)/(s3.z-s1.z);
-	//if ( (sy3 - sy1) != 0 ) {
-		dtx13 = (u3.x - u1.x)/(sy3 - sy1);		// slopes for texture coordinates
-		dty13 = (u3.y - u1.y)/(sy3 - sy1);
-	//}
+	dtx13 = (u3.x - u1.x)/(sy3 - sy1);		// slopes for texture coordinates
+	dty13 = (u3.y - u1.y)/(sy3 - sy1);
 
-	//dtx12 = (u2.x - u1.x)/(s2.z-s1.z);
-	//dty12 = (u2.y - u1.y)/(s2.z-s1.z);
-	//if ( (sy2 - sy1) != 0 ) {
-		dtx12 = (u2.x - u1.x)/(sy2 - sy1);
-		dty12 = (u2.y - u1.y)/(sy2 - sy1);
-	//}
+	dtx12 = (u2.x - u1.x)/(sy2 - sy1);
+	dty12 = (u2.y - u1.y)/(sy2 - sy1);
 
-	//dtx23 = (u3.x - u2.x)/(s3.z-s2.z);
-	//dty23 = (u3.y - u2.y)/(s3.z-s2.z);
-	//if ( (sy3 - sy2) != 0 ) {
-		dtx23 = (u3.x - u2.x)/(sy3 - sy2);
-		dty23 = (u3.y - u2.y)/(sy3 - sy2);
-	//}
+	dtx23 = (u3.x - u2.x)/(sy3 - sy2);
+	dty23 = (u3.y - u2.y)/(sy3 - sy2);
 
-	//dtx14 = (u4.x - u1.x)/(s4.z-s1.z);
-	//dty14 = (u4.y - u1.y)/(s4.z-s1.z);
-	//if ( (sy4 - sy1) != 0 ) {
-		dtx14 = (u4.x - u1.x)/(sy4 - sy1);
-		dty14 = (u4.y - u1.y)/(sy4 - sy1);
-	//}
+	dtx14 = (u4.x - u1.x)/(sy4 - sy1);
+	dty14 = (u4.y - u1.y)/(sy4 - sy1);
 
-	//dtx43 = (u3.x - u4.x)/(s3.z-s4.z);
-	//dty43 = (u3.y - u4.y)/(s3.z-s4.z);
-	//if ( (sy3 - sy4) != 0 ) {
-		dtx43 = (u3.x - u4.x)/(sy3 - sy4);
-		dty43 = (u3.y - u4.y)/(sy3 - sy4);
-	//}
+	dtx43 = (u3.x - u4.x)/(sy3 - sy4);
+	dty43 = (u3.y - u4.y)/(sy3 - sy4);
 
     if ( abs(s1.y - s2.y) < EPSILON ) {   // Flat top
         if ( s1.x < s2.x ) {
@@ -391,7 +371,7 @@ void Triangle::DrawFilled ( void ) {
     }
 }
 
-// Pass in the Global to screen space transform
+// Pass in the pixel-space y value
 void Triangle::DrawFilledZbuffer ( const int y ) {
     if ( normal.z > 0 || 
 		s1.y < y || s3.y > y )
@@ -481,7 +461,7 @@ void Triangle::DrawFilledZbuffer ( const int y ) {
     }
 }
 
-// Pass in the Global to screen space transform
+// Pass in the pixel-space y value
 void Triangle::DrawTexturedZbuffer ( const int y ) {
     if ( 
 		s1.y < y || s3.y > y )
@@ -640,5 +620,183 @@ void Triangle::DrawTexturedZbuffer ( const int y ) {
 			display_buffer[ x + y*SIZE_X ] = texture[index];
 		}
         zi += dzx;		// because dx > 0, we increment
+    }
+}
+
+
+
+// Pass in the view to screen space transform
+void Triangle::TransformToScreenHomogeneous ( const Matrix& m ) {
+	visible = false;
+	Vector3D eye = Vector3D(0,0,-1);
+	Vector3D cull = eye-a;
+	float test = cull*normal;
+	if ( test < 0 ) {
+		return;	// Triangle isn't renderable, don't need to calculate anything else
+	}
+	visible = true;
+
+    s1 = a;
+    s2 = b;
+    s3 = c;
+
+	if ( s1.z > 0 ) {
+		s1.x = (s1.x)/(s1.z+1); // d should be contained in m
+		s1.y = (s1.y)/(s1.z+1);
+	}
+
+	if ( s2.z > 0 ) {
+		s2.x = (s2.x)/(s2.z+1);
+		s2.y = (s2.y)/(s2.z+1);
+	}
+
+	if ( s3.z > 0 ) {
+		s3.x = (s3.x)/(s3.z+1);
+		s3.y = (s3.y)/(s3.z+1);
+	}
+
+    // sort vertices and associated texture coords by  Screen space y
+    Point3D t1 = s1, t2 = s2, t3 = s3;
+	Point2D tex1 = u, tex2 = v, tex3 = w;
+	Point3D tmp;
+	Point2D tex;
+    if ( t1.y < s2.y ) {
+        t1 = s2;
+        t2 = s1;
+		tex1 = v;
+		tex2 = u;
+    }
+    if ( t1.y < s3.y ) {
+        t3 = t1;
+        t1 = s3;
+		tex3 = tex1;
+		tex1 = w;
+    }
+    if ( t2.y < t3.y ) {
+        tmp = t2;
+        t2 = t3;
+        t3 = tmp;
+		tex = tex2;
+		tex2 = tex3;
+		tex3 = tex;
+    }
+    s1 = t1;
+    s2 = t2;
+    s3 = t3;
+	u1 = tex1;
+	u2 = tex2;
+	u3 = tex3;		// Sort the texture points along with polygon points
+
+    s1 = m*s1;		// PERFORM THE TRANSFORMATION
+    s2 = m*s2;
+    s3 = m*s3;
+
+	// Screen-space Slopes
+    m12 = (s2.x-s1.x)/(s2.y-s1.y);   // inverse slope between s1 & s2
+    m13 = (s3.x-s1.x)/(s3.y-s1.y);   // inverse slope between s1 & s3
+    m23 = (s3.x-s2.x)/(s3.y-s2.y);   // inverse slope between s2 & s3
+
+	float sy1 = s1.y, sx1 = s1.x,
+		  sy2 = s2.y, sx2 = s2.x,
+		  sy3 = s3.y, sx3 = s3.x;
+
+    s4.y = s2.y;
+    s4.x = s1.x + (s2.y-s1.y)*m13;
+	s4.z = 1/(-(sy3 - sy1) + (s3.z - s1.z)*(s1.y + (s2.y - s1.y))) * ((s3.z-s1.z)*sy1 - (sy3 - sy1)*s1.z);
+
+    if ( abs(s1.y - s2.y) < EPSILON ) {   // Flat top
+        if ( s1.x < s2.x ) {
+            type = FLAT_TOP_RIGHT;
+			sx = s1.x;
+			ex = s2.x;
+			sz = 1/s1.z;
+			ez = 1/s2.z;
+			stu = u1.x;
+			stv = u1.y;
+			etu = u2.x;
+			etv = u2.y;
+        }
+        else {
+			sx = s2.x;
+			ex = s1.x;
+			sz = 1/s2.z;
+			ez = 1/s1.z;
+			stu = u2.x;
+			stv = u2.y;
+			etu = u1.x;
+			etv = u1.y;
+            type = FLAT_TOP_LEFT;
+        }
+    }
+    else {
+		sx = s1.x;
+		ex = s1.x;
+		sz = 1/s1.z;
+		ez = 1/s1.z;
+		stu = u1.x;
+		stv = u1.y;
+		etu = u1.x;
+		etv = u1.y;
+        if ( abs(s2.y - s3.y) < EPSILON ) {   // Flat Bottom
+            if ( s3.x < s2.x ) {
+                type = FLAT_BOTTOM_RIGHT;
+            }
+            else {
+                type = FLAT_BOTTOM_LEFT;
+            }
+        }
+        else {      // Normal triangle
+            if ( s2.x > s4.x ) {
+                type = NORMAL_RIGHT;
+            }
+            else {
+                type = NORMAL_LEFT;
+            }
+        }
+    }
+}
+
+// Pass in the pixel-space y value
+void Triangle::DrawTexturedZbufferHomogeneous ( const int y ) {
+    if ( 
+		s1.y < y || s3.y > y )
+        return;
+
+    float dy = y - s1.y;	// dy is negative!
+	
+    switch ( type ) {
+    case FLAT_TOP_RIGHT:
+        break;
+    case FLAT_TOP_LEFT:
+        break;
+    case FLAT_BOTTOM_RIGHT:
+        break;
+    case FLAT_BOTTOM_LEFT:
+        break;
+    case NORMAL_RIGHT:
+        if ( s2.y <= y ) { 
+        }
+        else {
+            dy = y - s2.y;
+        }
+        break;
+    case NORMAL_LEFT:
+        if ( s2.y <= y ) {
+        }
+        else {
+            dy = y - s2.y;
+        }
+        break;
+    default:
+        break;
+    }
+	
+    float zi = sz;
+	int x;
+    for (x = sx;x<=ex;x++) {
+		if ( zi > z_buffer[ x + y*SIZE_X ] ) {
+			z_buffer[ x + y*SIZE_X ] = zi;
+		}
+        //zi += dzx;		// because dx > 0, we increment
     }
 }

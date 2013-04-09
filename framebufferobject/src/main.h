@@ -57,4 +57,6 @@ const int    DATA_SIZE = IMAGE_WIDTH * IMAGE_HEIGHT * CHANNEL_COUNT;
 #define BLU_RGB(xRGB)    ( ( (xRGB >> 11 ) & 0x1F ) * 8 )
 #endif
 
+#define BACKGROUND_COLOR	RGB_BLACK
+
 #endif
