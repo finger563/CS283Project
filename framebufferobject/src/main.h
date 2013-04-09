@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <limits>
+#include "Engine\constants.h"
 
 #define CLIPPING_TEST
 
