@@ -107,6 +107,7 @@
     <ClInclude Include="src\Engine\object.h" />
     <ClInclude Include="src\Engine\matrix.h" />
     <ClInclude Include="src\Engine\point.h" />
+    <ClInclude Include="src\Engine\Polygon.h" />
     <ClInclude Include="src\Engine\triangle.h" />
     <ClInclude Include="src\Engine\Vertex.h" />
     <ClInclude Include="src\main.h" />

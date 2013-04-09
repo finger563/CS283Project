@@ -66,6 +66,9 @@
     <ClInclude Include="src\Engine\Vertex.h">
       <Filter>headers\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\Engine\Polygon.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\color.frag" />
