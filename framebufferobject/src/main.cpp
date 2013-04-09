@@ -30,6 +30,7 @@ using std::ends;
 #include "Sprites\box.h"
 #include "Sprites\floor.h"
 #include "Sprites\floorsmall.h"
+#include "Sprites\checkerboard.h"
 #include "Engine\camera.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
@@ -48,7 +49,7 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 
 Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(floortexsmall,floortexsmallwidth);
+Object testobj3 = Object(checkerboard,checkerboardwidth);
 
 std::list<Object> objectlist;
 std::list<Triangle> renderlist;
@@ -161,30 +162,25 @@ int main(int argc, char **argv)
 
 	// Structure of a transformation matrix:
 	// ( r=rotation, p=projection, t=translation )
-	// | r r r p |
-	// | r r r p |
-	// | r r r p |
-	// | t t t s |
-
-    tm.data[3][0] = SIZE_X/2;	// translate x
-    tm.data[3][1] = SIZE_Y/2;	// translate y
-	tm.data[3][2] = 0;			// translate z
-    tm.data[0][0] = SIZE_X/2;	// scale x
-    tm.data[1][1] = SIZE_Y/2;	// scale y
-	tm.data[2][2] = 1;			// scale z
-	tm.data[0][3] = 0;			// project x
-	tm.data[1][3] = 0;			// project y
-	tm.data[2][3] = 1;			// project z
+	// [ x y z w ]	| r r r p | = [ x' y' z' w']
+	//				| r r r p |
+	//				| r r r p |
+	//				| t t t s |
+	//				or 
+	// | r r r t | | x | = | x' |
+	// | r r r t | | y |   | y' |
+	// | r r r t | | z |   | z' |
+	// | p p p s | | w |   | w' |
 	
-    tm.data[3][0] = 0;	// translate x
-    tm.data[3][1] = 0;	// translate y
-	tm.data[3][2] = 0;			// translate z
+    tm.data[0][3] = SIZE_X/2;	// translate x
+    tm.data[1][3] = SIZE_Y/2;	// translate y
+	tm.data[2][3] = 1;			// translate z
     tm.data[0][0] = SIZE_X/2;	// scale x
     tm.data[1][1] = SIZE_Y/2;	// scale y
 	tm.data[2][2] = 1;			// scale z
-	tm.data[0][3] = SIZE_X/2;			// project x
-	tm.data[1][3] = SIZE_Y/2;			// project y
-	tm.data[2][3] = 1;			// project z
+	tm.data[3][0] = 0;			// project x
+	tm.data[3][1] = 0;			// project y
+	tm.data[3][2] = 1;			// project z
 
 	testobj.generateCube();
 	testobj2.generateCube();
