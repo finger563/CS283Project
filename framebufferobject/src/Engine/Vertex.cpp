@@ -1,6 +1,6 @@
 #include "Vertex.h"
 
-length& length::operator= (const length& rhs) 
+Vertex& Vertex::operator= (const Vertex& rhs) 
 {
     x = rhs.x;
     y = rhs.y;
@@ -9,27 +9,27 @@ length& length::operator= (const length& rhs)
     return (*this);   
 }
 
-length length::operator* (const float rhs) const 
+Vertex Vertex::operator* (const float rhs) const 
 {
-    return length(x*rhs,y*rhs,z*rhs,w*rhs);   
+    return Vertex(x*rhs,y*rhs,z*rhs,w*rhs);   
 }
 
-length length::operator/ (const float rhs) const 
+Vertex Vertex::operator/ (const float rhs) const 
 {
-    return length(x/rhs,y/rhs,z/rhs,w/rhs);   
+    return Vertex(x/rhs,y/rhs,z/rhs,w/rhs);   
 }
 
-float length::operator* (const length& rhs) const 
+float Vertex::operator* (const Vertex& rhs) const 
 {
     return (x*rhs.x + y*rhs.y + z*rhs.z);
 }
 
-length length::operator+ (const length& rhs) const 
+Vertex Vertex::operator+ (const Vertex& rhs) const 
 {
-    return length(x+rhs.x,y+rhs.y,z+rhs.z);
+    return Vertex(x+rhs.x,y+rhs.y,z+rhs.z);
 }
 
-length length::operator- (const length& rhs) const 
+Vertex Vertex::operator- (const Vertex& rhs) const 
 {
-    return length(x-rhs.x,y-rhs.y,z-rhs.z);
+    return Vertex(x-rhs.x,y-rhs.y,z-rhs.z);
 }
