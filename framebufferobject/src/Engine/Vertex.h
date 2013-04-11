@@ -7,16 +7,22 @@
 #include "..\main.h"
 #include "matrix.h"
 
+#define NUM_VERTEX_DATA	16
+
 class Vertex
 {
 public:
-
-    float x,y,z,w;		// 3D homogeneous coords
-	float ex,ey,ez;		// 3D homogenous eye/camera coords ( w for this system is h1 )
-	float u,v;			// 2D texture coords ( w for this system is h1 )
-	float r,g,b;		// RGB color (range = [0,1]), ( w for this system is h1 )
-	float nx,ny,nz;		// components of normal vector ( w for this system is h1 )
-	float hw;			// homogeneous coordinate for interpolated values ( 1/~Pw )
+	union {
+		struct {
+			float x,y,z,w;		// 3D homogeneous coords
+			float ex,ey,ez;		// 3D homogenous eye/camera coords ( w for this system is h1 )
+			float u,v;			// 2D texture coords ( w for this system is h1 )
+			float r,g,b;		// RGB color (range = [0,1]), ( w for this system is h1 )
+			float nx,ny,nz;		// components of normal vector ( w for this system is h1 )
+			float hw;			// homogeneous coordinate for interpolated values ( 1/~Pw )
+		};
+		float data[NUM_VERTEX_DATA];
+	};
 
     Vertex() {
 		x=y=z=0;w=1;
@@ -51,6 +57,9 @@ public:
 
 	// Operator Overloads
 	Vertex& operator= (const Vertex& rhs);
+	bool operator== (const Vertex& rhs) const;
+	float& operator[](const int i) { return data[i]; }
+	float operator[](const int i) const { return data[i]; }
 };
 
 #endif	// Vertex_H

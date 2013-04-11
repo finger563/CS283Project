@@ -43,3 +43,11 @@ Vertex& Vertex::operator= (const Vertex& rhs)
 	hw = rhs.hw;
     return (*this);   
 }
+
+bool Vertex::operator== (const Vertex& rhs) const {
+	for (int i=0;i<NUM_VERTEX_DATA;i++){
+		if ( data[i] != rhs[i] )
+			return false;
+	}
+	return true;
+}

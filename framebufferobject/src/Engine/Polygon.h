@@ -22,7 +22,8 @@ enum RenderType {
 class Poly
 {
 public:
-	Vertex v1,v2,v3,v4;						// Only support Quads and Triangles
+	Vertex v[POLY_MAX_VERTICES];
+	int numVertices;
 	
 	const unsigned short* texture;			// for texturing
 	int texwidth;							// width of texture
@@ -34,6 +35,7 @@ public:
 	bool visible;		// for backface culling
 
     Poly() {
+		numVertices = 0;
 		texture = defaulttexture;
 		texwidth = defaulttexturewidth;
 	}
@@ -41,14 +43,16 @@ public:
 		 const Vertex& _v2,
 		 const Vertex& _v3,
 		 const Vertex& _v4 = Vertex(),
+		 const int vertices = 3,
 		 const Vector3D& n = Vector3D(),
 		 const RenderType rt = FLAT,
 		 const unsigned short* tex = defaulttexture,
 		 const int width = defaulttexturewidth) {
-		v1 = _v1;
-		v2 = _v2;
-		v3 = _v3;
-		v4 = _v4;
+		v[0] = _v1;
+		v[1] = _v2;
+		v[2] = _v3;
+		v[3] = _v4;
+		numVertices = vertices;
 		normal = n;
 		rType = rt;
 		texture = tex;
@@ -60,9 +64,9 @@ public:
 	void SetTexture( const unsigned short *tex, const int width ) { texture = tex; texwidth = width; }
 
 	// General Transformation Methods, only operate on x,y,z,w of vertices
-	void Transform( const Matrix& m );
-    void Translate( const Vector3D& v );
-    void Translate( const float x, const float y, const float z );
+	void Transform( const Matrix& _m );
+    void Translate( const Vector3D& _v );
+    void Translate( const float _x, const float _y, const float _z );
 
 	// Pipeline Transformation Methods
     void TransformToCamera( const Matrix& m );
