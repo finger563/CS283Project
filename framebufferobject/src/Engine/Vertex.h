@@ -25,12 +25,9 @@ public:
 	};
 
     Vertex() {
-		x=y=z=0;w=1;
-		ex=ey=ez=0;
-		u=v=0;
-		r=g=b=0;
-		nx=ny=nz=0;
-		hw=1;
+		for (int i=0;i<NUM_VERTEX_DATA;i++)
+			data[i] = 0;
+		w=hw=1;
 	}
     Vertex(const float _x,const float _y,const float _z, const float _w = 1) { 
 		x = _x; y = _y; z = _z; w = _w; 
@@ -38,7 +35,7 @@ public:
 		u=v=0;
 		r=g=b=0;
 		nx=ny=nz=0;
-		hw=1;
+		hw=_w;
 	}
     ~Vertex(){}
 

@@ -6,8 +6,14 @@
 
 #define POLY_MAX_VERTICES 4		// don't want anything other than tris and quads
 
+// This makes rasterization much faster (precompute values)
 enum PolyType {
-    FLAT_TOP_RIGHT
+    FLAT_TOP_RIGHT,
+    FLAT_TOP_LEFT,
+    FLAT_BOTTOM_RIGHT,
+    FLAT_BOTTOM_LEFT,
+    NORMAL_RIGHT,
+    NORMAL_LEFT
 };
 
 // This tells the engine what type of rendering we want for this polygon
@@ -62,6 +68,8 @@ public:
 
 	// Polygon variable setter methods
 	void SetTexture( const unsigned short *tex, const int width ) { texture = tex; texwidth = width; }
+	void SetRenderType( const RenderType rt ) { rType =rt; }
+	void SetNormal( const Vector3D n ) { normal = n; }
 
 	// General Transformation Methods, only operate on x,y,z,w of vertices
 	void Transform( const Matrix& _m );

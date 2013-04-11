@@ -25,22 +25,8 @@ void Vertex::Translate( const float _x, const float _y, const float _z ) {
 // Operator Overloads
 Vertex& Vertex::operator= (const Vertex& rhs) 
 {
-    x = rhs.x;
-    y = rhs.y;
-    z = rhs.z;
-	w = rhs.w;
-	ex = rhs.ex;
-	ey = rhs.ey;
-	ez = rhs.ez;
-	u = rhs.u;
-	v = rhs.v;
-	r = rhs.r;
-	g = rhs.g;
-	b = rhs.b;
-	nx = rhs.nx;
-	ny = rhs.ny;
-	nz = rhs.nz;
-	hw = rhs.hw;
+	for (int i=0;i<NUM_VERTEX_DATA;i++)
+		data[i] = rhs[i];
     return (*this);   
 }
 
