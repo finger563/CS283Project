@@ -77,8 +77,8 @@ public:
     void Translate( const float _x, const float _y, const float _z );
 
 	// Pipeline Transformation Methods
-    void TransformToCamera( const Matrix& m );
-    void TransformToPerspective( const Matrix& m );
+    void TransformToCamera( const Matrix& _m );
+    void TransformToPerspective( const Matrix& _m );
 
 	// Pipeline function methods
 	void Clip( );

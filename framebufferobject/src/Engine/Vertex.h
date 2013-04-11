@@ -48,9 +48,14 @@ public:
 	void SetNormalCoords(const float _x, const float _y, const float _z) { nx=_x;ny=_y;nz=_z; }
 	
 	// General Transformation Methods, only operate on x,y,z,w
-	void Transform( const Matrix& m );
-    void Translate( const Vector3D& v );
+	void Transform( const Matrix& _m );
+    void Translate( const Vector3D& _v );
     void Translate( const float _x, const float _y, const float _z );
+	
+	// Pipeline Transformation Methods
+    void TransformToCamera( const Matrix& _m );
+    void TransformToPerspective( const Matrix& _m );
+	void HomogeneousDivide( );
 
 	// Operator Overloads
 	Vertex& operator= (const Vertex& rhs);

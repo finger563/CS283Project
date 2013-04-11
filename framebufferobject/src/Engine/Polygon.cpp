@@ -21,10 +21,14 @@ void Poly::Translate( const float _x, const float _y, const float _z ) {
 }
 
 // Pipeline Transformation Methods
-void Poly::TransformToCamera( const Matrix& m ) {
+void Poly::TransformToCamera( const Matrix& _m ) {
+	for (int i=0;i<numVertices;i++)
+		v[i].TransformToCamera(_m);
 }
 
-void Poly::TransformToPerspective( const Matrix& m ) {
+void Poly::TransformToPerspective( const Matrix& _m ) {
+	for (int i=0;i<numVertices;i++)
+		v[i].TransformToPerspective(_m);
 }
 
 // Pipeline function methods
