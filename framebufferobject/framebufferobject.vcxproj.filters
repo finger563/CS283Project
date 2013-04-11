@@ -28,6 +28,9 @@
     <ClCompile Include="src\Engine\Vertex.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\Polygon.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -68,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="src\Engine\Polygon.h">
       <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprites\defaulttexture.h">
+      <Filter>headers\Sprites</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
