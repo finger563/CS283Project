@@ -34,6 +34,8 @@ public:
 	const unsigned short* texture;			// for texturing
 	int texwidth;							// width of texture
 
+	float r,g,b;							// for flat coloring
+
 	RenderType rType;		// Generally defined by the object, stored here for speed
     PolyType tType;			// for fast rendering, pre-compute
 
@@ -44,6 +46,7 @@ public:
 		numVertices = 0;
 		texture = defaulttexture;
 		texwidth = defaulttexturewidth;
+		r=g=b=1;
 	}
     Poly(const Vertex& _v1,
 		 const Vertex& _v2,
@@ -52,6 +55,7 @@ public:
 		 const int vertices = 3,
 		 const Vector3D& n = Vector3D(),
 		 const RenderType rt = FLAT,
+		 const Vector3D& rgb = Vector3D(1,1,1,1),
 		 const unsigned short* tex = defaulttexture,
 		 const int width = defaulttexturewidth) {
 		v[0] = _v1;
@@ -63,11 +67,29 @@ public:
 		rType = rt;
 		texture = tex;
 		texwidth = width;
+		r=rgb.x;
+		b=rgb.y;
+		g=rgb.z;
 	}
     ~Poly(){}
 
 	// Polygon variable setter methods
-	void SetTexture( const unsigned short *tex, const int width ) { texture = tex; texwidth = width; }
+	void SetTexture( const unsigned short *tex, 
+					 const int width,
+					 Point2D u1 = Point2D(),
+					 Point2D u2 = Point2D(),
+					 Point2D u3 = Point2D(),
+					 Point2D u4 = Point2D()) { 
+		texture = tex; texwidth = width; 
+		v[0].u = u1.x;
+		v[0].v = u1.y;
+		v[1].u = u2.x;
+		v[1].v = u2.y;
+		v[2].u = u3.x;
+		v[2].v = u3.y;
+		v[3].u = u4.x;
+		v[3].v = u4.y;
+	}
 	void SetRenderType( const RenderType rt ) { rType =rt; }
 	void SetNormal( const Vector3D n ) { normal = n; }
 

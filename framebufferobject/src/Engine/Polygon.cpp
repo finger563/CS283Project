@@ -115,21 +115,32 @@ void Poly::Rasterize( const int y ) {
 		}
 		vi = sv;
 		for (int x=sv.x;x<=ev.x;x++) {
-
-		}
-		switch ( rType ) {	// What are we interpolating/rendering?
-		case FLAT:
-			break;
-		case COLORED:
-			break;
-		case SMOOTH:
-			break;
-		case TEXTURED:
-			break;
-		case TEXTURED_SMOOTH:
-			break;
-		default:
-			break;
+			ai = (sv.x-x)/((sv.x-x) - (ev.x-x));
+			vi = sv + (ev-sv)*ai;
+			if ( vi.z < z_buffer[x + y*SIZE_X] ) {
+				switch ( rType ) {	// What are we interpolating/rendering?
+				case FLAT:
+					display_buffer[x + y*SIZE_X] = RGB_MAKE((int)(r*255),(int)(g*255),(int)(b*255));
+					break;
+				case COLORED:
+					vi.r = vi.r/vi.hw;	// divide all interpolated values by hw 
+					vi.g = vi.g/vi.hw;	// divide all interpolated values by hw 
+					vi.b = vi.b/vi.hw;	// divide all interpolated values by hw 
+					display_buffer[x + y*SIZE_X] = RGB_MAKE((int)(vi.r*255),(int)(vi.g*255),(int)(vi.g*255));
+					break;
+				case SMOOTH:
+					break;
+				case TEXTURED:
+					vi.u = vi.u/vi.hw;	// divide all interpolated values by hw 
+					vi.v = vi.v/vi.hw;	// divide all interpolated values by hw 
+					display_buffer[x + y*SIZE_X] = texture[(int)vi.u + ((int)vi.v)*texwidth];
+					break;
+				case TEXTURED_SMOOTH:
+					break;
+				default:
+					break;
+				}
+			}
 		}
 	}
 	else {

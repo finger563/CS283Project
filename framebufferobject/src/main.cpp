@@ -198,8 +198,11 @@ int main(int argc, char **argv)
 
 	projectionToPixel.data[3][0] = SIZE_X/2;	// translate x
 	projectionToPixel.data[3][1] = SIZE_Y/2;	// translate y
-	//projectionToPixel.data[0][0] = SIZE_X/2;	// scale x
-	//projectionToPixel.data[1][1] = SIZE_Y/2;	// scale y
+	projectionToPixel.data[0][0] = 10;	// scale x
+	projectionToPixel.data[1][1] = 10;	// scale y
+
+	testpoly.SetRenderType(TEXTURED);
+	testpoly.SetTexture(floortex,floortexwidth,Point2D(0,0),Point2D(floortexwidth,0),Point2D(0,floortexwidth));
 
 	testobj.generateCube();
 	testobj2.generateCube();
@@ -518,7 +521,7 @@ void updatePixels(GLubyte* dst, int size)
 	for (int y=0;y<SIZE_Y;y++)
 		for (int x = 0; x<SIZE_X;x++) {
 			display_buffer[x + y*SIZE_X] = BACKGROUND_COLOR;
-			z_buffer[x + y*SIZE_X] = 0;
+			z_buffer[x + y*SIZE_X] = DEFAULT_Z_BUFFER;
 		}
 
 #if 0
@@ -553,6 +556,7 @@ void updatePixels(GLubyte* dst, int size)
     for (int y=SIZE_Y-1;y>=0;y--) {
 		renderpoly.Rasterize(y);
 	}
+	testpoly.Transform(rmy);
 #endif
 	
     // copy 4 bytes at once

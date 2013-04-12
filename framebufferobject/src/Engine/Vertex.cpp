@@ -88,3 +88,10 @@ Vertex Vertex::operator* (const float rhs) const {
 		v[i] = data[i]*rhs;
 	return v;
 }
+
+Vertex Vertex::operator/ (const float rhs) const {
+	Vertex v;
+	for (int i=0;i<NUM_VERTEX_DATA;i++)
+		v[i] = data[i]/rhs;
+	return v;
+}

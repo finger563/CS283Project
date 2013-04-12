@@ -65,6 +65,7 @@ public:
 	Vertex operator- (const Vertex& rhs) const;
 	Vertex operator+ (const Vertex& rhs) const;
 	Vertex operator* (const float rhs) const;
+	Vertex operator/ (const float rhs) const;
 };
 
 #endif	// Vertex_H
