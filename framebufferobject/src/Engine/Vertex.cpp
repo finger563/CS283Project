@@ -67,3 +67,24 @@ bool Vertex::operator== (const Vertex& rhs) const {
 	}
 	return true;
 }
+
+Vertex Vertex::operator- (const Vertex& rhs) const{
+	Vertex v;
+	for (int i=0;i<NUM_VERTEX_DATA;i++)
+		v[i] = data[i] - rhs[i];
+	return v;
+}
+
+Vertex Vertex::operator+ (const Vertex& rhs) const {
+	Vertex v;
+	for (int i=0;i<NUM_VERTEX_DATA;i++)
+		v[i] = data[i] + rhs[i];
+	return v;
+}
+
+Vertex Vertex::operator* (const float rhs) const {
+	Vertex v;
+	for (int i=0;i<NUM_VERTEX_DATA;i++)
+		v[i] = data[i]*rhs;
+	return v;
+}

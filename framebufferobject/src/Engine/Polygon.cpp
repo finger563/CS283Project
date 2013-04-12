@@ -31,6 +31,11 @@ void Poly::TransformToPerspective( const Matrix& _m ) {
 		v[i].TransformToPerspective(_m);
 }
 
+void Poly::TransformToPixel( const Matrix& _m ) {
+	for (int i=0;i<numVertices;i++)
+		v[i].Transform(_m);		// only transform the pixel coords (x,y,z)
+}
+
 // Pipeline function methods
 void Poly::Clip( ) {
 	// Can simplify this into the operations instead of
@@ -50,17 +55,82 @@ void Poly::HomogeneousDivide( ) {
 
 // Rasterization Methods
 void Poly::Rasterize( ) {
-	YSort();	// sort the vertices by Y (screen-space)
+	//YSort();	// sort the vertices by Y (screen-space)
+	int y=0;
 	if ( numVertices == 3 ) {
-
 	}
 	else {
 	}
 }
 
 void Poly::Rasterize( const int y ) {
-	YSort();	// sort the vertices by Y (screen-space)
+	//YSort();					// sort the vertices by Y (screen-space)
+	float BC[4] = {0,0,0,0};		// boundary tests against y scanline
+	int line[4] = {0,0,0,0};	// which lines cross y scanline
+	int lines = 0;
+	float a1,a2,ai;				// alphas for each crossing line (there can only be 2), and for inside scanline
+	Vertex sv,ev,vi;			// Start and end scanline vertices, and rendering vertex
+
 	if ( numVertices == 3 ) {
+		for (int i=0;i<numVertices;i++) {
+			BC[i] = v[i].y - y;		// + is above, - is below, 0 is on
+		}
+		line[0] =  ((BC[0] > 0 && BC[1] < 0 ) ||
+					(BC[0] < 0 && BC[1] > 0 ) ) ? 1 : 0;
+		line[1] =  ((BC[1] > 0 && BC[2] < 0 ) ||
+					(BC[1] < 0 && BC[2] > 0 ) ) ? 1 : 0;
+		line[2] =  ((BC[2] > 0 && BC[0] < 0 ) ||
+					(BC[2] < 0 && BC[0] > 0 ) ) ? 1 : 0;
+		lines = line[0] + line[1]*2 + line[2]*4;
+		switch (lines) {
+		case 0:
+		case 1:		// These cases represent a degenerate triangle
+		case 2:
+		case 4:
+		default:
+			break;
+		case 3:		// Lines 0 and 1 cross scanline
+			a1 = BC[0]/(BC[0]-BC[1]);
+			a2 = BC[1]/(BC[1]-BC[2]);
+			sv = v[0] + (v[1]-v[0])*a1;
+			ev = v[1] + (v[2]-v[1])*a2;
+			break;
+		case 5:		// Lines 0 and 2 cross scanline
+			a1 = BC[0]/(BC[0]-BC[1]);
+			a2 = BC[2]/(BC[2]-BC[0]);
+			sv = v[0] + (v[1]-v[0])*a1;
+			ev = v[2] + (v[0]-v[2])*a2;
+			break;
+		case 6:		// Lines 1 and 2 cross scanline
+			a1 = BC[1]/(BC[1]-BC[2]);
+			a2 = BC[2]/(BC[2]-BC[0]);
+			sv = v[1] + (v[2]-v[1])*a1;
+			ev = v[2] + (v[0]-v[2])*a2;
+			break;
+		}
+		if ( sv.x > ev.x ) {	// need to flip start and end vertices
+			Vertex temp = ev;
+			ev = sv;
+			sv = temp;
+		}
+		vi = sv;
+		for (int x=sv.x;x<=ev.x;x++) {
+
+		}
+		switch ( rType ) {	// What are we interpolating/rendering?
+		case FLAT:
+			break;
+		case COLORED:
+			break;
+		case SMOOTH:
+			break;
+		case TEXTURED:
+			break;
+		case TEXTURED_SMOOTH:
+			break;
+		default:
+			break;
+		}
 	}
 	else {
 	}

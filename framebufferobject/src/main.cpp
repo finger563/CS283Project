@@ -50,10 +50,13 @@ Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
 Object testobj3 = Object(checkerboard,checkerboardwidth);
 
-Poly testpoly = 
-    Poly(Vertex(-10,10,10),
-		 Vertex(10,10,10),
-		 Vertex(0,-10,10));
+Poly testpoly = Poly(Vertex(-10,10,10),
+					 Vertex(10,10,10),
+					 Vertex(-10,-10,10));
+
+Matrix worldToCamera;
+Matrix perspectiveProjection;
+Matrix projectionToPixel;
 
 std::list<Object> objectlist;
 std::list<Triangle> renderlist;
@@ -178,9 +181,9 @@ int main(int argc, char **argv)
 
 	// We use ROW vector notation
 	
-    tm.data[3][1] = SIZE_X/2;	// translate x
-    tm.data[3][2] = SIZE_Y/2;	// translate y
-	tm.data[3][3] = -1;			// translate z
+    tm.data[3][0] = SIZE_X/2;	// translate x
+    tm.data[3][1] = SIZE_Y/2;	// translate y
+	tm.data[3][2] = -1;			// translate z
     tm.data[0][0] = SIZE_X/2;	// scale x
     tm.data[1][1] = SIZE_Y/2;	// scale y
 	tm.data[2][2] = 1;			// scale z
@@ -188,13 +191,22 @@ int main(int argc, char **argv)
 	tm.data[0][3] = 0;			// project x
 	tm.data[1][3] = 0;			// project y
 	tm.data[2][3] = 1;			// project z
+	
+	//worldToCamera;
+	perspectiveProjection.data[3][2] = -1;	// translate z
+	perspectiveProjection.data[2][3] = 1;	// project z
 
-	//testobj.generateCube();
-	//testobj2.generateCube();
-	//testobj3.generateFloor(30,-10);
-	//objectlist.push_back(testobj);
-	//objectlist.push_back(testobj2);
-	//objectlist.push_back(testobj3);
+	projectionToPixel.data[3][0] = SIZE_X/2;	// translate x
+	projectionToPixel.data[3][1] = SIZE_Y/2;	// translate y
+	//projectionToPixel.data[0][0] = SIZE_X/2;	// scale x
+	//projectionToPixel.data[1][1] = SIZE_Y/2;	// scale y
+
+	testobj.generateCube();
+	testobj2.generateCube();
+	testobj3.generateFloor(30,-10);
+	objectlist.push_back(testobj);
+	objectlist.push_back(testobj2);
+	objectlist.push_back(testobj3);
 
     initSharedMem();
 
@@ -532,13 +544,15 @@ void updatePixels(GLubyte* dst, int size)
 		it->Rotate(rot);
 	}
 #else
-		Matrix worldToCamera;
-		testpoly.TransformToCamera(worldToCamera);
-		Matrix perspectiveProjection;
-		testpoly.TransformToPerspective(perspectiveProjection);
-		testpoly.Clip();
-		testpoly.HomogeneousDivide();
-		testpoly.Rasterize();
+		Poly renderpoly = testpoly;
+	renderpoly.TransformToCamera( worldToCamera );
+	renderpoly.TransformToPerspective( perspectiveProjection );
+	renderpoly.Clip();
+	renderpoly.HomogeneousDivide();
+	renderpoly.TransformToPixel( projectionToPixel );
+    for (int y=SIZE_Y-1;y>=0;y--) {
+		renderpoly.Rasterize(y);
+	}
 #endif
 	
     // copy 4 bytes at once

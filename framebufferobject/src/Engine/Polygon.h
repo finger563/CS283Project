@@ -79,6 +79,7 @@ public:
 	// Pipeline Transformation Methods
     void TransformToCamera( const Matrix& _m );
     void TransformToPerspective( const Matrix& _m );
+	void TransformToPixel( const Matrix & _m );
 
 	// Pipeline function methods
 	void Clip( );

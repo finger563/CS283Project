@@ -33,7 +33,7 @@ public:
 		x = _x; y = _y; z = _z; w = _w; 
 		ex=ey=ez=0;
 		u=v=0;
-		r=g=b=0;
+		r=g=b=1;	// default color is white
 		nx=ny=nz=0;
 		hw=_w;
 	}
@@ -62,6 +62,9 @@ public:
 	bool operator== (const Vertex& rhs) const;
 	float& operator[](const int i) { return data[i]; }
 	float operator[](const int i) const { return data[i]; }
+	Vertex operator- (const Vertex& rhs) const;
+	Vertex operator+ (const Vertex& rhs) const;
+	Vertex operator* (const float rhs) const;
 };
 
 #endif	// Vertex_H
