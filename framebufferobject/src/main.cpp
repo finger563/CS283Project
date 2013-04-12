@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <stack>
 #include "glInfo.h"                             // glInfo struct
 #include "Timer.h"
 
@@ -50,8 +51,23 @@ Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
 Object testobj3 = Object(floortexsmall,floortexsmallwidth);
 
+//shoot will be the projectile
+Object shot = Object(box,boxtexwidth,Vector3D(),Point3D(0, 0, 5));
+
+// a predicate implemented as a function:
+//bool killShot (Object value) { return value.getKill(); }
+
+//hopefully a trigger to create chat window
+bool type = false;
+
 std::list<Object> objectlist;
 std::list<Triangle> renderlist;
+
+//For chat
+std::stack<std::string> conversation;
+std::string userName = "";
+std::string msg = "";
+bool print = false;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -66,6 +82,7 @@ float rot_angle = 3.141/1200;
 Matrix rot;		// debug/testing for rotating objects
 
 Camera camera;
+
 
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
 void displayCB();
@@ -90,6 +107,7 @@ void updatePixels(GLubyte* dst, int size);
 void drawString(const char *str, int x, int y, float color[4], void *font);
 void drawString3D(const char *str, float pos[3], float color[4], void *font);
 void showInfo();
+void chat();
 void showTransferRate();
 void printTransferRate();
 
@@ -163,10 +181,15 @@ int main(int argc, char **argv)
     tm.data[1][3] = SIZE_Y/2;	// how much to translate y?
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
     tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
+	tm.data[3][2] = 1;
 
 	testobj.generateCube();
 	testobj2.generateCube();
 	testobj3.generateFloor(30,-10);
+
+	//projectile code
+	shot.projectileInit(camera.getForward());
+
 	objectlist.push_back(testobj);
 	objectlist.push_back(testobj2);
 	objectlist.push_back(testobj3);
@@ -486,13 +509,25 @@ void updatePixels(GLubyte* dst, int size)
 
 	renderlist.clear();
 
+	
+	
+
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
+		
+
+		//does this need to be here?
+		if(it->getCount() == 1)
+			it->upCount();
+		else if(it->getCount() > 1)
+			it->projectileMove();
+
 		it->updateList();
 		it->Translate( it->getPosition() + camera.getPosition() );
 		it->rotateTemp(camera.getRotation());
 		it->TransformToScreen( tm );
 		std::list<Triangle> templist = it->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
+
 	}
 
     for (int y=SIZE_Y-1;y>=0;y--) {
@@ -501,8 +536,16 @@ void updatePixels(GLubyte* dst, int size)
 		}
 	}
 
-	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
-		it->Rotate(rot);
+	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); ++it) {
+		
+		it->Rotate(rot);	
+
+		//if shot needs to be deleted
+		if(it->getKill())
+		{
+			it = objectlist.erase(it);
+			--it;
+		}
 	}
 	
     // copy 4 bytes at once
@@ -565,9 +608,16 @@ void showInfo()
     drawString(ss.str().c_str(), 1, screenHeight-(3*TEXT_HEIGHT), color, font);
     ss.str("");
 
-    ss << "Press SPACE key to toggle PBO on/off." << ends;
-    drawString(ss.str().c_str(), 1, 1, color, font);
-
+	//if(type == true)
+	//{
+		//chat();
+		//type = false;
+	//}
+	//else
+	//{
+		ss << "Press SPACE key to toggle PBO on/off." << ends;
+		drawString(ss.str().c_str(), 1, 1, color, font);
+	//}
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
 
@@ -579,7 +629,52 @@ void showInfo()
     glPopMatrix();                   // restore to previous modelview matrix
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// display chat messages
+///////////////////////////////////////////////////////////////////////////////
+void chat()
+{
+    // backup current model-view matrix
+    glPushMatrix();                     // save current modelview matrix
+    glLoadIdentity();                   // reset modelview matrix
 
+    // set to 2D orthogonal projection
+    glMatrixMode(GL_PROJECTION);     // switch to projection matrix
+    glPushMatrix();                  // save current projection matrix
+    glLoadIdentity();                // reset projection matrix
+    gluOrtho2D(0, screenWidth, 0, screenHeight); // set to orthogonal projection
+
+    float color[4] = {1, 1, 1, 1};
+	//std::string input;
+
+    stringstream ss;
+    
+    /*ss << "Switching to chat worked! Enter text below: " << ends;
+    drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+	ss.str("");*/
+
+	userName = "myUsername: ";
+
+	
+    if(print)
+	{
+		ss << conversation.top() << ends;
+		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+		ss.str("");
+
+		print = false;
+	}
+
+    // unset floating format
+    ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
+
+    // restore projection matrix
+    glPopMatrix();                   // restore to previous projection matrix
+
+    // restore modelview matrix
+    glMatrixMode(GL_MODELVIEW);      // switch to modelview matrix
+    glPopMatrix();                   // restore to previous modelview matrix
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // display transfer rates
@@ -825,14 +920,26 @@ void displayCB()
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // draw info messages
-    showInfo();
-    //showTransferRate();
+	if(type == true)
+	{
+		chat();
+		
+	}
+	else
+	{
+		// draw info messages
+		showInfo();
+		//showTransferRate();
+	}
+	
+
     printTransferRate();
 
     glPopMatrix();
 
     glutSwapBuffers();
+
+	//type = false;
 }
 
 
@@ -862,8 +969,43 @@ void keyboardCB(unsigned char key, int x, int y)
     switch(key)
     {
     case 27: // ESCAPE
-        exit(0);
+		if(!type)
+			exit(0);
+		else
+		{//send final string array
+			//to be named later to stack
+			//shouldn't that be done already though??
+			type = false;
+			print = false;
+		}
         break;
+
+	case 13: //ENTER
+		if(type)
+		{
+			conversation.push(userName + msg);
+			msg = "";
+			print = true;
+		}
+		//else
+			//send string array
+			//to be named later to stack
+        break;
+	}
+
+	if(type)
+	{
+		//append character to string
+		//being typed
+		msg += key;
+		return;
+	}
+
+	switch(key)
+	{
+	case 't': //chat function
+		type = true;
+		break;
 
 	case 'q':	// rotate left
 		camera.Rotate(.1,Vector3D(0,1,0));
@@ -986,21 +1128,6 @@ void specialKeyCB(int key, int x, int y)
     switch(key)
     {
 	case GLUT_KEY_UP: // Up
-<<<<<<< HEAD
-		camera.Translate(Vector3D(0,0,-1));
-		break;
-
-	case GLUT_KEY_DOWN: // down
-		camera.Translate(Vector3D(0,0,1));
-		break;
-
-	case GLUT_KEY_LEFT: // left
-		camera.Translate(Vector3D(1,0,0));
-		break;
-
-	case GLUT_KEY_RIGHT: // right
-		camera.Translate(Vector3D(-1,0,0));
-=======
 		//CameraPos = CameraPos + Vector3D(0,0,-1);
 		break;
 
@@ -1014,7 +1141,6 @@ void specialKeyCB(int key, int x, int y)
 
 	case GLUT_KEY_RIGHT: // right
 		//CameraPos = CameraPos + Vector3D(-1,0,0);
->>>>>>> e80b2be2d9b463492e7112a89cd2342810e2b53b
 		break;
 	}
 }
@@ -1030,6 +1156,8 @@ void mouseCB(int button, int state, int x, int y)
         if(state == GLUT_DOWN)
         {
             mouseLeftDown = true;
+
+			objectlist.push_back(shot);
         }
         else if(state == GLUT_UP)
             mouseLeftDown = false;

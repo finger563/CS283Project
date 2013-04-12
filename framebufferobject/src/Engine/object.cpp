@@ -6,6 +6,8 @@ Object::Object()
 {
 	velocity = Vector3D(0,0,0);
 	position = Point3D(0,0,0);
+	kill = false;
+	counter = 0;
 }
 
 //Alternate texture, veloctity, heading, position
@@ -35,8 +37,8 @@ Object::Object(Triangle poly, const unsigned short* texture, const int texWid, V
 //Destructor
 Object::~Object()
 {
-	if( *tex != 0)
-		delete tex;
+	//if( *tex != 0)
+		//delete tex;
 }
 
 //generate() method switch statements??
@@ -336,6 +338,44 @@ std::list<Triangle> Object::getRenderList()
 	updateList(get);
 	
 	return temp;
+}
+
+////////////////////////////////////////
+/////////////////Projectile functons////
+///////////////////////////////////////
+void Object::projectileInit(Vector3D head, Vector3D pos)
+{
+	//may have to create overload this to take a vector based
+	//on where the mouse clicks
+	heading = head;
+	position = pos;
+	generateCube(2);
+	counter++;
+}
+
+void Object::projectileMove()
+{
+	
+	position.z++; //moves cube forward
+	counter++;
+
+	if(counter == 25)
+		kill = true;
+}
+
+bool Object::getKill()
+{
+	return kill;
+}
+
+size_t Object::getCount()
+{
+	return counter;
+}
+
+void Object::upCount()
+{
+	counter++;
 }
 
 #if 0

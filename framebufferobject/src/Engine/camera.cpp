@@ -15,6 +15,11 @@ Point3D Camera::getPosition() {
 	return position;
 }
 
+Point3D Camera::getForward()
+{
+	return forward;
+}
+
 //sets position
 void Camera::Translate( Vector3D v)
 {
@@ -32,7 +37,7 @@ void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or sho
 	 
 	 //rotate each vector by rotation
 	 //up = m * up;
-	 //forward = m * forward;
+	 forward = m * forward;
 	 //right = m * right;
 	 //Normalize();
 }
@@ -45,7 +50,7 @@ void Camera::Rotate (float x, float y, float z)
 
 	 //rotate each vector by rotation
 	 //up = m * up;
-	 //forward = m * forward;
+	 forward = m * forward;
 	 //right = m * right;
 	 //Normalize();
 }
@@ -58,7 +63,7 @@ void Camera::Rotate (float x, Vector3D v)
 
 	 //rotate each vector by rotation
 	 //up = m * up;
-	 //forward = m * forward;
+	 forward = m * forward;
 	 //right = m * right;
 	 //Normalize();
 }

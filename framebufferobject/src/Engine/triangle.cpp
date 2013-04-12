@@ -50,8 +50,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
     s3 = c;
 
 	if ( s1.z > 0 ) {
-		s1.x = (s1.x)/s1.z; // d should be contained in m
-		s1.y = (s1.y)/s1.z;
+		s1.x = (s1.x)/(s1.z+1); // d should be contained in m
+		s1.y = (s1.y)/(s1.z+1);
 	}
 	else if (s1.z == 0) {	// screen-space coords are the same as world if z=0
 	}
@@ -61,8 +61,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	}
 
 	if ( s2.z > 0 ) {
-		s2.x = (s2.x)/s2.z;
-		s2.y = (s2.y)/s2.z;
+		s2.x = (s2.x)/(s2.z+1);
+		s2.y = (s2.y)/(s2.z+1);
 	}
 	else if (s2.z == 0) {
 	}
@@ -72,8 +72,8 @@ void Triangle::TransformToScreen ( const Matrix& m ) {
 	}
 
 	if ( s3.z > 0 ) {
-		s3.x = (s3.x)/s3.z;
-		s3.y = (s3.y)/s3.z;
+		s3.x = (s3.x)/(s3.z+1);
+		s3.y = (s3.y)/(s3.z+1);
 	}
 	else if (s3.z == 0) {
 	}

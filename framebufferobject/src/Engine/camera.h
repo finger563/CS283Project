@@ -46,6 +46,7 @@ Matrix getRotation();
 
 Point3D getPosition();
 
+Point3D getForward();
 
 
 

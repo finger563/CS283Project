@@ -10,7 +10,7 @@
 class Object
 {
 public:
-
+	
 	//Constructor
 	Object();
 
@@ -76,6 +76,19 @@ public:
 	//returns final render list
 	std::list<Triangle> getRenderList();
 
+	////////////////////////////////////////
+	/////////////////Projectile functons////
+	///////////////////////////////////////
+	void projectileInit(Vector3D head, Vector3D pos = Vector3D(0, 0, 0));
+
+	void projectileMove();
+
+	bool getKill();
+
+	size_t getCount();
+
+	void upCount();
+
 private:
 
 	std::list<Triangle> master;
@@ -84,6 +97,8 @@ private:
 	Point3D position;
 	const unsigned short* tex;
 	int texWidth;
+	size_t counter;
+	bool kill;
 	//Object* next;
 
 };
