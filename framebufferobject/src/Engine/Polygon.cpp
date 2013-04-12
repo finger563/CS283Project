@@ -126,8 +126,8 @@ void Poly::Rasterize( const int y ) {
 		for (int x=vi.x;x<=ev.x;x++) {
 			ai = (sv.x-x)/((sv.x-x) - (ev.x-x));
 			vi = sv + (ev-sv)*ai;
-			if ( vi.z < z_buffer[x + y*SIZE_X] ) {
-				z_buffer[x + y*SIZE_X] = vi.z;
+			if ( vi.ez/vi.hw < z_buffer[x + y*SIZE_X] ) {
+				z_buffer[x + y*SIZE_X] = vi.ez/vi.hw;
 				switch ( rType ) {	// What are we interpolating/rendering?
 				case FLAT:
 					display_buffer[x + y*SIZE_X] = RGB_MAKE((int)(r*255),(int)(g*255),(int)(b*255));
