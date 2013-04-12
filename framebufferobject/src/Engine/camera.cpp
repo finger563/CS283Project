@@ -34,7 +34,7 @@ void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or sho
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 //Normalize();
+	 Normalize();
 }
 
 void Camera::Rotate (float x, float y, float z) 
@@ -47,7 +47,7 @@ void Camera::Rotate (float x, float y, float z)
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 //Normalize();
+	 Normalize();
 }
 
 void Camera::Rotate (float x, Vector3D v) 
@@ -60,7 +60,7 @@ void Camera::Rotate (float x, Vector3D v)
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 //Normalize();
+	 Normalize();
 }
 
 Matrix Camera::getRotation()
