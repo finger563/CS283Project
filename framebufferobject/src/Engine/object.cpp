@@ -32,13 +32,6 @@ Object::Object(Triangle poly, const unsigned short* texture, const int texWid, V
 	temp.push_back(poly);
 }
 
-//Destructor
-Object::~Object()
-{
-	if( *tex != 0)
-		delete tex;
-}
-
 //generate() method switch statements??
 
 //Updates Temp list with any changes to the master list

@@ -2,18 +2,18 @@
 #define	Polygon_H
 
 #include "Vertex.h"
-#include "../Sprites/defaulttexture.h"
+#include "../Textures.h"
 
 #define POLY_MAX_VERTICES 4		// don't want anything other than tris and quads
 
 // This makes rasterization much faster (precompute values)
 enum PolyType {
-    FLAT_TOP_RIGHT,
-    FLAT_TOP_LEFT,
-    FLAT_BOTTOM_RIGHT,
-    FLAT_BOTTOM_LEFT,
-    NORMAL_RIGHT,
-    NORMAL_LEFT
+    FLAT_TOP_RIGHT_T,
+    FLAT_TOP_LEFT_T,
+    FLAT_BOTTOM_RIGHT_T,
+    FLAT_BOTTOM_LEFT_T,
+    NORMAL_RIGHT_T,
+    NORMAL_LEFT_T
 };
 
 // This tells the engine what type of rendering we want for this polygon
@@ -82,9 +82,16 @@ public:
 
 	// Pipeline function methods
 	void Clip( );
+	void HomogeneousDivide( );
 
 	// Rasterization Methods
 	void Rasterize( );
+	void Rasterize( const int y );
+
+	// Helper Functions
+	void YSort();
+	void XSort();
+	void ZSort();
 };
 
 #endif		// Polygon_H

@@ -23,7 +23,7 @@ public:
 		Point3D pos = Point3D(0,0,0));
 
 	//Destructor
-	~Object();
+	~Object(){}
 
 	//Updates Temp last with any changes to the master list
 	bool updateList();

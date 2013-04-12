@@ -117,6 +117,7 @@
     <ClInclude Include="src\Sprites\defaulttexture.h" />
     <ClInclude Include="src\Sprites\floor.h" />
     <ClInclude Include="src\Sprites\floorsmall.h" />
+    <ClInclude Include="src\Textures.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

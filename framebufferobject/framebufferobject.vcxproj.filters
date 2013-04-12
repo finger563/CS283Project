@@ -75,6 +75,9 @@
     <ClInclude Include="src\Sprites\defaulttexture.h">
       <Filter>headers\Sprites</Filter>
     </ClInclude>
+    <ClInclude Include="src\Textures.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\color.frag" />

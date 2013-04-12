@@ -27,10 +27,9 @@ using std::ends;
 #include "main.h"
 #include "Engine\triangle.h"
 #include "Engine\Object.h"
-#include "Sprites\box.h"
-#include "Sprites\floor.h"
-#include "Sprites\floorsmall.h"
-#include "Sprites\checkerboard.h"
+
+#include "Engine\Polygon.h"
+
 #include "Engine\camera.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
@@ -50,6 +49,11 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
 Object testobj3 = Object(checkerboard,checkerboardwidth);
+
+Poly testpoly = 
+    Poly(Vertex(-10,10,10),
+		 Vertex(10,10,10),
+		 Vertex(0,-10,10));
 
 std::list<Object> objectlist;
 std::list<Triangle> renderlist;
@@ -172,7 +176,7 @@ int main(int argc, char **argv)
 	// | r r r t | | z |   | z' |
 	// | p p p s | | w |   | w' |
 
-	// We use column vector notation
+	// We use ROW vector notation
 	
     tm.data[3][1] = SIZE_X/2;	// translate x
     tm.data[3][2] = SIZE_Y/2;	// translate y
@@ -185,12 +189,12 @@ int main(int argc, char **argv)
 	tm.data[1][3] = 0;			// project y
 	tm.data[2][3] = 1;			// project z
 
-	testobj.generateCube();
-	testobj2.generateCube();
-	testobj3.generateFloor(30,-10);
-	objectlist.push_back(testobj);
-	objectlist.push_back(testobj2);
-	objectlist.push_back(testobj3);
+	//testobj.generateCube();
+	//testobj2.generateCube();
+	//testobj3.generateFloor(30,-10);
+	//objectlist.push_back(testobj);
+	//objectlist.push_back(testobj2);
+	//objectlist.push_back(testobj3);
 
     initSharedMem();
 
@@ -505,6 +509,7 @@ void updatePixels(GLubyte* dst, int size)
 			z_buffer[x + y*SIZE_X] = 0;
 		}
 
+#if 0
 	renderlist.clear();
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
@@ -526,6 +531,15 @@ void updatePixels(GLubyte* dst, int size)
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		it->Rotate(rot);
 	}
+#else
+		Matrix worldToCamera;
+		testpoly.TransformToCamera(worldToCamera);
+		Matrix perspectiveProjection;
+		testpoly.TransformToPerspective(perspectiveProjection);
+		testpoly.Clip();
+		testpoly.HomogeneousDivide();
+		testpoly.Rasterize();
+#endif
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i)
