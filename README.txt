@@ -1,35 +1,22 @@
-This project is a simple demo from lighthouse3D.com on OpenGL framebuffer objects.
+CS283Project
+============
 
-It uses VSL, also from lighthouse3D, which in turn uses the following third party libs:
+CS 283 Networked 3D Game Project
 
-- Assimp
-- DevIL
-- FreeGlut
-- tinyXML 
+This project is written by William Emfinger and Paul Mcneil for Vanderbilt's 
+spring 2013 CS283 Computer Networks class.
 
-For your convinience the headers, libs and dlls of all these libs have been added to this project. Licenses for all third party libs can be found in folder framebufferobject/licenses.
+The program is a networked 3D first person game in which the player can use the 
+mouse and keyboard to move and look in a 3D virtual environment.  The player can
+connect to a server, and will be able to chat with, see, and interact with other
+players on that server.  
 
-The project also includes a model courtesy of Viewpoint Animation Engineering. Please see the OBJ file for the usage agreement.
+The rendering code for this projet is written from scratch, and only uses a small
+subset of OpenGL in order to have access to a pixel buffer.  The vector/matrix 
+manipulation, the polygon transformations and rasterizations, and all of the 
+camera and object code is entirely written from scratch.  As such, this graphics
+library (contained within ./src/Engine) is portable to any device which has a C++ 
+compiler.  Modifications to the code to work in a C only environment are not difficult.
 
-The rest belongs to lighthouse3D, and it  is released under the zlib license:
-
-This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-
-2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
-
-3. This notice may not be removed or altered from any source distribution.
-
-
-INSTRUCTIONS
-
-Mouse
--Left button: rotate camera around the object
--Right button: zoom
-
-Keyboard
-m: enable multisampling
-n: disable multisampling
+The networked part of the code has not been implemented yet, but it will most likely
+use ACE/TAO for the networking library.  

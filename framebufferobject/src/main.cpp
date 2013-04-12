@@ -179,6 +179,7 @@ int main(int argc, char **argv)
 
     tm.data[0][3] = SIZE_X/2;	// how much to translate x?
     tm.data[1][3] = SIZE_Y/2;	// how much to translate y?
+    tm.data[2][3] = 1;	// how much to translate z?
     tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
     tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
 	tm.data[3][2] = 1;
