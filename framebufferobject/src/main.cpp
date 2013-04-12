@@ -524,7 +524,7 @@ void updatePixels(GLubyte* dst, int size)
 			z_buffer[x + y*SIZE_X] = DEFAULT_Z_BUFFER;
 		}
 
-#if 0
+#if 1
 	renderlist.clear();
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
