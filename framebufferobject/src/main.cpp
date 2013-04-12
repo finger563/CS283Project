@@ -50,16 +50,16 @@ Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
 Object testobj3 = Object(checkerboard,checkerboardwidth);
 
-Poly testpoly = Poly(Vertex(-10,10,10),
-					 Vertex(10,10,10),
-					 Vertex(-10,-10,10));
+Poly testpoly = Poly(Vertex(-6.666,6.666,30),
+					 Vertex(13.333,6.666,30),
+					 Vertex(-6.666,-13.333,30));
 
 Matrix worldToCamera;
 Matrix perspectiveProjection;
 Matrix projectionToPixel;
 
 std::list<Object> objectlist;
-std::list<Triangle> renderlist;
+std::list<Poly> renderlist;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -198,8 +198,8 @@ int main(int argc, char **argv)
 
 	projectionToPixel.data[3][0] = SIZE_X/2;	// translate x
 	projectionToPixel.data[3][1] = SIZE_Y/2;	// translate y
-	projectionToPixel.data[0][0] = 10;	// scale x
-	projectionToPixel.data[1][1] = 10;	// scale y
+	projectionToPixel.data[0][0] = SIZE_X/2;	// scale x
+	projectionToPixel.data[1][1] = SIZE_Y/2;	// scale y
 
 	testpoly.SetRenderType(TEXTURED);
 	testpoly.SetTexture(floortex,floortexwidth,Point2D(0,0),Point2D(floortexwidth,0),Point2D(0,floortexwidth));
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
 	testobj3.generateFloor(30,-10);
 	objectlist.push_back(testobj);
 	objectlist.push_back(testobj2);
-	objectlist.push_back(testobj3);
+	//objectlist.push_back(testobj3);
 
     initSharedMem();
 
@@ -524,22 +524,28 @@ void updatePixels(GLubyte* dst, int size)
 			z_buffer[x + y*SIZE_X] = DEFAULT_Z_BUFFER;
 		}
 
-#if 0
+#if 1
 	renderlist.clear();
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		it->updateList();
 		it->Translate( it->getPosition() + camera.getPosition() );	// translate world to camera
 		it->rotateTemp(camera.getRotation());	// rotate world to viewspace/camera
-		it->TransformToScreen( tm );			// transform viewspace/camera to screenspace
-		// TODO: Implement Frustum culling and clipping here
-		std::list<Triangle> templist = it->getRenderList();
+		it->TransformToCamera(worldToCamera);
+		it->TransformToPerspective( perspectiveProjection );
+		std::list<Poly> templist = it->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
 	}
 
+	for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
+		it->Clip();
+		it->HomogeneousDivide();
+		it->TransformToPixel( projectionToPixel );
+	}
+
     for (int y=SIZE_Y-1;y>=0;y--) {
-		for (std::list<Triangle>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
-			it->DrawTexturedZbuffer(y);
+		for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
+			it->Rasterize(y);
 		}
 	}
 
@@ -556,7 +562,7 @@ void updatePixels(GLubyte* dst, int size)
     for (int y=SIZE_Y-1;y>=0;y--) {
 		renderpoly.Rasterize(y);
 	}
-	testpoly.Transform(rmy);
+	testpoly.Transform(rot);
 #endif
 	
     // copy 4 bytes at once
@@ -565,9 +571,9 @@ void updatePixels(GLubyte* dst, int size)
         for(int j = 0; j < IMAGE_WIDTH; ++j)
         {	// 0xAARRGGBB
 			if (display_z_buffer) {
-				*ptr = ((int)(1/z_buffer[j+i*SIZE_X]) << 16) 
-					+ ((int)(1/z_buffer[j+i*SIZE_X]) << 8)
-					+ (int)(1/z_buffer[j+i*SIZE_X]);
+				*ptr = ((int)(z_buffer[j+i*SIZE_X]) << 16) 
+					+ ((int)(z_buffer[j+i*SIZE_X]) << 8)
+					+ (int)(z_buffer[j+i*SIZE_X]);
 			}
 			else {
 				*ptr = ((int)RED_RGB(display_buffer[j+i*SIZE_X]) << 16) 

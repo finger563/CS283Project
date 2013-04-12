@@ -115,6 +115,9 @@ public:
 	void YSort();
 	void XSort();
 	void ZSort();
+
+	// Operator Overloads
+	Poly& operator= (const Poly& rhs);
 };
 
 #endif		// Polygon_H

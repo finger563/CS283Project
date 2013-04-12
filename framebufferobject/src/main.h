@@ -4,7 +4,7 @@
 #include <limits>
 #include "Engine\constants.h"
 
-#define CLIPPING_TEST
+//#define CLIPPING_TEST
 
 // constants
 const int    SCREEN_WIDTH    = 400;

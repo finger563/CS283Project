@@ -5,7 +5,7 @@ Point3D& Point3D::operator= (const Point3D& rhs)
     x = rhs.x;
     y = rhs.y;
     z = rhs.z;
-	//w = rhs.w;
+	w = rhs.w;
     return (*this);   
 }
 

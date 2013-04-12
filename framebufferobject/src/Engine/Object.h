@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string>
 #include <list>
-#include "triangle.h"
+#include "Polygon.h"
 
 class Object
 {
@@ -19,7 +19,7 @@ public:
 		Point3D pos = Point3D(0,0,0));
 
 	//Alternate Constructor
-	Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
+	Object(Poly poly, const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
 		Point3D pos = Point3D(0,0,0));
 
 	//Destructor
@@ -29,7 +29,7 @@ public:
 	bool updateList();
 
 	//Updates Temp list to whatever list is passed (i.e. Render list)
-	bool updateList(std::list<Triangle> poly);
+	bool updateList(std::list<Poly> poly);
 
 	//Clears Temp list
 	void clearTemp();
@@ -38,7 +38,7 @@ public:
 	void rotateTemp(Matrix m);
 
 	//add polygon to lists
-	void add(Triangle poly);
+	void add(Poly poly);
 
 	//Generates cube with default size being 5
 	//5 here is half the length of the cube
@@ -63,25 +63,22 @@ public:
 	Point3D getPosition(void);
 
 	//assumes that only the temp list is being passed through
-	std::list<Triangle> Rotate(Matrix& m);
+	std::list<Poly> Rotate(Matrix& m);
 
 	//assumes that only the temp list is being passed through
-	std::list<Triangle> Translate(Vector3D& v);
+	std::list<Poly> Translate(Vector3D& v);
 
 	//transforms polygons to screen
-	std::list<Triangle> TransformToScreen(Matrix& m);
-
-	// ONLY FOR HOMOGENEOUS TESTING
-	//transforms polygons to screen
-	std::list<Triangle> TransformToScreenHomogeneous(Matrix& m);
-
-	//returns final render list
-	std::list<Triangle> getRenderList();
+	std::list<Poly> TransformToCamera(Matrix& m);
+	std::list<Poly> TransformToPerspective(Matrix& m);
+	std::list<Poly> TransformToPixel(Matrix& m);
+	
+	std::list<Poly> getRenderList();
 
 private:
 
-	std::list<Triangle> master;
-	std::list<Triangle> temp;
+	std::list<Poly> master;
+	std::list<Poly> temp;
 	Vector3D heading, velocity; 
 	Point3D position;
 	const unsigned short* tex;

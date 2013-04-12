@@ -24,11 +24,13 @@ void Poly::Translate( const float _x, const float _y, const float _z ) {
 void Poly::TransformToCamera( const Matrix& _m ) {
 	for (int i=0;i<numVertices;i++)
 		v[i].TransformToCamera(_m);
+	normal = _m*normal;
 }
 
 void Poly::TransformToPerspective( const Matrix& _m ) {
 	for (int i=0;i<numVertices;i++)
 		v[i].TransformToPerspective(_m);
+	normal = _m*normal;
 }
 
 void Poly::TransformToPixel( const Matrix& _m ) {
@@ -114,10 +116,18 @@ void Poly::Rasterize( const int y ) {
 			sv = temp;
 		}
 		vi = sv;
-		for (int x=sv.x;x<=ev.x;x++) {
+		if ( vi.x < 0 ) {
+			vi.x = 0;
+		}
+		if ( ev.x >= SIZE_X ) {
+			ai = (sv.x-(SIZE_X-1))/((sv.x-(SIZE_X-1)) - (ev.x-(SIZE_X-1)));
+			ev = sv + (ev-sv)*ai;
+		}
+		for (int x=vi.x;x<=ev.x;x++) {
 			ai = (sv.x-x)/((sv.x-x) - (ev.x-x));
 			vi = sv + (ev-sv)*ai;
 			if ( vi.z < z_buffer[x + y*SIZE_X] ) {
+				z_buffer[x + y*SIZE_X] = vi.z;
 				switch ( rType ) {	// What are we interpolating/rendering?
 				case FLAT:
 					display_buffer[x + y*SIZE_X] = RGB_MAKE((int)(r*255),(int)(g*255),(int)(b*255));
@@ -207,4 +217,26 @@ void Poly::XSort() {
 }
 
 void Poly::ZSort() {
+}
+
+// Operator Overloads
+Poly& Poly::operator= (const Poly& rhs) {
+	for (int i=0;i<POLY_MAX_VERTICES;i++) 
+		v[i] = rhs.v[i];
+
+	numVertices = rhs.numVertices;
+	
+	texture = rhs.texture;
+	texwidth = rhs.texwidth;
+
+	r = rhs.r;
+	g = rhs.g;
+	b = rhs.b;
+
+	rType = rhs.rType;
+	tType = rhs.tType;
+
+	normal = rhs.normal;
+	visible = rhs.visible;
+    return (*this); 
 }
