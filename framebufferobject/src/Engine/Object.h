@@ -15,11 +15,11 @@ public:
 	Object();
 
 	//Alternate Constructor
-	Object(const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
+	Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
 		Point3D pos = Point3D(0,0,0));
 
 	//Alternate Constructor
-	Object(Poly poly, const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
+	Object(Poly poly, const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
 		Point3D pos = Point3D(0,0,0));
 
 	//Destructor
@@ -63,17 +63,17 @@ public:
 	Point3D getPosition(void);
 
 	//assumes that only the temp list is being passed through
-	std::list<Poly> Rotate(Matrix& m);
+	void Rotate(Matrix& m);
 
 	//assumes that only the temp list is being passed through
-	std::list<Poly> Translate(Vector3D& v);
+	void Translate(Vector3D& v);
 
 	//transforms polygons to screen
-	std::list<Poly> TransformToCamera(Matrix& m);
-	std::list<Poly> TransformToPerspective(Matrix& m);
-	std::list<Poly> TransformToPixel(Matrix& m);
+	void TransformToCamera(Matrix& m);
+	void TransformToPerspective(Matrix& m);
+	void TransformToPixel(Matrix& m);
 	
-	std::list<Poly> getRenderList();
+	std::list<Poly*> getRenderList();
 
 private:
 
@@ -83,8 +83,8 @@ private:
 	Point3D position;
 	const unsigned short* tex;
 	int texWidth;
+	int texHeight;
 	//Object* next;
-
 };
 
 #endif

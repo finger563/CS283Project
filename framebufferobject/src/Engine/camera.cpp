@@ -34,33 +34,33 @@ void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or sho
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 Normalize();
+	 //Normalize();
 }
 
 void Camera::Rotate (float x, float y, float z) 
 {
 	 Matrix m;
 	 m.SetRotation(x, y, z);
-	 rotation = rotation*m;
+	 rotation = m*rotation;
 
 	 //rotate each vector by rotation
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 Normalize();
+	 //Normalize();
 }
 
 void Camera::Rotate (float x, Vector3D v) 
 {
 	 Matrix m;
 	 m.SetRotation(x,v);
-	 rotation = rotation*m;
+	 rotation = m*rotation;
 
 	 //rotate each vector by rotation
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 Normalize();
+	 //Normalize();
 }
 
 Matrix Camera::getRotation()

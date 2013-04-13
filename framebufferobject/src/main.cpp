@@ -46,20 +46,30 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 	 rotz = 0,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
-Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
-Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(checkerboard,checkerboardwidth);
+Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
+Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
+Object testobj3 = Object(checkerboard,checkerboardwidth,checkerboardheight);
 
-Poly testpoly = Poly(Vertex(-6.666,6.666,30),
-					 Vertex(13.333,6.666,30),
-					 Vertex(-6.666,-13.333,30));
+#if 1
+Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
+					 Vertex(13.333,6.666,0,1,1,0),
+					 Vertex(-6.666,-13.333,0,1,0,1),
+					 Vertex(),3,Vector3D(0,0,-1),TEXTURED);
+#else
+Poly testpoly = Poly(Vertex(-10,10,0,1,0,0),
+					 Vertex(10,10,0,1,1,0),
+					 Vertex(10,-10,0,1,1,1),
+					 Vertex(-10,-10,0,1,0,1),
+					 4,Vector3D(0,0,-1),TEXTURED);
+#endif
+Poly renderpoly;
 
 Matrix worldToCamera;
 Matrix perspectiveProjection;
 Matrix projectionToPixel;
 
-std::list<Object> objectlist;
-std::list<Poly> renderlist;
+std::list<Object*> objectlist;
+std::list<Poly*> renderlist;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -69,7 +79,7 @@ Matrix rmz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
 Matrix tm = Matrix();				// transformation matrix (scale to screen)
-float rot_angle = 3.141/1200;
+float rot_angle = 3.141/120;
 		
 Matrix rot;		// debug/testing for rotating objects
 
@@ -147,25 +157,13 @@ PFNGLUNMAPBUFFERARBPROC pglUnmapBufferARB = 0;                   // unmap VBO pr
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
 {    
-    rmz.data[0][0] = cos(rot_angle);
-    rmz.data[0][1] = -sin(rot_angle);
-    rmz.data[1][0] = sin(rot_angle);
-    rmz.data[1][1] = cos(rot_angle);
-    
-    rmy.data[0][0] = cos(rot_angle);
-    rmy.data[0][2] = -sin(rot_angle);
-    rmy.data[2][0] = sin(rot_angle);
-    rmy.data[2][2] = cos(rot_angle);
-    
-    rmx.data[1][1] = cos(rot_angle);
-    rmx.data[1][2] = -sin(rot_angle);
-    rmx.data[2][1] = sin(rot_angle);
-    rmx.data[2][2] = cos(rot_angle);
-    
-    rmxy = rmx*rmy;
-	rmxz = rmx*rmz;
-	rmyz = rmy*rmz;
-    rmxyz = rmz*rmxy;
+	rmz.SetRotation(rot_angle,Vector3D(0,0,1));
+	rmy.SetRotation(rot_angle,Vector3D(0,1,0));
+	rmx.SetRotation(rot_angle,Vector3D(1,0,0));
+	rmxy.SetRotation(rot_angle,Vector3D(1,1,0));
+	rmxz.SetRotation(rot_angle,Vector3D(1,0,1));
+	rmyz.SetRotation(rot_angle,Vector3D(0,1,1));
+	rmxyz.SetRotation(rot_angle,Vector3D(1,1,1));
 
 	// Structure of a transformation matrix:
 	// ( r=rotation, p=projection, t=translation )
@@ -201,15 +199,14 @@ int main(int argc, char **argv)
 	projectionToPixel.data[0][0] = SIZE_X/2;	// scale x
 	projectionToPixel.data[1][1] = SIZE_Y/2;	// scale y
 
-	testpoly.SetRenderType(TEXTURED);
-	testpoly.SetTexture(floortex,floortexwidth,Point2D(0,0),Point2D(floortexwidth,0),Point2D(0,floortexwidth));
-
 	testobj.generateCube();
+	objectlist.push_back(&testobj);
+
 	testobj2.generateCube();
-	testobj3.generateFloor(30,-10);
-	objectlist.push_back(testobj);
-	objectlist.push_back(testobj2);
-	//objectlist.push_back(testobj3);
+	objectlist.push_back(&testobj2);
+
+	//testobj3.generateFloor(30,-10);
+	//objectlist.push_back(&testobj3);
 
     initSharedMem();
 
@@ -527,33 +524,46 @@ void updatePixels(GLubyte* dst, int size)
 #if 1
 	renderlist.clear();
 
-	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
-		it->updateList();
-		it->Translate( it->getPosition() + camera.getPosition() );	// translate world to camera
-		it->rotateTemp(camera.getRotation());	// rotate world to viewspace/camera
-		it->TransformToCamera(worldToCamera);
-		it->TransformToPerspective( perspectiveProjection );
-		std::list<Poly> templist = it->getRenderList();
+	for (std::list<Object*>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
+		(*it)->updateList();
+		(*it)->Translate( (*it)->getPosition() + camera.getPosition());
+		(*it)->rotateTemp( camera.getRotation() );
+		//Vector3D tmp = (*it)->getPosition() + camera.getPosition();
+		//worldToCamera.SetIdentity();
+		//worldToCamera.data[3][0] = tmp.x;
+		//worldToCamera.data[3][1] = tmp.y;
+		//worldToCamera.data[3][2] = tmp.z;
+		worldToCamera = worldToCamera*camera.getRotation();
+		(*it)->TransformToCamera( worldToCamera );
+		(*it)->TransformToPerspective( perspectiveProjection );
+		std::list<Poly*> templist = (*it)->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
 	}
 
-	for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
-		it->Clip();
-		it->HomogeneousDivide();
-		it->TransformToPixel( projectionToPixel );
+	for (std::list<Poly*>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
+		(*it)->Clip();
+		(*it)->HomogeneousDivide();
+		(*it)->TransformToPixel( projectionToPixel );
 	}
 
     for (int y=SIZE_Y-1;y>=0;y--) {
-		for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
-			it->Rasterize(y);
+		for (std::list<Poly*>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
+			(*it)->Rasterize(y);
 		}
 	}
 
-	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
-		it->Rotate(rot);
+	for (std::list<Object*>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
+		(*it)->Rotate(rot);
 	}
 #else
-		Poly renderpoly = testpoly;
+	renderpoly = testpoly;
+			
+	Vector3D tmp = Vector3D(0,0,30) + camera.getPosition();
+	worldToCamera.SetIdentity();
+	worldToCamera.data[3][0] = tmp.x;
+	worldToCamera.data[3][1] = tmp.y;
+	worldToCamera.data[3][2] = tmp.z;
+	worldToCamera = worldToCamera*camera.getRotation();
 	renderpoly.TransformToCamera( worldToCamera );
 	renderpoly.TransformToPerspective( perspectiveProjection );
 	renderpoly.Clip();
@@ -571,14 +581,14 @@ void updatePixels(GLubyte* dst, int size)
         for(int j = 0; j < IMAGE_WIDTH; ++j)
         {	// 0xAARRGGBB
 			if (display_z_buffer) {
-				*ptr = ((int)(z_buffer[j+i*SIZE_X]) << 16) 
-					+ ((int)(z_buffer[j+i*SIZE_X]) << 8)
-					+ (int)(z_buffer[j+i*SIZE_X]);
+				*ptr = ((char)(z_buffer[j+i*SIZE_X]) << 16) 
+					+ ((char)(z_buffer[j+i*SIZE_X]) << 8)
+					+ (char)(z_buffer[j+i*SIZE_X]);
 			}
 			else {
-				*ptr = ((int)RED_RGB(display_buffer[j+i*SIZE_X]) << 16) 
-					+ ((int)GRN_RGB(display_buffer[j+i*SIZE_X]) << 8)
-					+ (int)BLU_RGB(display_buffer[j+i*SIZE_X]);
+				*ptr = ((char)RED_RGB(display_buffer[j+i*SIZE_X]) << 16) 
+					+ ((char)GRN_RGB(display_buffer[j+i*SIZE_X]) << 8)
+					+ (char)BLU_RGB(display_buffer[j+i*SIZE_X]);
 			}
             ++ptr;
         }
@@ -926,11 +936,11 @@ void keyboardCB(unsigned char key, int x, int y)
         break;
 
 	case 'q':	// rotate left
-		camera.Rotate(.1,Vector3D(0,1,0));
+		camera.Rotate(.05,Vector3D(0,1,0));
 		break;
 
 	case 'e':	// rotate right
-		camera.Rotate(-.1,Vector3D(0,1,0));
+		camera.Rotate(-.05,Vector3D(0,1,0));
 		break;
 
 	case 'w': // Up

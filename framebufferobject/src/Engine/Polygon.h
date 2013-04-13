@@ -33,6 +33,7 @@ public:
 	
 	const unsigned short* texture;			// for texturing
 	int texwidth;							// width of texture
+	int texheight;							// height of texture
 
 	float r,g,b;							// for flat coloring
 
@@ -46,6 +47,7 @@ public:
 		numVertices = 0;
 		texture = defaulttexture;
 		texwidth = defaulttexturewidth;
+		texheight = defaulttextureheight;
 		r=g=b=1;
 	}
     Poly(const Vertex& _v1,
@@ -57,7 +59,8 @@ public:
 		 const RenderType rt = FLAT,
 		 const Vector3D& rgb = Vector3D(1,1,1,1),
 		 const unsigned short* tex = defaulttexture,
-		 const int width = defaulttexturewidth) {
+		 const int width = defaulttexturewidth,
+		 const int height = defaulttextureheight) {
 		v[0] = _v1;
 		v[1] = _v2;
 		v[2] = _v3;
@@ -67,6 +70,7 @@ public:
 		rType = rt;
 		texture = tex;
 		texwidth = width;
+		texheight = height;
 		r=rgb.x;
 		b=rgb.y;
 		g=rgb.z;
@@ -76,11 +80,12 @@ public:
 	// Polygon variable setter methods
 	void SetTexture( const unsigned short *tex, 
 					 const int width,
+					 const int height,
 					 Point2D u1 = Point2D(),
 					 Point2D u2 = Point2D(),
 					 Point2D u3 = Point2D(),
 					 Point2D u4 = Point2D()) { 
-		texture = tex; texwidth = width; 
+		texture = tex; texwidth = width; texheight = height;
 		v[0].u = u1.x;
 		v[0].v = u1.y;
 		v[1].u = u2.x;

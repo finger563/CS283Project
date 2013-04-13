@@ -10,6 +10,7 @@
 // target height : 220
 // ############################################
 const int checkerboardwidth = 220;
+const int checkerboardheight = 220;
 const unsigned short checkerboard[] = 
 {
 	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,

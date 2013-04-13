@@ -15,10 +15,10 @@ public:
 	union {
 		struct {
 			float x,y,z,w;		// 3D homogeneous coords
-			float ex,ey,ez;		// 3D homogenous eye/camera coords ( w for this system is h1 )
-			float u,v;			// 2D texture coords ( w for this system is h1 )
-			float r,g,b;		// RGB color (range = [0,1]), ( w for this system is h1 )
-			float nx,ny,nz;		// components of normal vector ( w for this system is h1 )
+			float ex,ey,ez;		// 3D homogenous eye/camera coords ( w for this system is hw )
+			float u,v;			// 2D texture coords (range = [0,1]) ( w for this system is hw )
+			float r,g,b;		// RGB color (range = [0,1]), ( w for this system is hw )
+			float nx,ny,nz;		// components of normal vector ( w for this system is hw )
 			float hw;			// homogeneous coordinate for interpolated values ( 1/~Pw )
 		};
 		float data[NUM_VERTEX_DATA];
@@ -29,10 +29,11 @@ public:
 			data[i] = 0;
 		w=hw=1;
 	}
-    Vertex(const float _x,const float _y,const float _z, const float _w = 1) { 
+    Vertex(const float _x,const float _y,const float _z, const float _w = 1, const float _u = 0, const float _v = 0) { 
 		x = _x; y = _y; z = _z; w = _w; 
 		ex=ey=ez=0;
-		u=v=0;
+		u=_u;
+		v=_v;
 		r=g=b=1;	// default color is white
 		nx=ny=nz=0;
 		hw=_w;

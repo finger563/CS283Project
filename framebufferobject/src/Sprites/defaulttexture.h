@@ -10,6 +10,7 @@
 // target height : 256
 // ############################################
 const int defaulttexturewidth = 256;
+const int defaulttextureheight = 256;
 const unsigned short defaulttexture[] = 
 {
 	0x79ED,0x79ED,0x79ED,0x79ED,0x79ED,0x79ED,0x79ED,0x79ED,

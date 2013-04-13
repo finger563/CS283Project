@@ -19,6 +19,7 @@ void Matrix::SetIdentity() {
 }
 
 void Matrix::SetRotation(float x, float y, float z) {
+	SetIdentity();
 	data[0][0] = cos(y)*cos(z);
 	data[0][1] = cos(x)*sin(z) + sin(x)*sin(y)*cos(z);
 	data[0][2] = sin(x)*sin(z) - cos(x)*sin(y)*cos(z);
@@ -31,6 +32,7 @@ void Matrix::SetRotation(float x, float y, float z) {
 }
 
 void Matrix::SetRotation(float theta, Vector3D u) {
+	SetIdentity();
 	data[0][0] = cos(theta) + u.x*u.x*(1-cos(theta));
 	data[0][1] = u.x*u.y*(1-cos(theta)) - u.z*sin(theta);
 	data[0][2] = u.x*u.z*(1-cos(theta)) + u.y*sin(theta);
@@ -101,13 +103,25 @@ Matrix Matrix::operator/ (const float rhs) const {
 
 Matrix Matrix::operator* (const Matrix& rhs) const {
     Matrix m;
-    for (int row=0;row<4;row++) {
-        for (int col=0;col<4;col++) {
-            for (int i=0;i<4;i++) {
-                m.data[row][col] += data[row][i] * rhs.data[i][col];
-            }
-        }
-    }
+	m.data[0][0] = data[0][0]*rhs.data[0][0] + data[0][1]*rhs.data[1][0] + data[0][2]*rhs.data[2][0] + data[0][3]*rhs.data[3][0];
+	m.data[0][1] = data[0][0]*rhs.data[0][1] + data[0][1]*rhs.data[1][1] + data[0][2]*rhs.data[2][1] + data[0][3]*rhs.data[3][1];
+	m.data[0][2] = data[0][0]*rhs.data[0][2] + data[0][1]*rhs.data[1][2] + data[0][2]*rhs.data[2][2] + data[0][3]*rhs.data[3][2];
+	m.data[0][3] = data[0][0]*rhs.data[0][3] + data[0][1]*rhs.data[1][3] + data[0][2]*rhs.data[2][3] + data[0][3]*rhs.data[3][3];
+	
+	m.data[1][0] = data[1][0]*rhs.data[0][0] + data[1][1]*rhs.data[1][0] + data[1][2]*rhs.data[2][0] + data[1][3]*rhs.data[3][0];
+	m.data[1][1] = data[1][0]*rhs.data[0][1] + data[1][1]*rhs.data[1][1] + data[1][2]*rhs.data[2][1] + data[1][3]*rhs.data[3][1];
+	m.data[1][2] = data[1][0]*rhs.data[0][2] + data[1][1]*rhs.data[1][2] + data[1][2]*rhs.data[2][2] + data[1][3]*rhs.data[3][2];
+	m.data[1][3] = data[1][0]*rhs.data[0][3] + data[1][1]*rhs.data[1][3] + data[1][2]*rhs.data[2][3] + data[1][3]*rhs.data[3][3];
+	
+	m.data[2][0] = data[2][0]*rhs.data[0][0] + data[2][1]*rhs.data[1][0] + data[2][2]*rhs.data[2][0] + data[2][3]*rhs.data[3][0];
+	m.data[2][1] = data[2][0]*rhs.data[0][1] + data[2][1]*rhs.data[1][1] + data[2][2]*rhs.data[2][1] + data[2][3]*rhs.data[3][1];
+	m.data[2][2] = data[2][0]*rhs.data[0][2] + data[2][1]*rhs.data[1][2] + data[2][2]*rhs.data[2][2] + data[2][3]*rhs.data[3][2];
+	m.data[2][3] = data[2][0]*rhs.data[0][3] + data[2][1]*rhs.data[1][3] + data[2][2]*rhs.data[2][3] + data[2][3]*rhs.data[3][3];
+	
+	m.data[3][0] = data[3][0]*rhs.data[0][0] + data[3][1]*rhs.data[1][0] + data[3][2]*rhs.data[2][0] + data[3][3]*rhs.data[3][0];
+	m.data[3][1] = data[3][0]*rhs.data[0][1] + data[3][1]*rhs.data[1][1] + data[3][2]*rhs.data[2][1] + data[3][3]*rhs.data[3][1];
+	m.data[3][2] = data[3][0]*rhs.data[0][2] + data[3][1]*rhs.data[1][2] + data[3][2]*rhs.data[2][2] + data[3][3]*rhs.data[3][2];
+	m.data[3][3] = data[3][0]*rhs.data[0][3] + data[3][1]*rhs.data[1][3] + data[3][2]*rhs.data[2][3] + data[3][3]*rhs.data[3][3];
     return m;
 }
 

@@ -10,6 +10,7 @@
 // target height : 512
 // ############################################
 const int floortexwidth = 512;
+const int floortexheight = 512;
 const unsigned short floortex[] = 
 {
 	0x1904,0x1082,0x0861,0x0841,0x10A3,0x4208,0x5AAB,0x3186,
