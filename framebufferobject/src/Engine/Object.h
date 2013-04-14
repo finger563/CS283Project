@@ -73,7 +73,7 @@ public:
 	void TransformToPerspective(Matrix& m);
 	void TransformToPixel(Matrix& m);
 	
-	std::list<Poly*> getRenderList();
+	std::list<Poly> getRenderList();
 
 private:
 

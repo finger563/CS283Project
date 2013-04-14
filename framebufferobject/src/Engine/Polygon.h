@@ -80,11 +80,16 @@ public:
 	// Polygon variable setter methods
 	void SetTexture( const unsigned short *tex, 
 					 const int width,
+					 const int height) { 
+		texture = tex; texwidth = width; texheight = height;
+	}
+	void SetTexture( const unsigned short *tex, 
+					 const int width,
 					 const int height,
-					 Point2D u1 = Point2D(),
-					 Point2D u2 = Point2D(),
-					 Point2D u3 = Point2D(),
-					 Point2D u4 = Point2D()) { 
+					 Point2D u1,
+					 Point2D u2,
+					 Point2D u3,
+					 Point2D u4) { 
 		texture = tex; texwidth = width; texheight = height;
 		v[0].u = u1.x;
 		v[0].v = u1.y;
@@ -120,6 +125,12 @@ public:
 	void YSort();
 	void XSort();
 	void ZSort();
+	float MinX();
+	float MinY();
+	float MinZ();
+	float MaxX();
+	float MaxY();
+	float MaxZ();
 
 	// Operator Overloads
 	Poly& operator= (const Poly& rhs);

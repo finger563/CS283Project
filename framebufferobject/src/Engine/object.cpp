@@ -109,59 +109,45 @@ void Object::add(Poly poly)
 
 //generates cube
 void Object::generateCube(float size)
-{
-	//assume texture is set and set texture 
-	Poly tri1 = Poly( Vertex(size, size, size,1,0,0),Vertex(size, -size, size,1,0,1), 
-					Vertex(-size, size, size,1,1,0),Vertex(),3,Vector3D(0,0,1),TEXTURED),
-
-			tri2 = Poly(Vertex(size, -size, size,1,0,1), Vertex(-size, size, size,1,1,0),
-					Vertex(-size, -size, size,1,1,1),Vertex(),3,Vector3D(0,0,1),TEXTURED),
-
-			tri3 = Poly( Vertex(size, size, -size,1,1,0), Vertex(size, -size, -size,1,1,1),
-					Vertex(-size, size, -size,1,0,0),Vertex(),3,Vector3D(0,0,-1),TEXTURED),
-
-			tri4 = Poly( Vertex(size, -size, -size,1,1,1),Vertex(-size, size, -size,1,0,0),
-					Vertex(-size, -size, -size,1,0,1),Vertex(),3,Vector3D(0,0,-1),TEXTURED),
-			
-			tri5 = Poly( Vertex(size, size, -size,1,0,0), Vertex(size, size, size,1,1,0),
-					Vertex(size, -size, size,1,1,1),Vertex(),3,Vector3D(1,0,0),TEXTURED),
-
-			tri6 = Poly( Vertex(size, size, -size,1,0,0),Vertex(size, -size, -size,1,0,1),
-					Vertex(size, -size, size,1,1,1),Vertex(),3,Vector3D(1,0,0),TEXTURED),
-
-			tri7 = Poly( Vertex(-size, size, -size,1,1,0),Vertex(-size, size, size,1,0,0),
-					Vertex(-size, -size, -size,1,1,1),Vertex(),3,Vector3D(-1,0,0),TEXTURED),
-
-			tri8 = Poly( Vertex(-size, size, size,1,0,0),Vertex(-size, -size, size,1,0,1),
-					Vertex(-size, -size, -size,1,1,1),Vertex(),3,Vector3D(-1,0,0),TEXTURED),
-
-			tri9 = Poly( Vertex(size, size, size,1,1,0),Vertex(-size, size, size,1,0,0),
-					Vertex(size, size, -size,1,1,1),Vertex(),3,Vector3D(0,1,0),TEXTURED),
-
-			tri10 = Poly( Vertex(-size, size, -size,1,0,1),Vertex(-size, size, size,1,0,0),
-					Vertex(size, size, -size,1,1,1),Vertex(),3,Vector3D(0,1,0),TEXTURED),
-
-			tri11 = Poly( Vertex(size, -size, size,1,1,1),Vertex(size, -size, -size,1,1,0),
-					Vertex(-size, -size, -size,1,0,0),Vertex(),3,Vector3D(0,-1,0),TEXTURED),
-
-			tri12 = Poly( Vertex(size, -size, size,1,1,1),Vertex(-size, -size, size,1,0,1),
-					Vertex(-size, -size, -size,1,0,0),Vertex(),3,Vector3D(0,-1,0),TEXTURED);
-	  
+{	  
 	master.clear();
 
 	//stores in objects master list
-	master.push_back(tri1);
-	master.push_back(tri2);
-	master.push_back(tri3);
-	master.push_back(tri4);
-	master.push_back(tri5);
-	master.push_back(tri6);
-	master.push_back(tri7);
-	master.push_back(tri8);
-	master.push_back(tri9);
-	master.push_back(tri10);
-	master.push_back(tri11);
-	master.push_back(tri12);
+	master.push_back(Poly( Vertex(size, size, size,1,0,0),Vertex(size, -size, size,1,0,1), 
+						   Vertex(-size, size, size,1,1,0),Vertex(),3,Vector3D(0,0,1),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, -size, size,1,0,1), Vertex(-size, size, size,1,1,0),
+						   Vertex(-size, -size, size,1,1,1),Vertex(),3,Vector3D(0,0,1),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, size, -size,1,1,0), Vertex(size, -size, -size,1,1,1),
+						   Vertex(-size, size, -size,1,0,0),Vertex(),3,Vector3D(0,0,-1),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, -size, -size,1,1,1),Vertex(-size, size, -size,1,0,0),
+						   Vertex(-size, -size, -size,1,0,1),Vertex(),3,Vector3D(0,0,-1),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, size, -size,1,0,0), Vertex(size, size, size,1,1,0),
+						   Vertex(size, -size, size,1,1,1),Vertex(),3,Vector3D(1,0,0),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, size, -size,1,0,0),Vertex(size, -size, -size,1,0,1),
+						   Vertex(size, -size, size,1,1,1),Vertex(),3,Vector3D(1,0,0),TEXTURED));
+
+	master.push_back(Poly( Vertex(-size, size, -size,1,1,0),Vertex(-size, size, size,1,0,0),
+						   Vertex(-size, -size, -size,1,1,1),Vertex(),3,Vector3D(-1,0,0),TEXTURED));
+
+	master.push_back(Poly( Vertex(-size, size, size,1,0,0),Vertex(-size, -size, size,1,0,1),
+						   Vertex(-size, -size, -size,1,1,1),Vertex(),3,Vector3D(-1,0,0),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, size, size,1,1,0),Vertex(-size, size, size,1,0,0),
+						   Vertex(size, size, -size,1,1,1),Vertex(),3,Vector3D(0,1,0),TEXTURED));
+
+	master.push_back(Poly( Vertex(-size, size, -size,1,0,1),Vertex(-size, size, size,1,0,0),
+						   Vertex(size, size, -size,1,1,1),Vertex(),3,Vector3D(0,1,0),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, -size, size,1,1,1),Vertex(size, -size, -size,1,1,0),
+						   Vertex(-size, -size, -size,1,0,0),Vertex(),3,Vector3D(0,-1,0),TEXTURED));
+
+	master.push_back(Poly( Vertex(size, -size, size,1,1,1),Vertex(-size, -size, size,1,0,1),
+						   Vertex(-size, -size, -size,1,0,0),Vertex(),3,Vector3D(0,-1,0),TEXTURED));
 
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
@@ -206,16 +192,13 @@ void Object::generateTetra(float size)
 //generates cube
 void Object::generateFloor(float length, float depth)
 {
-	float sl = 5;	// sidelength of the square
 	position = Point3D(0,depth,0);
 
-	Poly tri1 = Poly(Vertex(-length,0,-length,1,0,1),Vertex(-length,0,length,1,0,0),Vertex(length,0,length,1,1,0),
-							Vertex(),3,Vector3D(0,1,0),TEXTURED),
-			 tri2 = Poly(Vertex(-length,0,-length,1,0,1),Vertex(length,0,-length,1,1,1),Vertex(length,0,length,1,1,0),
-						 Vertex(),3,Vector3D(0,1,0),TEXTURED);
 	master.clear();
-	master.push_back(tri1);
-	master.push_back(tri2);
+	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(-length,0,length,1,0,0),Vertex(length,0,length,1,1,0),
+							Vertex(),3,Vector3D(0,1,0),TEXTURED));
+	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(length,0,-length,1,1,1),Vertex(length,0,length,1,1,0),
+							Vertex(),3,Vector3D(0,1,0),TEXTURED));
 
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
@@ -253,10 +236,6 @@ void Object::Rotate(Matrix& m)
 	{
 		it->Transform(m);
 	}
-
-	updateList();
-
-	//return temp;
 }
 
 //assumes that only the temp list is being passed through
@@ -266,8 +245,6 @@ void Object::Translate(Vector3D& v)
 	{
 		it->Translate(v.x,v.y,v.z);
 	}
-
-	//return temp;
 }
 
 //returns modified polygon list
@@ -277,8 +254,6 @@ void Object::TransformToCamera(Matrix& m)
 	{
 		it->TransformToCamera(m);
 	}
-
-	//return temp;
 }
 
 //returns modified polygon list
@@ -288,8 +263,6 @@ void Object::TransformToPerspective(Matrix& m)
 	{
 		it->TransformToPerspective(m);
 	}
-
-	//return temp;
 }
 
 //returns modified polygon list
@@ -299,14 +272,12 @@ void Object::TransformToPixel(Matrix& m)
 	{
 		it->TransformToPixel(m);
 	}
-
-	//return temp;
 }
 
 //returns final render list
-std::list<Poly*> Object::getRenderList()
+std::list<Poly> Object::getRenderList()
 {
-	std::list<Poly*> get;
+	std::list<Poly> get;
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		if( it->visible &&
@@ -324,11 +295,9 @@ std::list<Poly*> Object::getRenderList()
 #endif
 			)
 		{
-			get.push_back(&(*it));
+			get.push_back(*it);
 		}
 	}
-
-	//updateList(get);
 	
 	return get;
 }
