@@ -116,6 +116,7 @@ public:
 	// Pipeline function methods
 	void Clip( );
 	void HomogeneousDivide( );
+	void SetupRasterization( );
 
 	// Rasterization Methods
 	void Rasterize( );

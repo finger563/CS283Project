@@ -34,8 +34,9 @@ public:
 	//Clears Temp list
 	void clearTemp();
 
-	//Rotate Temp list
-	void rotateTemp(Matrix m);
+	//Temp list operations
+	void RotateTemp(const Matrix& m);
+	void TranslateTemp(const Vector3D& v);
 
 	//add polygon to lists
 	void add(Poly poly);

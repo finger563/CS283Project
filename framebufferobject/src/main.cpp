@@ -56,7 +56,7 @@ Poly testpoly = Poly(Vertex(-10,10,0,1,0,0),
 					 Vertex(10,10,0,1,1,0),
 					 Vertex(10,-10,0,1,1,1),
 					 Vertex(-10,-10,0,1,0,1),
-					 4,Vector3D(0,0,-1),TEXTURED,Vector3D(1,1,1,1),
+					 4,Vector3D(0,0,-1),TEXTURED,Vector3D(1,1,1),
 					 box,boxtexwidth,boxtexheight);
 #endif
 Poly renderpoly;
@@ -67,9 +67,9 @@ Object testobj3 = Object(checkerboard,checkerboardwidth,checkerboardheight);
 Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
 
 
-Matrix worldToCamera;
-Matrix perspectiveProjection;
-Matrix projectionToPixel;
+Matrix worldToCamera=Matrix(),
+	   perspectiveProjection=Matrix(),
+	   projectionToPixel=Matrix();
 
 std::list<Object> objectlist;
 std::list<Poly> renderlist;
@@ -82,7 +82,7 @@ Matrix rmz = Matrix(),
 		rmxz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
-Matrix tm = Matrix();				// transformation matrix (scale to screen)
+
 float rot_angle = 3.141/120;
 		
 Matrix rot;		// debug/testing for rotating objects
@@ -206,25 +206,14 @@ int main(int argc, char **argv)
 	// | p p p s | | w |   | w' |
 
 	// We use ROW vector notation
-	
-    tm.data[3][0] = SIZE_X/2;	// translate x
-    tm.data[3][1] = SIZE_Y/2;	// translate y
-	tm.data[3][2] = -1;			// translate z
-    tm.data[0][0] = SIZE_X/2;	// scale x
-    tm.data[1][1] = SIZE_Y/2;	// scale y
-	tm.data[2][2] = 1;			// scale z
-	tm.data[3][3] = 0;			// scale w
-	tm.data[0][3] = 0;			// project x
-	tm.data[1][3] = 0;			// project y
-	tm.data[2][3] = 1;			// project z
-	
+		
 	perspectiveProjection.data[3][2] = -1;	// translate z
 	perspectiveProjection.data[2][3] = 1;	// project z
 
-	projectionToPixel.data[3][0] = SIZE_X/2;	// translate x
-	projectionToPixel.data[3][1] = SIZE_Y/2;	// translate y
-	projectionToPixel.data[0][0] = SIZE_X/2;	// scale x
-	projectionToPixel.data[1][1] = SIZE_Y/2;	// scale y
+	projectionToPixel.data[3][0] = (float)SIZE_X*0.5;	// translate x
+	projectionToPixel.data[3][1] = (float)SIZE_Y*0.5;	// translate y
+	projectionToPixel.data[0][0] = (float)SIZE_X*0.5;	// scale x
+	projectionToPixel.data[1][1] = (float)SIZE_Y*0.5;	// scale y
 
 	testobj.generateCube();
 	objectlist.push_back(testobj);
@@ -232,7 +221,7 @@ int main(int argc, char **argv)
 	testobj2.generateCube();
 	objectlist.push_back(testobj2);
 
-	testobj3.generateFloor(10,-10);
+	testobj3.generateFloor(30,-10);
 	objectlist.push_back(testobj3);
 
 	objectlist.push_back(testobj4);
@@ -555,11 +544,9 @@ void updatePixels(GLubyte* dst, int size)
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		it->updateList();
-		Vector3D tmp = it->getPosition() + camera.getPosition();
+		Vector3D tmp = it->getPosition() - camera.getPosition();
+		it->TranslateTemp(tmp);
 		worldToCamera.SetIdentity();
-		worldToCamera.data[3][0] = tmp.x;
-		worldToCamera.data[3][1] = tmp.y;
-		worldToCamera.data[3][2] = tmp.z;
 		worldToCamera = worldToCamera*camera.getRotation();
 		it->TransformToCamera( worldToCamera );
 		it->TransformToPerspective( perspectiveProjection );
@@ -571,6 +558,7 @@ void updatePixels(GLubyte* dst, int size)
 		it->Clip();
 		it->HomogeneousDivide();
 		it->TransformToPixel( projectionToPixel );
+		it->SetupRasterization( );		// for optimization
 	}
 
     for (int y=SIZE_Y-1;y>=0;y--) {
@@ -971,27 +959,27 @@ void keyboardCB(unsigned char key, int x, int y)
 		break;
 
 	case 'w': // Up
-		camera.Translate(Vector3D(0,0,-1));
-		break;
-
-	case 's': // down
 		camera.Translate(Vector3D(0,0,1));
 		break;
 
-	case 'a': // left
-		camera.Translate(Vector3D(1,0,0));
+	case 's': // down
+		camera.Translate(Vector3D(0,0,-1));
 		break;
 
-	case 'd': // right
+	case 'a': // left
 		camera.Translate(Vector3D(-1,0,0));
 		break;
 
+	case 'd': // right
+		camera.Translate(Vector3D(1,0,0));
+		break;
+
 	case ' ': // space
-		camera.Translate(Vector3D(0,-1,0));
+		camera.Translate(Vector3D(0,1,0));
 		break;
 
 	case 'c': // c
-		camera.Translate(Vector3D(0,1,0));
+		camera.Translate(Vector3D(0,-1,0));
 		break;
 
     case 'p':

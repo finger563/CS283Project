@@ -4,8 +4,6 @@
 #include <limits>
 #include "Engine\constants.h"
 
-//#define CLIPPING_TEST
-
 // constants
 const int    SCREEN_WIDTH    = 400;
 const int    SCREEN_HEIGHT   = 300;
@@ -61,7 +59,7 @@ const int    DATA_SIZE = IMAGE_WIDTH * IMAGE_HEIGHT * CHANNEL_COUNT;
                                 ( ((xR)>>3) ) )
 #endif
 
-#define BACKGROUND_COLOR	RGB_BLUE
+#define BACKGROUND_COLOR	RGB_BLACK
 #define DEFAULT_Z_BUFFER	((float)10000)
 
 #endif

@@ -91,12 +91,20 @@ void Object::clearTemp()
 	temp.clear();
 }
 
-//Rotate Temp list
-void Object::rotateTemp(Matrix m)
+//Temp List Operations
+void Object::RotateTemp(const Matrix& m)
 {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->Transform(m);
+	}
+}
+
+void Object::TranslateTemp(const Vector3D& v)
+{
+	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
+	{
+		it->Translate(v);
 	}
 }
 
@@ -241,7 +249,7 @@ void Object::Rotate(Matrix& m)
 //assumes that only the temp list is being passed through
 void Object::Translate(Vector3D& v)
 {
-	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
+	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
 		it->Translate(v.x,v.y,v.z);
 	}
@@ -281,18 +289,12 @@ std::list<Poly> Object::getRenderList()
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		if( it->visible &&
-#ifndef CLIPPING_TEST
-			it->v[0].z > 0 &&
-			it->v[1].z > 0 &&
-			it->v[2].z > 0 
-#else
 				(
 				it->v[0].z > 0 ||
 				it->v[1].z > 0 ||
 				it->v[2].z > 0 ||
 				it->v[3].z > 0
 				)
-#endif
 			)
 		{
 			get.push_back(*it);
