@@ -25,11 +25,7 @@ using std::endl;
 using std::ends;
 
 #include "main.h"
-#include "Engine\triangle.h"
 #include "Engine\Object.h"
-
-#include "Engine\Polygon.h"
-
 #include "Engine\camera.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
@@ -46,7 +42,7 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 	 rotz = 0,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
-#if 0
+#if 1
 Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
 					 Vertex(13.333,6.666,0,1,1,0),
 					 Vertex(-6.666,-13.333,0,1,0,1),
@@ -216,14 +212,14 @@ int main(int argc, char **argv)
 	projectionToPixel.data[1][1] = (float)SIZE_Y*0.5;	// scale y
 
 	testobj.generateCube();
-	objectlist.push_back(testobj);
+	//objectlist.push_back(testobj);
 
 	testobj2.generateCube();
-	testobj2.SetRenderType(COLORED);
-	objectlist.push_back(testobj2);
+	testobj2.SetRenderType(FLAT);
+	//objectlist.push_back(testobj2);
 
 	testobj3.generateFloor(30,-10);
-	objectlist.push_back(testobj3);
+	//objectlist.push_back(testobj3);
 
 	objectlist.push_back(testobj4);
 
@@ -559,12 +555,12 @@ void updatePixels(GLubyte* dst, int size)
 		it->Clip();
 		it->HomogeneousDivide();
 		it->TransformToPixel( projectionToPixel );
-		it->SetupRasterization( );		// for optimization
+		it->SetupRasterization( );		// for speed optimization
 	}
 
     for (int y=SIZE_Y-1;y>=0;y--) {
 		for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
-			it->Rasterize(y);
+			it->RasterizeFast(y);
 		}
 	}
 

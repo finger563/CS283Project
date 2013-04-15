@@ -62,6 +62,7 @@ public:
 	// Operator Overloads
 	Vertex& operator= (const Vertex& rhs);
 	bool operator== (const Vertex& rhs) const;
+	bool operator!= (const Vertex& rhs) const;
 	float& operator[](const int i) { return data[i]; }
 	float operator[](const int i) const { return data[i]; }
 	Vertex operator- (const Vertex& rhs) const;

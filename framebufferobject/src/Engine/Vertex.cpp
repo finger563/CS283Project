@@ -81,6 +81,14 @@ bool Vertex::operator== (const Vertex& rhs) const {
 	return true;
 }
 
+bool Vertex::operator!= (const Vertex& rhs) const {
+	for (int i=0;i<NUM_VERTEX_DATA;i++){
+		if ( data[i] == rhs[i] )
+			return true;
+	}
+	return false;
+}
+
 Vertex Vertex::operator- (const Vertex& rhs) const{
 	Vertex v;
 	for (int i=0;i<NUM_VERTEX_DATA;i++)

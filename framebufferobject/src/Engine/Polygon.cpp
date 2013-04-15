@@ -274,148 +274,51 @@ void Poly::HomogeneousDivide( ) {
 }
 
 void Poly::SetupRasterization( ) {
-	int y =0;
-	if ( y > MaxY() || y < MinY() )
-		return;
-	float BC[POLY_MAX_VERTICES] = {};		// boundary tests against y scanline
-	int line[POLY_MAX_VERTICES] = {};	// which lines cross y scanline
-	int lines = 0;
-	float a1,a2,ai;				// alphas for each crossing line (there can only be 2), and for inside scanline
-	Vertex sv,ev,vi;			// Start and end scanline vertices, and rendering vertex
+	float a1,a2;
 	
-	for (int i=0;i<numVertices;i++) {
-		BC[i] = v[i].y - y;		// + is above, - is below, 0 is on
+	Vertex temp[POLY_MAX_VERTICES];
+	YSort(temp);
+	Vertex left,right;
+
+	ySlopeChanges[0] = temp[0].y;
+	ySlopeChanges[1] = temp[1].y;
+	ySlopeChanges[2] = temp[2].y;
+	if ( numVertices == 4 )
+		ySlopeChanges[3] = temp[3].y;
+
+	a1 = 1/(temp[0].y - temp[1].y - 1);
+	a2 = 1/(temp[0].y - temp[2].y - 1);
+	left = temp[0] + (temp[1] - temp[0])*a1;
+	right = temp[0] + (temp[2] - temp[0])*a2;
+	if ( v[2].x < v[1].x ) {
+		Vertex tmpv = right;
+		right = left;
+		left = tmpv;
+	}
+	for (int i=0;i<NUM_VERTEX_DATA;i++) {
+		increments[0][0][i] = left[i];
+		increments[0][1][i] = right[i];
 	}
 
-	if ( numVertices == 3 ) {
-		line[0] =  ((BC[0] >= 0 && BC[1] <= 0 ) ||
-					(BC[0] <= 0 && BC[1] >= 0 ) ) ? 1 : 0;
-		line[1] =  ((BC[1] >= 0 && BC[2] <= 0 ) ||
-					(BC[1] <= 0 && BC[2] >= 0 ) ) ? 1 : 0;
-		line[2] =  ((BC[2] >= 0 && BC[0] <= 0 ) ||
-					(BC[2] <= 0 && BC[0] >= 0 ) ) ? 1 : 0;
-		lines = line[0] + line[1]*2 + line[2]*4;
-		switch (lines) {
-		default:	// These cases represent a degenerate triangle
-			return;	// therefore do not do anything else
-		case 3:		// Lines 0 and 1 cross scanline
-			a1 = BC[0]/(BC[0]-BC[1]);
-			a2 = BC[1]/(BC[1]-BC[2]);
-			sv = v[0] + (v[1]-v[0])*a1;
-			ev = v[1] + (v[2]-v[1])*a2;
-			break;
-		case 5:		// Lines 0 and 2 cross scanline
-			a1 = BC[0]/(BC[0]-BC[1]);
-			a2 = BC[2]/(BC[2]-BC[0]);
-			sv = v[0] + (v[1]-v[0])*a1;
-			ev = v[2] + (v[0]-v[2])*a2;
-			break;
-		case 6:		// Lines 1 and 2 cross scanline
-			a1 = BC[1]/(BC[1]-BC[2]);
-			a2 = BC[2]/(BC[2]-BC[0]);
-			sv = v[1] + (v[2]-v[1])*a1;
-			ev = v[2] + (v[0]-v[2])*a2;
-			break;
-		}
-	}
-	else {		// Poly is a QUAD
-		line[0] =  ((BC[0] > 0 && BC[1] < 0 ) ||
-					(BC[0] < 0 && BC[1] > 0 ) ) ? 1 : 0;
-		line[1] =  ((BC[1] > 0 && BC[2] < 0 ) ||
-					(BC[1] < 0 && BC[2] > 0 ) ) ? 1 : 0;
-		line[2] =  ((BC[2] > 0 && BC[3] < 0 ) ||
-					(BC[2] < 0 && BC[3] > 0 ) ) ? 1 : 0;
-		line[3] =  ((BC[3] > 0 && BC[0] < 0 ) ||
-					(BC[3] < 0 && BC[0] > 0 ) ) ? 1 : 0;
-		lines = line[0] + line[1]*2 + line[2]*4 + line[3]*8;
-		switch (lines) {
-		default:	// These cases represent a degenerate triangle
-			return;	// therefore do not do anything else
-		case 3:		// Lines 0 and 1 cross scanline
-			a1 = BC[0]/(BC[0]-BC[1]);
-			a2 = BC[1]/(BC[1]-BC[2]);
-			sv = v[0] + (v[1]-v[0])*a1;
-			ev = v[1] + (v[2]-v[1])*a2;
-			break;
-		case 5:		// Lines 0 and 2 cross scanline
-			a1 = BC[0]/(BC[0]-BC[1]);
-			a2 = BC[2]/(BC[2]-BC[3]);
-			sv = v[0] + (v[1]-v[0])*a1;
-			ev = v[2] + (v[3]-v[2])*a2;
-			break;
-		case 6:		// Lines 1 and 2 cross scanline
-			a1 = BC[1]/(BC[1]-BC[2]);
-			a2 = BC[2]/(BC[2]-BC[3]);
-			sv = v[1] + (v[2]-v[1])*a1;
-			ev = v[2] + (v[3]-v[2])*a2;
-			break;
-		case 9:		// Lines 0 and 3 cross scanline
-			a1 = BC[0]/(BC[0]-BC[1]);
-			a2 = BC[3]/(BC[3]-BC[0]);
-			sv = v[0] + (v[1]-v[0])*a1;
-			ev = v[3] + (v[0]-v[3])*a2;
-			break;
-		case 10:	// Lines 1 and 3 cross scanline
-			a1 = BC[1]/(BC[1]-BC[2]);
-			a2 = BC[3]/(BC[3]-BC[0]);
-			sv = v[1] + (v[2]-v[1])*a1;
-			ev = v[3] + (v[0]-v[3])*a2;
-			break;
-		case 12:	// Lines 2 and 3 cross scanline
-			a1 = BC[2]/(BC[2]-BC[3]);
-			a2 = BC[3]/(BC[3]-BC[0]);
-			sv = v[2] + (v[3]-v[2])*a1;
-			ev = v[3] + (v[0]-v[3])*a2;
-			break;
-		}
-	}
-	if ( sv.x > ev.x ) {	// need to flip start and end vertices
-		Vertex temp = ev;
-		ev = sv;
-		sv = temp;
-	}
-	vi = sv;
-	if ( vi.x < 0 ) {
-		vi.x = 0;
-	}
-	if ( ev.x >= SIZE_X ) {
-		ai = (sv.x-(SIZE_X-1))/((sv.x-(SIZE_X-1)) - (ev.x-(SIZE_X-1)));
-		ev = sv + (ev-sv)*ai;
-	}
-	if ( floor(vi.x) == ceil(ev.x) )
-		return;
-	for (int x=vi.x;x<=ev.x;x++) {
-		ai = (sv.x-x)/((sv.x-x) - (ev.x-x));
-		vi = sv + (ev-sv)*ai;
-		if ( vi.ez/vi.hw < z_buffer[x + y*SIZE_X] ) {
-			z_buffer[x + y*SIZE_X] = vi.ez/vi.hw;
-			switch ( rType ) {	// What are we interpolating/rendering?
-			case FLAT:
-				display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(r*255.0),(char)(g*255.0),(char)(b*255.0));
-				break;
-			case COLORED:
-				vi.r = vi.r/vi.hw;	// divide all interpolated values by hw 
-				vi.g = vi.g/vi.hw;	// divide all interpolated values by hw 
-				vi.b = vi.b/vi.hw;	// divide all interpolated values by hw 
-				display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(vi.r*255.0),(char)(vi.g*255.0),(char)(vi.b*255.0));
-				break;
-			case SMOOTH:
-				break;
-			case TEXTURED:
-				vi.u = vi.u/vi.hw;	// divide all interpolated values by hw 
-				vi.v = vi.v/vi.hw;	// divide all interpolated values by hw 
-				if ( vi.u < 0 || vi.u > 1 )
-					vi.u = 0;
-				if ( vi.v < 0 || vi.v > 1 )
-					vi.v = 0;
-				display_buffer[x + y*SIZE_X] = texture[(int)(vi.u*(texwidth-1)) + ((int)(vi.v*(texheight-1)))*texwidth];
-				break;
-			case TEXTURED_SMOOTH:
-				break;
-			default:
-				break;
+	if ( numVertices == 3 ) {	// RENDERING A TRIANGLE
+		if ( v[2].x < v[1].x ) {	// y-middle is right
+			a2 = 1/(temp[1].y - temp[2].y - 1);
+			right = temp[1] + (temp[2] - temp[1])*a2;
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[1][0][i] = left[i];
+				increments[1][1][i] = right[i];
 			}
 		}
+		else {						// y-middle is left
+			a1 = 1/(temp[1].y - temp[2].y - 1);
+			left = temp[1] + (temp[2] - temp[1])*a1;
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[1][0][i] = left[i];
+				increments[1][1][i] = right[i];
+			}
+		}
+	}
+	else {		// RENDERING A QUAD - NOT IMPLEMENTED YET
 	}
 }
 
@@ -669,6 +572,8 @@ void Poly::Rasterize( const int y ) {
 	if ( vi.x < 0 ) {
 		vi.x = 0;
 	}
+	if ( ev.x < 0 )
+		return;
 	if ( ev.x >= SIZE_X ) {
 		ai = (sv.x-(SIZE_X-1))/((sv.x-(SIZE_X-1)) - (ev.x-(SIZE_X-1)));
 		ev = sv + (ev-sv)*ai;
@@ -707,6 +612,143 @@ void Poly::Rasterize( const int y ) {
 				break;
 			}
 		}
+	}
+}
+
+void Poly::RasterizeFast( ) {
+}
+
+void Poly::RasterizeFast( const int y ) {
+	if ( y > ySlopeChanges[0] || 
+		 y < ySlopeChanges[2] ||
+		 y < ySlopeChanges[3] )
+		 return;
+	float dy,ai;
+	float interp[2][NUM_VERTEX_DATA];
+	if ( y < ySlopeChanges[0] &&
+		 y > ySlopeChanges[1] ) {
+		dy = ySlopeChanges[0] - y;
+		for (int i=0;i<NUM_VERTEX_DATA;i++) {
+			interp[0][i] = increments[0][0][i] * dy;
+			interp[1][i] = increments[0][1][i] * dy;
+		}
+		//if ( interp[1][0] < 0 ) 
+		//	return;		// both edges of this scanline are offscreen
+		float mid[NUM_VERTEX_DATA];
+		int x;
+		for (int i=0;i<NUM_VERTEX_DATA;i++)
+			mid[i] = interp[0][i];
+		if ( mid[0] < 0 ) {
+			x=0;
+			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
+			for (int i=0;i<NUM_VERTEX_DATA;i++)
+				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+		}
+		if ( interp[1][0] >= SIZE_X ) {
+			x=SIZE_X-1;
+			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
+			for (int i=0;i<NUM_VERTEX_DATA;i++)
+				interp[1][i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+		}
+		for (x=mid[0];x<interp[1][0];x++) {	// Raster the scanline
+			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
+			for (int i=0;i<NUM_VERTEX_DATA;i++)
+				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+			if ( mid[6]/mid[NUM_VERTEX_DATA-1] < z_buffer[x + y*SIZE_X] ) {
+				z_buffer[x + y*SIZE_X] = mid[6]/mid[NUM_VERTEX_DATA-1];
+				switch ( rType ) {
+				case FLAT:
+					display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(r*255.0),(char)(g*255.0),(char)(b*255.0));
+					break;
+				case COLORED:
+					break;
+				case SMOOTH:
+					break;
+				case TEXTURED:
+					mid[7] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
+					mid[8] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
+					if ( mid[7] < 0 || mid[7] > 1 )
+						mid[7] = 0;
+					if ( mid[8] < 0 || mid[8] > 1 )
+						mid[8] = 0;
+					display_buffer[x + y*SIZE_X] = texture[(int)(mid[7]*(texwidth-1)) + ((int)(mid[8]*(texheight-1)))*texwidth];
+					break;
+				case TEXTURED_SMOOTH:
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+	else if ( y <= ySlopeChanges[1] && 
+			  y > ySlopeChanges[2] ) {
+		dy = ySlopeChanges[1] - y;
+		if ( v[1].x > v[2].x ) {
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				interp[0][i] = increments[1][0][i] * (ySlopeChanges[0] - y);
+				interp[1][i] = increments[1][1][i] * dy;
+			}
+		}
+		else {
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				interp[0][i] = increments[1][0][i] * dy;
+				interp[1][i] = increments[1][1][i] * (ySlopeChanges[0] - y);
+			}
+		}
+		if ( interp[1][0] < 0 ) 
+			return;		// both edges of this scanline are offscreen
+		float mid[NUM_VERTEX_DATA];
+		int x;
+		for (int i=0;i<NUM_VERTEX_DATA;i++)
+			mid[i] = interp[0][i];
+		if ( mid[0] < 0 ) {
+			x=0;
+			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
+			for (int i=0;i<NUM_VERTEX_DATA;i++)
+				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+		}
+		if ( interp[1][0] >= SIZE_X ) {
+			x=SIZE_X-1;
+			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
+			for (int i=0;i<NUM_VERTEX_DATA;i++)
+				interp[1][i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+		}
+		for (x=mid[0];x<interp[1][0];x++) {	// Raster the scanline
+			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
+			for (int i=0;i<NUM_VERTEX_DATA;i++)
+				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+			if ( mid[6]/mid[NUM_VERTEX_DATA-1] < z_buffer[x + y*SIZE_X] ) {
+				z_buffer[x + y*SIZE_X] = mid[6]/mid[NUM_VERTEX_DATA-1];
+				switch ( rType ) {
+				case FLAT:
+					display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(r*255.0),(char)(g*255.0),(char)(b*255.0));
+					break;
+				case COLORED:
+					break;
+				case SMOOTH:
+					break;
+				case TEXTURED:
+					mid[7] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
+					mid[8] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
+					if ( mid[7] < 0 || mid[7] > 1 )
+						mid[7] = 0;
+					if ( mid[8] < 0 || mid[8] > 1 )
+						mid[8] = 0;
+					display_buffer[x + y*SIZE_X] = texture[(int)(mid[7]*(texwidth-1)) + ((int)(mid[8]*(texheight-1)))*texwidth];
+					break;
+				case TEXTURED_SMOOTH:
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+	else if ( numVertices == 4 &&
+			  y <= ySlopeChanges[2] &&
+			  y > ySlopeChanges[3] ) {
+			dy = ySlopeChanges[2] - y;
 	}
 }
 
@@ -765,8 +807,7 @@ float Poly::MaxZ() {
 	return max;
 }
 
-void Poly::YSort() {
-	Vertex temp[POLY_MAX_VERTICES];
+void Poly::YSort( Vertex* temp ) {
 	temp[0] = v[0];
 	temp[1] = v[1];
 	temp[2] = v[2];
@@ -820,10 +861,112 @@ void Poly::YSort() {
 	}
 }
 
-void Poly::XSort() {
+void Poly::XSort( Vertex* temp ) {
+	temp[0] = v[0];
+	temp[1] = v[1];
+	temp[2] = v[2];
+	temp[3] = v[3];
+	if ( numVertices == 3 ) {
+		if ( v[0].x < v[1].x ) {
+			temp[0] = v[1];
+			temp[1] = v[0];
+		}
+		if ( temp[0].x < v[2].x ) {	// v[2] has largest x
+			temp[2] = temp[1];
+			temp[1] = temp[0];
+			temp[0] = v[2];
+		}
+		else if ( temp[1].x < v[2].x ) {	// v[2] has 2nd largest x
+			temp[2] = temp[1];
+			temp[1] = v[2];
+		}
+	}
+	else {	// numVertices must equal 4
+		if ( v[0].x < v[1].x ) {
+			temp[0] = v[1];
+			temp[1] = v[0];
+		}
+		if ( temp[0].x < v[2].x ) {	// v[2] has largest x
+			temp[2] = temp[1];
+			temp[1] = temp[0];
+			temp[0] = v[2];
+		}
+		else if ( temp[1].x < v[2].x ) {	// v[2] has 2nd largest x
+			temp[2] = temp[1];
+			temp[1] = v[2];
+		}
+		if ( temp[0].x < v[3].x ) {
+			temp[3] = temp[2];
+			temp[2] = temp[1];
+			temp[1] = temp[0];
+			temp[0] = v[3];
+		}
+		else {
+			if ( temp[1].x < v[3].x ) {
+				temp[3] = temp[2];
+				temp[2] = temp[1];
+				temp[1] = v[3];
+			}
+			else if ( temp[2].x < v[3].x ) {
+				temp[3] = temp[2];
+				temp[2] = v[3];
+			}
+		}
+	}
 }
 
-void Poly::ZSort() {
+void Poly::ZSort( Vertex* temp ) {
+	temp[0] = v[0];
+	temp[1] = v[1];
+	temp[2] = v[2];
+	temp[3] = v[3];
+	if ( numVertices == 3 ) {
+		if ( v[0].z < v[1].z ) {
+			temp[0] = v[1];
+			temp[1] = v[0];
+		}
+		if ( temp[0].z < v[2].z ) {	// v[2] has largest z
+			temp[2] = temp[1];
+			temp[1] = temp[0];
+			temp[0] = v[2];
+		}
+		else if ( temp[1].z < v[2].z ) {	// v[2] has 2nd largest z
+			temp[2] = temp[1];
+			temp[1] = v[2];
+		}
+	}
+	else {	// numVertices must equal 4
+		if ( v[0].z < v[1].z ) {
+			temp[0] = v[1];
+			temp[1] = v[0];
+		}
+		if ( temp[0].z < v[2].z ) {	// v[2] has largest z
+			temp[2] = temp[1];
+			temp[1] = temp[0];
+			temp[0] = v[2];
+		}
+		else if ( temp[1].z < v[2].z ) {	// v[2] has 2nd largest z
+			temp[2] = temp[1];
+			temp[1] = v[2];
+		}
+		if ( temp[0].z < v[3].z ) {
+			temp[3] = temp[2];
+			temp[2] = temp[1];
+			temp[1] = temp[0];
+			temp[0] = v[3];
+		}
+		else {
+			if ( temp[1].z < v[3].z ) {
+				temp[3] = temp[2];
+				temp[2] = temp[1];
+				temp[1] = v[3];
+			}
+			else if ( temp[2].z < v[3].z ) {
+				temp[3] = temp[2];
+				temp[2] = v[3];
+			}
+		}
+	}
 }
 
 // Operator Overloads
@@ -841,9 +984,17 @@ Poly& Poly::operator= (const Poly& rhs) {
 	b = rhs.b;
 
 	rType = rhs.rType;
-	tType = rhs.tType;
 
 	normal = rhs.normal;
 	visible = rhs.visible;
     return (*this); 
+}
+
+bool Poly::operator== (const Poly& rhs) const {
+	if ( numVertices != rhs.numVertices )
+		return false;
+	for (int i=0;i<POLY_MAX_VERTICES;i++) {
+		if ( v[i] != rhs.v[i] )
+			return false;
+	}
 }

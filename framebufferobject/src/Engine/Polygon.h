@@ -28,10 +28,13 @@ public:
 	float r,g,b;					// for flat coloring
 
 	RenderType rType;		// Method of rendering this polygon
-    //PolyType tType;			// for fast rendering, pre-compute
 
 	Vector3D normal;	// for backface culling
 	bool visible;		// for backface culling
+	
+	// THESE ARE FOR RENDERING QUICKLY
+	float ySlopeChanges[POLY_MAX_VERTICES];						// y values where slopes change
+	float increments[POLY_MAX_VERTICES][2][NUM_VERTEX_DATA];	// increments along edges of left & right slopes
 
     Poly() {
 		numVertices = 0;
@@ -138,11 +141,13 @@ public:
 	// Rasterization Methods
 	void Rasterize( );
 	void Rasterize( const int y );
+	void RasterizeFast( );
+	void RasterizeFast( const int y );
 
 	// Helper Functions
-	void YSort();
-	void XSort();
-	void ZSort();
+	void YSort( Vertex* temp );
+	void XSort( Vertex* temp );
+	void ZSort( Vertex* temp );
 	float MinX();
 	float MinY();
 	float MinZ();
@@ -152,6 +157,7 @@ public:
 
 	// Operator Overloads
 	Poly& operator= (const Poly& rhs);
+	bool operator== (const Poly& rhs) const;	// Incomplete implementation!
 };
 
 #endif		// Polygon_H
