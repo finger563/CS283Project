@@ -15,7 +15,7 @@ class Vertex
 public:
 	union {
 		struct {
-			float x,y,z,w;		// 3D homogeneous coords
+			float x,y,z,w;		// 3D homogeneous coords ( get transformed into pixel space )
 			float ex,ey,ez;		// 3D homogenous eye/camera coords ( w for this system is hw )
 			float u,v;			// 2D texture coords (range = [0,1]) ( w for this system is hw )
 			float r,g,b;		// RGB color (range = [0,1]), ( w for this system is hw )

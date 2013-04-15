@@ -276,20 +276,32 @@ void Poly::HomogeneousDivide( ) {
 void Poly::SetupRasterization( ) {
 	float a1,a2;
 	
-	Vertex temp[POLY_MAX_VERTICES];
-	YSort(temp);
+	YSort(ySorted);
 	Vertex left,right;
 
-	ySlopeChanges[0] = temp[0].y;
-	ySlopeChanges[1] = temp[1].y;
-	ySlopeChanges[2] = temp[2].y;
-	if ( numVertices == 4 )
-		ySlopeChanges[3] = temp[3].y;
+	switch ( rType ) {
+	default:
+	case FLAT:
+		numInterps = 4;	// just x,y,ez,hw
+		break;
+	case COLORED:
+		numInterps = 7;	// just x,y,ez,hw,r,g,b
+		break;
+	case SMOOTH:
+		numInterps = 7;	// just x,y,ez,hw,nx,ny,nz
+		break;
+	case TEXTURED:
+		numInterps = 6;	// just x,y,ez,hw,u,v
+		break;
+	case TEXTURED_SMOOTH:
+		numInterps = 9;	// just x,y,ez,hw,nx,ny,nz,u,v
+		break;
+	}
 
-	a1 = 1/(temp[0].y - temp[1].y - 1);
-	a2 = 1/(temp[0].y - temp[2].y - 1);
-	left = temp[0] + (temp[1] - temp[0])*a1;
-	right = temp[0] + (temp[2] - temp[0])*a2;
+	a1 = 1/(ySorted[0].y - ySorted[1].y - 1);
+	a2 = 1/(ySorted[0].y - ySorted[2].y - 1);
+	left = ySorted[0] + (ySorted[1] - ySorted[0])*a1;
+	right = ySorted[0] + (ySorted[2] - ySorted[0])*a2;
 	if ( v[2].x < v[1].x ) {
 		Vertex tmpv = right;
 		right = left;
@@ -301,24 +313,57 @@ void Poly::SetupRasterization( ) {
 	}
 
 	if ( numVertices == 3 ) {	// RENDERING A TRIANGLE
-		if ( v[2].x < v[1].x ) {	// y-middle is right
-			a2 = 1/(temp[1].y - temp[2].y - 1);
-			right = temp[1] + (temp[2] - temp[1])*a2;
+		if ( ySorted[2].x < ySorted[1].x ) {	// y-middle is right
+			a2 = 1/(ySorted[1].y - ySorted[2].y - 1);
+			right = ySorted[1] + (ySorted[2] - ySorted[1])*a2;
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
 				increments[1][0][i] = left[i];
 				increments[1][1][i] = right[i];
 			}
 		}
 		else {						// y-middle is left
-			a1 = 1/(temp[1].y - temp[2].y - 1);
-			left = temp[1] + (temp[2] - temp[1])*a1;
+			a1 = 1/(ySorted[1].y - ySorted[2].y - 1);
+			left = ySorted[1] + (ySorted[2] - ySorted[1])*a1;
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
 				increments[1][0][i] = left[i];
 				increments[1][1][i] = right[i];
 			}
 		}
 	}
-	else {		// RENDERING A QUAD - NOT IMPLEMENTED YET
+	else {		// RENDERING A QUAD
+		if ( ySorted[2].x < ySorted[1].x ) {
+			a2 = 1/(ySorted[1].y - ySorted[3].y - 1);
+			right = ySorted[1] + (ySorted[3] - ySorted[1])*a2;
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[1][0][i] = left[i];
+				increments[1][1][i] = right[i];
+			}
+		}
+		else {
+			a1 = 1/(ySorted[1].y - ySorted[3].y - 1);
+			left = ySorted[1] + (ySorted[3] - ySorted[1])*a1;
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[1][0][i] = left[i];
+				increments[1][1][i] = right[i];
+			}
+		}
+
+		if ( ySorted[2].x > ySorted[3].x ) {
+			a2 = 1/(ySorted[2].y - ySorted[3].y - 1);
+			right = ySorted[2] + (ySorted[3] - ySorted[2])*a2;
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[2][0][i] = left[i];
+				increments[2][1][i] = right[i];
+			}
+		}
+		else {
+			a1 = 1/(ySorted[2].y - ySorted[3].y - 1);
+			left = ySorted[2] + (ySorted[3] - ySorted[2])*a1;
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[2][0][i] = left[i];
+				increments[2][1][i] = right[i];
+			}
+		}
 	}
 }
 
@@ -619,30 +664,31 @@ void Poly::RasterizeFast( ) {
 }
 
 void Poly::RasterizeFast( const int y ) {
-	if ( y > ySlopeChanges[0] || 
-		 y < ySlopeChanges[2] ||
-		 y < ySlopeChanges[3] )
+	if ( y > ySorted[0].y || 
+		 y < ySorted[2].y ||
+		 y < ySorted[3].y )
 		 return;
-	float dy,ai;
-	float interp[2][NUM_VERTEX_DATA];
-	if ( y < ySlopeChanges[0] &&
-		 y > ySlopeChanges[1] ) {
-		dy = ySlopeChanges[0] - y;
+
+	float interp[2][NUM_VERTEX_DATA];	// on the stack for speed, but only use numInterps
+	float px[NUM_VERTEX_DATA];			// For the pixel in the scanline
+	
+	float dy,al,ar,ai;
+
+	if ( y < ySorted[0].y &&
+		 y > ySorted[1].y ) {
+		dy = ySorted[0].y - y;
 		for (int i=0;i<NUM_VERTEX_DATA;i++) {
-			interp[0][i] = increments[0][0][i] * dy;
-			interp[1][i] = increments[0][1][i] * dy;
+			interp[0][i] = increments[0][0][i] * dy + ySorted[0][i];
+			interp[1][i] = increments[0][1][i] * dy + ySorted[0][i];
 		}
-		//if ( interp[1][0] < 0 ) 
-		//	return;		// both edges of this scanline are offscreen
-		float mid[NUM_VERTEX_DATA];
-		int x;
+		int x = interp[0][0];
 		for (int i=0;i<NUM_VERTEX_DATA;i++)
-			mid[i] = interp[0][i];
-		if ( mid[0] < 0 ) {
+			px[i] = interp[0][i];
+		if ( x < 0 ) {
 			x=0;
 			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
 			for (int i=0;i<NUM_VERTEX_DATA;i++)
-				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+				px[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
 		}
 		if ( interp[1][0] >= SIZE_X ) {
 			x=SIZE_X-1;
@@ -650,63 +696,59 @@ void Poly::RasterizeFast( const int y ) {
 			for (int i=0;i<NUM_VERTEX_DATA;i++)
 				interp[1][i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
 		}
-		for (x=mid[0];x<interp[1][0];x++) {	// Raster the scanline
+
+		for (int x=px[0];x<=interp[1][0];x++) {
 			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
 			for (int i=0;i<NUM_VERTEX_DATA;i++)
-				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
-			if ( mid[6]/mid[NUM_VERTEX_DATA-1] < z_buffer[x + y*SIZE_X] ) {
-				z_buffer[x + y*SIZE_X] = mid[6]/mid[NUM_VERTEX_DATA-1];
+				px[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+			if ( px[6]/px[NUM_VERTEX_DATA-1] < z_buffer[x + y*SIZE_X] ) {
+				z_buffer[x + y*SIZE_X] = px[6]/px[NUM_VERTEX_DATA-1];
 				switch ( rType ) {
+				default:
 				case FLAT:
-					display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(r*255.0),(char)(g*255.0),(char)(b*255.0));
 					break;
 				case COLORED:
 					break;
 				case SMOOTH:
 					break;
 				case TEXTURED:
-					mid[7] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
-					mid[8] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
-					if ( mid[7] < 0 || mid[7] > 1 )
-						mid[7] = 0;
-					if ( mid[8] < 0 || mid[8] > 1 )
-						mid[8] = 0;
-					display_buffer[x + y*SIZE_X] = texture[(int)(mid[7]*(texwidth-1)) + ((int)(mid[8]*(texheight-1)))*texwidth];
+					px[7] = px[7]/px[NUM_VERTEX_DATA-1];
+					px[8] = px[8]/px[NUM_VERTEX_DATA-1];
+					if ( px[7] < 0 || px[7] > 1 )
+						px[7] = 0;
+					if ( px[8] < 0 || px[8] > 1 )
+						px[8] = 0;
+					display_buffer[x + y*SIZE_X] = texture[(int)(px[7]*(texwidth-1)) + ((int)(px[8]*(texheight-1)))*texwidth];
 					break;
 				case TEXTURED_SMOOTH:
-					break;
-				default:
 					break;
 				}
 			}
 		}
 	}
-	else if ( y <= ySlopeChanges[1] && 
-			  y > ySlopeChanges[2] ) {
-		dy = ySlopeChanges[1] - y;
-		if ( v[1].x > v[2].x ) {
+	else if ( y < ySorted[1].y && 
+			  y > ySorted[2].y ) {
+		dy = ySorted[1].y - y;
+		if ( ySorted[1].x < ySorted[2].x ) {
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				interp[0][i] = increments[1][0][i] * (ySlopeChanges[0] - y);
-				interp[1][i] = increments[1][1][i] * dy;
+				interp[0][i] = increments[1][0][i] * dy + ySorted[1][i];
+				interp[1][i] = increments[1][1][i] * (ySorted[0].y - y) + ySorted[0][i];
 			}
 		}
 		else {
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				interp[0][i] = increments[1][0][i] * dy;
-				interp[1][i] = increments[1][1][i] * (ySlopeChanges[0] - y);
+				interp[0][i] = increments[1][0][i] * (ySorted[0].y - y) + ySorted[0][i];
+				interp[1][i] = increments[1][1][i] * dy + ySorted[1][i];
 			}
 		}
-		if ( interp[1][0] < 0 ) 
-			return;		// both edges of this scanline are offscreen
-		float mid[NUM_VERTEX_DATA];
-		int x;
+		int x = interp[0][0];
 		for (int i=0;i<NUM_VERTEX_DATA;i++)
-			mid[i] = interp[0][i];
-		if ( mid[0] < 0 ) {
+			px[i] = interp[0][i];
+		if ( x < 0 ) {
 			x=0;
 			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
 			for (int i=0;i<NUM_VERTEX_DATA;i++)
-				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+				px[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
 		}
 		if ( interp[1][0] >= SIZE_X ) {
 			x=SIZE_X-1;
@@ -714,41 +756,40 @@ void Poly::RasterizeFast( const int y ) {
 			for (int i=0;i<NUM_VERTEX_DATA;i++)
 				interp[1][i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
 		}
-		for (x=mid[0];x<interp[1][0];x++) {	// Raster the scanline
+
+		for (int x=px[0];x<=interp[1][0];x++) {
 			ai = (interp[0][0]-x)/((interp[0][0]-x) - (interp[1][0]-x));
 			for (int i=0;i<NUM_VERTEX_DATA;i++)
-				mid[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
-			if ( mid[6]/mid[NUM_VERTEX_DATA-1] < z_buffer[x + y*SIZE_X] ) {
-				z_buffer[x + y*SIZE_X] = mid[6]/mid[NUM_VERTEX_DATA-1];
+				px[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai;
+			if ( px[6]/px[NUM_VERTEX_DATA-1] < z_buffer[x + y*SIZE_X] ) {
+				z_buffer[x + y*SIZE_X] = px[6]/px[NUM_VERTEX_DATA-1];
 				switch ( rType ) {
+				default:
 				case FLAT:
-					display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(r*255.0),(char)(g*255.0),(char)(b*255.0));
 					break;
 				case COLORED:
 					break;
 				case SMOOTH:
 					break;
 				case TEXTURED:
-					mid[7] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
-					mid[8] = mid[8]/mid[NUM_VERTEX_DATA-1];	// divide all interpolated values by hw 
-					if ( mid[7] < 0 || mid[7] > 1 )
-						mid[7] = 0;
-					if ( mid[8] < 0 || mid[8] > 1 )
-						mid[8] = 0;
-					display_buffer[x + y*SIZE_X] = texture[(int)(mid[7]*(texwidth-1)) + ((int)(mid[8]*(texheight-1)))*texwidth];
+					px[7] = px[7]/px[NUM_VERTEX_DATA-1];
+					px[8] = px[8]/px[NUM_VERTEX_DATA-1];
+					if ( px[7] < 0 || px[7] > 1 )
+						px[7] = 0;
+					if ( px[8] < 0 || px[8] > 1 )
+						px[8] = 0;
+					display_buffer[x + y*SIZE_X] = texture[(int)(px[7]*(texwidth-1)) + ((int)(px[8]*(texheight-1)))*texwidth];
 					break;
 				case TEXTURED_SMOOTH:
-					break;
-				default:
 					break;
 				}
 			}
 		}
 	}
 	else if ( numVertices == 4 &&
-			  y <= ySlopeChanges[2] &&
-			  y > ySlopeChanges[3] ) {
-			dy = ySlopeChanges[2] - y;
+			  y <= ySorted[2].y &&
+			  y > ySorted[3].y ) {
+		dy = ySorted[2].y - y;
 	}
 }
 
@@ -990,6 +1031,7 @@ Poly& Poly::operator= (const Poly& rhs) {
     return (*this); 
 }
 
+// INCOMPLETE IMPLEMENTATION
 bool Poly::operator== (const Poly& rhs) const {
 	if ( numVertices != rhs.numVertices )
 		return false;

@@ -33,8 +33,9 @@ public:
 	bool visible;		// for backface culling
 	
 	// THESE ARE FOR RENDERING QUICKLY
-	float ySlopeChanges[POLY_MAX_VERTICES];						// y values where slopes change
+	Vertex ySorted[POLY_MAX_VERTICES];
 	float increments[POLY_MAX_VERTICES][2][NUM_VERTEX_DATA];	// increments along edges of left & right slopes
+	int numInterps;
 
     Poly() {
 		numVertices = 0;
