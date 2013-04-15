@@ -33,9 +33,10 @@ public:
 	bool visible;		// for backface culling
 	
 	// THESE ARE FOR RENDERING QUICKLY
-	Vertex ySorted[POLY_MAX_VERTICES];
+	Vertex ySorted[POLY_MAX_VERTICES];		// may not need this; just sort v[]
 	float increments[POLY_MAX_VERTICES][2][NUM_VERTEX_DATA];	// increments along edges of left & right slopes
-	int numInterps;
+	float starts[POLY_MAX_VERTICES][2][NUM_VERTEX_DATA];		// starting point of each edge
+	int numInterps;			// should use this for further optimization
 
     Poly() {
 		numVertices = 0;

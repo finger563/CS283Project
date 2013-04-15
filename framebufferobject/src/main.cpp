@@ -212,15 +212,18 @@ int main(int argc, char **argv)
 	projectionToPixel.data[1][1] = (float)SIZE_Y*0.5;	// scale y
 
 	testobj.generateCube();
-	//objectlist.push_back(testobj);
 
 	testobj2.generateCube();
-	testobj2.SetRenderType(FLAT);
-	//objectlist.push_back(testobj2);
+	testobj2.SetRenderType(COLORED);
 
 	testobj3.generateFloor(30,-10);
-	//objectlist.push_back(testobj3);
 
+#ifndef TEST_OPTIMIZE
+	objectlist.push_back(testobj);
+	objectlist.push_back(testobj2);
+#endif
+	
+	objectlist.push_back(testobj3);
 	objectlist.push_back(testobj4);
 
     initSharedMem();

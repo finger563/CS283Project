@@ -4,6 +4,8 @@
 #include <limits>
 #include "Engine\constants.h"
 
+//#define TEST_OPTIMIZE
+
 // constants
 const int    SCREEN_WIDTH    = 400;
 const int    SCREEN_HEIGHT   = 300;
