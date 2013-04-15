@@ -10,7 +10,7 @@ void Poly::Transform( const Matrix& _m ) {
 	v[2].Transform(_m);
 	if ( numVertices == 4 )
 		v[3].Transform(_m);
-	normal = normalize(_m*normal);
+	normal = (_m*normal);
 }
 
 void Poly::Translate( const Vector3D& _v ) {
@@ -36,7 +36,7 @@ void Poly::TransformToCamera( const Matrix& _m ) {
 	v[2].TransformToCamera(_m);
 	if ( numVertices == 4 )
 		v[3].TransformToCamera(_m);
-	normal = normalize(_m*normal);
+	normal = (_m*normal);
 }
 
 void Poly::TransformToPerspective( const Matrix& _m ) {
@@ -45,7 +45,7 @@ void Poly::TransformToPerspective( const Matrix& _m ) {
 	v[2].TransformToPerspective(_m);
 	if ( numVertices == 4 )
 		v[3].TransformToPerspective(_m);
-	normal = normalize(_m*normal);
+	//normal = _m*normal;
 	visible = false;
 	Vector3D eye = Vector3D(0,0,-1);
 	Vector3D cull = eye - Vector3D(v[0].ex,v[0].ey,v[0].ez);
@@ -66,10 +66,12 @@ void Poly::TransformToPerspective( const Matrix& _m ) {
 		visible = true;	// Triangle is renderable
 		return;
 	}
-	cull = eye - Vector3D(v[3].ex,v[3].ey,v[3].ez);
-	test = cull*normal;
-	if ( test > 0 ) {
-		visible = true;	// Triangle is renderable
+	if ( numVertices == 4 ) {
+		cull = eye - Vector3D(v[3].ex,v[3].ey,v[3].ez);
+		test = cull*normal;
+		if ( test > 0 ) {
+			visible = true;	// Triangle is renderable
+		}
 	}
 }
 
@@ -272,6 +274,149 @@ void Poly::HomogeneousDivide( ) {
 }
 
 void Poly::SetupRasterization( ) {
+	int y =0;
+	if ( y > MaxY() || y < MinY() )
+		return;
+	float BC[POLY_MAX_VERTICES] = {};		// boundary tests against y scanline
+	int line[POLY_MAX_VERTICES] = {};	// which lines cross y scanline
+	int lines = 0;
+	float a1,a2,ai;				// alphas for each crossing line (there can only be 2), and for inside scanline
+	Vertex sv,ev,vi;			// Start and end scanline vertices, and rendering vertex
+	
+	for (int i=0;i<numVertices;i++) {
+		BC[i] = v[i].y - y;		// + is above, - is below, 0 is on
+	}
+
+	if ( numVertices == 3 ) {
+		line[0] =  ((BC[0] >= 0 && BC[1] <= 0 ) ||
+					(BC[0] <= 0 && BC[1] >= 0 ) ) ? 1 : 0;
+		line[1] =  ((BC[1] >= 0 && BC[2] <= 0 ) ||
+					(BC[1] <= 0 && BC[2] >= 0 ) ) ? 1 : 0;
+		line[2] =  ((BC[2] >= 0 && BC[0] <= 0 ) ||
+					(BC[2] <= 0 && BC[0] >= 0 ) ) ? 1 : 0;
+		lines = line[0] + line[1]*2 + line[2]*4;
+		switch (lines) {
+		default:	// These cases represent a degenerate triangle
+			return;	// therefore do not do anything else
+		case 3:		// Lines 0 and 1 cross scanline
+			a1 = BC[0]/(BC[0]-BC[1]);
+			a2 = BC[1]/(BC[1]-BC[2]);
+			sv = v[0] + (v[1]-v[0])*a1;
+			ev = v[1] + (v[2]-v[1])*a2;
+			break;
+		case 5:		// Lines 0 and 2 cross scanline
+			a1 = BC[0]/(BC[0]-BC[1]);
+			a2 = BC[2]/(BC[2]-BC[0]);
+			sv = v[0] + (v[1]-v[0])*a1;
+			ev = v[2] + (v[0]-v[2])*a2;
+			break;
+		case 6:		// Lines 1 and 2 cross scanline
+			a1 = BC[1]/(BC[1]-BC[2]);
+			a2 = BC[2]/(BC[2]-BC[0]);
+			sv = v[1] + (v[2]-v[1])*a1;
+			ev = v[2] + (v[0]-v[2])*a2;
+			break;
+		}
+	}
+	else {		// Poly is a QUAD
+		line[0] =  ((BC[0] > 0 && BC[1] < 0 ) ||
+					(BC[0] < 0 && BC[1] > 0 ) ) ? 1 : 0;
+		line[1] =  ((BC[1] > 0 && BC[2] < 0 ) ||
+					(BC[1] < 0 && BC[2] > 0 ) ) ? 1 : 0;
+		line[2] =  ((BC[2] > 0 && BC[3] < 0 ) ||
+					(BC[2] < 0 && BC[3] > 0 ) ) ? 1 : 0;
+		line[3] =  ((BC[3] > 0 && BC[0] < 0 ) ||
+					(BC[3] < 0 && BC[0] > 0 ) ) ? 1 : 0;
+		lines = line[0] + line[1]*2 + line[2]*4 + line[3]*8;
+		switch (lines) {
+		default:	// These cases represent a degenerate triangle
+			return;	// therefore do not do anything else
+		case 3:		// Lines 0 and 1 cross scanline
+			a1 = BC[0]/(BC[0]-BC[1]);
+			a2 = BC[1]/(BC[1]-BC[2]);
+			sv = v[0] + (v[1]-v[0])*a1;
+			ev = v[1] + (v[2]-v[1])*a2;
+			break;
+		case 5:		// Lines 0 and 2 cross scanline
+			a1 = BC[0]/(BC[0]-BC[1]);
+			a2 = BC[2]/(BC[2]-BC[3]);
+			sv = v[0] + (v[1]-v[0])*a1;
+			ev = v[2] + (v[3]-v[2])*a2;
+			break;
+		case 6:		// Lines 1 and 2 cross scanline
+			a1 = BC[1]/(BC[1]-BC[2]);
+			a2 = BC[2]/(BC[2]-BC[3]);
+			sv = v[1] + (v[2]-v[1])*a1;
+			ev = v[2] + (v[3]-v[2])*a2;
+			break;
+		case 9:		// Lines 0 and 3 cross scanline
+			a1 = BC[0]/(BC[0]-BC[1]);
+			a2 = BC[3]/(BC[3]-BC[0]);
+			sv = v[0] + (v[1]-v[0])*a1;
+			ev = v[3] + (v[0]-v[3])*a2;
+			break;
+		case 10:	// Lines 1 and 3 cross scanline
+			a1 = BC[1]/(BC[1]-BC[2]);
+			a2 = BC[3]/(BC[3]-BC[0]);
+			sv = v[1] + (v[2]-v[1])*a1;
+			ev = v[3] + (v[0]-v[3])*a2;
+			break;
+		case 12:	// Lines 2 and 3 cross scanline
+			a1 = BC[2]/(BC[2]-BC[3]);
+			a2 = BC[3]/(BC[3]-BC[0]);
+			sv = v[2] + (v[3]-v[2])*a1;
+			ev = v[3] + (v[0]-v[3])*a2;
+			break;
+		}
+	}
+	if ( sv.x > ev.x ) {	// need to flip start and end vertices
+		Vertex temp = ev;
+		ev = sv;
+		sv = temp;
+	}
+	vi = sv;
+	if ( vi.x < 0 ) {
+		vi.x = 0;
+	}
+	if ( ev.x >= SIZE_X ) {
+		ai = (sv.x-(SIZE_X-1))/((sv.x-(SIZE_X-1)) - (ev.x-(SIZE_X-1)));
+		ev = sv + (ev-sv)*ai;
+	}
+	if ( floor(vi.x) == ceil(ev.x) )
+		return;
+	for (int x=vi.x;x<=ev.x;x++) {
+		ai = (sv.x-x)/((sv.x-x) - (ev.x-x));
+		vi = sv + (ev-sv)*ai;
+		if ( vi.ez/vi.hw < z_buffer[x + y*SIZE_X] ) {
+			z_buffer[x + y*SIZE_X] = vi.ez/vi.hw;
+			switch ( rType ) {	// What are we interpolating/rendering?
+			case FLAT:
+				display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(r*255.0),(char)(g*255.0),(char)(b*255.0));
+				break;
+			case COLORED:
+				vi.r = vi.r/vi.hw;	// divide all interpolated values by hw 
+				vi.g = vi.g/vi.hw;	// divide all interpolated values by hw 
+				vi.b = vi.b/vi.hw;	// divide all interpolated values by hw 
+				display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(vi.r*255.0),(char)(vi.g*255.0),(char)(vi.b*255.0));
+				break;
+			case SMOOTH:
+				break;
+			case TEXTURED:
+				vi.u = vi.u/vi.hw;	// divide all interpolated values by hw 
+				vi.v = vi.v/vi.hw;	// divide all interpolated values by hw 
+				if ( vi.u < 0 || vi.u > 1 )
+					vi.u = 0;
+				if ( vi.v < 0 || vi.v > 1 )
+					vi.v = 0;
+				display_buffer[x + y*SIZE_X] = texture[(int)(vi.u*(texwidth-1)) + ((int)(vi.v*(texheight-1)))*texwidth];
+				break;
+			case TEXTURED_SMOOTH:
+				break;
+			default:
+				break;
+			}
+		}
+	}
 }
 
 // Rasterization Methods
@@ -434,12 +579,12 @@ void Poly::Rasterize( const int y ) {
 	}
 
 	if ( numVertices == 3 ) {
-		line[0] =  ((BC[0] > 0 && BC[1] < 0 ) ||
-					(BC[0] < 0 && BC[1] > 0 ) ) ? 1 : 0;
-		line[1] =  ((BC[1] > 0 && BC[2] < 0 ) ||
-					(BC[1] < 0 && BC[2] > 0 ) ) ? 1 : 0;
-		line[2] =  ((BC[2] > 0 && BC[0] < 0 ) ||
-					(BC[2] < 0 && BC[0] > 0 ) ) ? 1 : 0;
+		line[0] =  ((BC[0] >= 0 && BC[1] <= 0 ) ||
+					(BC[0] <= 0 && BC[1] >= 0 ) ) ? 1 : 0;
+		line[1] =  ((BC[1] >= 0 && BC[2] <= 0 ) ||
+					(BC[1] <= 0 && BC[2] >= 0 ) ) ? 1 : 0;
+		line[2] =  ((BC[2] >= 0 && BC[0] <= 0 ) ||
+					(BC[2] <= 0 && BC[0] >= 0 ) ) ? 1 : 0;
 		lines = line[0] + line[1]*2 + line[2]*4;
 		switch (lines) {
 		default:	// These cases represent a degenerate triangle
@@ -530,20 +675,20 @@ void Poly::Rasterize( const int y ) {
 	}
 	if ( floor(vi.x) == ceil(ev.x) )
 		return;
-	for (int x=ceil(vi.x);x<=floor(ev.x);x++) {
+	for (int x=vi.x;x<=ev.x;x++) {
 		ai = (sv.x-x)/((sv.x-x) - (ev.x-x));
 		vi = sv + (ev-sv)*ai;
 		if ( vi.ez/vi.hw < z_buffer[x + y*SIZE_X] ) {
 			z_buffer[x + y*SIZE_X] = vi.ez/vi.hw;
 			switch ( rType ) {	// What are we interpolating/rendering?
 			case FLAT:
-				display_buffer[x + y*SIZE_X] = RGB_MAKE((int)(r*255),(int)(g*255),(int)(b*255));
+				display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(r*255.0),(char)(g*255.0),(char)(b*255.0));
 				break;
 			case COLORED:
 				vi.r = vi.r/vi.hw;	// divide all interpolated values by hw 
 				vi.g = vi.g/vi.hw;	// divide all interpolated values by hw 
 				vi.b = vi.b/vi.hw;	// divide all interpolated values by hw 
-				display_buffer[x + y*SIZE_X] = RGB_MAKE((int)(vi.r*255),(int)(vi.g*255),(int)(vi.g*255));
+				display_buffer[x + y*SIZE_X] = RGB_MAKE((char)(vi.r*255.0),(char)(vi.g*255.0),(char)(vi.b*255.0));
 				break;
 			case SMOOTH:
 				break;
@@ -567,7 +712,7 @@ void Poly::Rasterize( const int y ) {
 
 // Helper Functions
 float Poly::MinX() {
-	float min = 10000;
+	float min = v[0].x;
 	for (int i=0;i<numVertices;i++) {
 		if ( min > v[i].x )
 			min = v[i].x;
@@ -576,7 +721,7 @@ float Poly::MinX() {
 }
 
 float Poly::MinY() {
-	float min = 10000;
+	float min = v[0].y;
 	for (int i=0;i<numVertices;i++) {
 		if ( min > v[i].y )
 			min = v[i].y;
@@ -585,7 +730,7 @@ float Poly::MinY() {
 }
 
 float Poly::MinZ() {
-	float min = 10000;
+	float min = v[0].z;
 	for (int i=0;i<numVertices;i++) {
 		if ( min > v[i].z )
 			min = v[i].z;
@@ -594,7 +739,7 @@ float Poly::MinZ() {
 }
 
 float Poly::MaxX() {
-	float max = 0;
+	float max = v[0].x;
 	for (int i=0;i<numVertices;i++) {
 		if ( max < v[i].x )
 			max = v[i].x;
@@ -603,7 +748,7 @@ float Poly::MaxX() {
 }
 
 float Poly::MaxY() {
-	float max = 0;
+	float max = v[0].y;
 	for (int i=0;i<numVertices;i++) {
 		if ( max < v[i].y )
 			max = v[i].y;
@@ -612,7 +757,7 @@ float Poly::MaxY() {
 }
 
 float Poly::MaxZ() {
-	float max = 0;
+	float max = v[0].z;
 	for (int i=0;i<numVertices;i++) {
 		if ( max < v[i].z )
 			max = v[i].z;

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <cstdlib>
 #include "../main.h"
 #include "matrix.h"
 
@@ -19,7 +20,7 @@ public:
 			float u,v;			// 2D texture coords (range = [0,1]) ( w for this system is hw )
 			float r,g,b;		// RGB color (range = [0,1]), ( w for this system is hw )
 			float nx,ny,nz;		// components of normal vector ( w for this system is hw )
-			float hw;			// homogeneous coordinate for interpolated values ( 1/~Pw )
+			float hw;			// homogeneous coordinate for interpolated values ( 1/w )
 		};
 		float data[NUM_VERTEX_DATA];
 	};

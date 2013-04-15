@@ -63,7 +63,7 @@ Poly renderpoly;
 
 Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(checkerboard,checkerboardwidth,checkerboardheight);
+Object testobj3 = Object(floortex,floortexwidth,floortexheight);
 Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
 
 
@@ -219,6 +219,7 @@ int main(int argc, char **argv)
 	objectlist.push_back(testobj);
 
 	testobj2.generateCube();
+	testobj2.SetRenderType(COLORED);
 	objectlist.push_back(testobj2);
 
 	testobj3.generateFloor(30,-10);

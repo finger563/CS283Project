@@ -160,6 +160,16 @@ void Object::generateCube(float size)
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
 		it->SetTexture(tex, texWidth, texHeight);
+		it->SetColor(rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX);
+#if 0
+		it->SetVertexColors(rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,
+			rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,
+			rand()/(float)RAND_MAX,rand()/(float)RAND_MAX,rand()/(float)RAND_MAX);
+#else
+		it->SetVertexColors(0.9,0,0,
+			0,0.9,0,
+			0,0,0.9);
+#endif
 	}
 
 	updateList(); 
@@ -230,6 +240,15 @@ bool Object::setVel(Vector3D vector)
 bool Object::setPosition(Point3D pos)
 {
 	position = pos;
+	return true;
+}
+
+bool Object::SetRenderType( RenderType rt )
+{
+	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->SetRenderType(rt);
+	}
 	return true;
 }
 

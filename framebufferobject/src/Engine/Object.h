@@ -41,17 +41,17 @@ public:
 	//add polygon to lists
 	void add(Poly poly);
 
-	//Generates cube with default size being 5
-	//5 here is half the length of the cube
-	//total length will = 10 but 5 works well with polygons
+	//Generates cube with with sidelength = size*2
 	void generateCube(float size = 5);
 
 	//Generates tetrahedron
 	void generateTetra(float size = 5);
 
+	// Generates a floor at depth, with sidelength = length
 	void generateFloor(float length = 50, float depth = -10);
 
 	//fileParser()<-- future function
+
 	bool updateTime(int time);
 
 	//sets velocity
@@ -59,6 +59,9 @@ public:
 
 	//sets position
 	bool setPosition(Point3D pos);
+
+	// sets rendertype for all polygons
+	bool SetRenderType( RenderType rt );
 
 	//gets Position
 	Point3D getPosition(void);

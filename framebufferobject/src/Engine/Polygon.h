@@ -6,19 +6,9 @@
 
 #define POLY_MAX_VERTICES 4		// don't want anything other than tris and quads
 
-// This makes rasterization much faster (precompute values)
-enum PolyType {
-    FLAT_TOP_RIGHT_T,
-    FLAT_TOP_LEFT_T,
-    FLAT_BOTTOM_RIGHT_T,
-    FLAT_BOTTOM_LEFT_T,
-    NORMAL_RIGHT_T,
-    NORMAL_LEFT_T
-};
-
 // This tells the engine what type of rendering we want for this polygon
 enum RenderType {
-	FLAT,					// Color is average of the 3 vertices
+	FLAT,					// Color is polygon color
 	COLORED,				// Color is interpolated between vertices
 	SMOOTH,					// Normals are interpolated (smooth shading)
 	TEXTURED,				// Texture Coords are interpolated (no shading)
@@ -31,16 +21,16 @@ public:
 	Vertex v[POLY_MAX_VERTICES];
 	int numVertices;
 	
-	const unsigned short* texture;			// for texturing
-	int texwidth;							// width of texture
-	int texheight;							// height of texture
+	const unsigned short* texture;	// for texturing
+	int texwidth;					// width of texture
+	int texheight;					// height of texture
 
-	float r,g,b;							// for flat coloring
+	float r,g,b;					// for flat coloring
 
-	RenderType rType;		// Generally defined by the object, stored here for speed
-    PolyType tType;			// for fast rendering, pre-compute
+	RenderType rType;		// Method of rendering this polygon
+    //PolyType tType;			// for fast rendering, pre-compute
 
-	Vector3D normal;
+	Vector3D normal;	// for backface culling
 	bool visible;		// for backface culling
 
     Poly() {
@@ -102,6 +92,33 @@ public:
 	}
 	void SetRenderType( const RenderType rt ) { rType =rt; }
 	void SetNormal( const Vector3D n ) { normal = n; }
+	void SetColor( const float _r, const float _g, const float _b ) { r=_r; g=_g; b=_b; }
+	void SetVertexColors( 
+		const float _r1, 
+		const float _g1, 
+		const float _b1, 
+		const float _r2, 
+		const float _g2, 
+		const float _b2, 
+		const float _r3, 
+		const float _g3, 
+		const float _b3, 
+		const float _r4=1, 
+		const float _g4=1, 
+		const float _b4=1) {
+			v[0].r = _r1;
+			v[0].g = _g1;
+			v[0].b = _b1;
+			v[1].r = _r2;
+			v[1].g = _g2;
+			v[1].b = _b2;
+			v[2].r = _r3;
+			v[2].g = _g3;
+			v[2].b = _b3;
+			v[3].r = _r4;
+			v[3].g = _g4;
+			v[3].b = _b4;
+	}
 
 	// General Transformation Methods, only operate on x,y,z,w of vertices
 	void Transform( const Matrix& _m );
