@@ -341,53 +341,6 @@ void Poly::SetupRasterization( ) {
 			sides[j][1] = sides[j-1][1];
 		}
 	}
-#if 0
-	ind = edges[1],
-	ind1= (ind > 0) ? ind - 1 : numVertices-1,
-	ind2= (ind + 1) % numVertices;
-	
-	al = 1/(v[ind].y - v[ind1].y - 1);
-	ar = 1/(v[ind].y - v[ind2].y - 1);
-	vl = (v[ind1] - v[ind])*al;
-	vr = (v[ind2] - v[ind])*ar;
-
-	if ( edges[1] > edges[0] ) { // RIGHT
-		for (int i=0;i<NUM_VERTEX_DATA;i++) {
-			increments[1][0][i] = increments[0][0][i];
-			increments[1][1][i] = vr[i];
-		}
-	}
-	else {			// LEFT
-		for (int i=0;i<NUM_VERTEX_DATA;i++) {
-			increments[1][0][i] = vl[i];
-			increments[1][1][i] = increments[0][1][i];
-		}
-	}
-
-	if ( numVertices == 4 ) {	// Rendering a QUAD
-		ind = edges[2],
-		ind1= (ind > 0) ? ind - 1 : numVertices-1,
-		ind2= (ind + 1) % numVertices;
-	
-		al = 1/(v[ind].y - v[ind1].y - 1);
-		ar = 1/(v[ind].y - v[ind2].y - 1);
-		vl = v[ind] + (v[ind1] - v[ind])*al;
-		vr = v[ind] + (v[ind2] - v[ind])*ar;
-
-		if ( edges[2] == (edges[1]+1)%numVertices ) { // RIGHT
-			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				increments[2][0][i] = increments[1][0][i];
-				increments[2][1][i] = vr[i] - v[ind][i];
-			}
-		}
-		else {			// LEFT
-			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				increments[2][0][i] = vl[i] - v[ind][i];
-				increments[2][1][i] = increments[1][1][i];
-			}
-		}
-	}
-#endif
 }
 
 // Rasterization Methods
