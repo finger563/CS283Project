@@ -100,12 +100,9 @@ private:
 	Point3D position;
 	const unsigned short* tex;
 	int texWidth;
-<<<<<<< HEAD
+	int texHeight;
 	size_t counter;
 	bool kill;
-=======
-	int texHeight;
->>>>>>> feature-homogeneous-coordinates
 	//Object* next;
 };
 

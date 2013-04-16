@@ -60,11 +60,8 @@ Poly renderpoly;
 
 Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
-//shoot will be the projectile
-Object shot = Object(box,boxtexwidth,Vector3D(),Point3D(0, 0, 5));
 Object testobj3 = Object(floortex,floortexwidth,floortexheight);
 Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
-
 
 Matrix worldToCamera=Matrix(),
 	   perspectiveProjection=Matrix(),
@@ -73,11 +70,17 @@ Matrix worldToCamera=Matrix(),
 std::list<Object> objectlist;
 std::list<Poly> renderlist;
 
+//shoot will be the projectile
+Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
+
 //For chat
 std::stack<std::string> conversation;
 std::string userName = "";
 std::string msg = "";
 bool print = false;
+
+//hopefully a trigger to create chat window
+bool type = false;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -211,7 +214,6 @@ int main(int argc, char **argv)
 	// | r r r t | | y |   | y' |
 	// | r r r t | | z |   | z' |
 	// | p p p s | | w |   | w' |
-	tm.data[3][2] = 1;
 
 	// We use ROW vector notation
 		
