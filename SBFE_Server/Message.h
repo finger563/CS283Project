@@ -36,8 +36,8 @@ enum MessageType {
 	REMOVE		//	Then the server removes the player from it's list and sends REMOVE to remove the object from other players' games
 };
 
-enum ObjectType {
-	HW, PA, TQ,DEBUG_A
+enum ObjectType {	// These are the types of dynamic objects which need to be tracked by the server
+	PLAYER, SHOT
 };
 
 struct Player_s {
@@ -77,7 +77,7 @@ struct Object_s {
 	char			content_[MAX_CONT_LEN];
 	Object_s*	next;
 	
-	Object_s() {next=NULL;type=HW;id=0;memset(content_,0,MAX_CONT_LEN);}
+	Object_s() {next=NULL;type=SHOT;id=0;memset(content_,0,MAX_CONT_LEN);}
 	Object_s(const Object_s &a){next=NULL;type=a.type;id=a.id;strcpy(content_,a.content_);}
 	Object_s(ObjectType t, ACE_CDR::Long i,char* c){next=NULL;type=t;id=i;strcpy(content_,c);}
 	
@@ -156,7 +156,7 @@ public:
 	const char*		Content() const {return content_;}
 	void			Content(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}
 
-	bool FormMessage(bool isTeacher);
+	bool FormMessage(bool isServer);
 };
 
 

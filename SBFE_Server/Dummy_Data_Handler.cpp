@@ -120,7 +120,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
     // this is an error condition
     ACE_ERROR ((LM_ERROR,
                 ACE_TEXT ("%s force quit their client application!\n"),
-				teacher.Student(myid)));
+				teacher.Player(myid)));
     // we let the reactor trigger the handle close
     return -1;
 
@@ -128,32 +128,32 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
     // some data is received.
 #if defined(DEBUG)
 		cout << "Message type: " << mymessage.Type() << endl
-			<< "Assignment type: " << mymessage.Assignment().type << endl
-			<< "Assignment ID: " << mymessage.Assignment().id << endl
-			<< "Student Name: " << mymessage.Student().name << endl
-			<< "Student ID: " << mymessage.Student().id << endl
+			<< "Object type: " << mymessage.Object().type << endl
+			<< "Object ID: " << mymessage.Object().id << endl
+			<< "Player Name: " << mymessage.Player().name << endl
+			<< "Player ID: " << mymessage.Player().id << endl
 			<< "Message Content: " << mymessage.Content() << endl;
 #endif
 		// Now process message
 		switch (mymessage.Type())
 		{
 		case REGISTER:
-			if ( teacher.Register(mymessage.Student()) )
+			if ( teacher.Register(mymessage.Player()) )
 			{
-				myid = mymessage.Student().id;
+				myid = mymessage.Player().id;
 				peer_s *newpeer = new peer_s(&(this->peer()),myid);
 				con_peers.Push(newpeer);
 			}
 			break;
 		case QUESTION:
-			if ( teacher.Student(mymessage.Student()) )
-				teacher.Questions(mymessage.Assignment());
+			if ( teacher.Player(mymessage.Player()) )
+				teacher.Questions(mymessage.Object());
 			break;
 		case SUBMIT:
-			if ( teacher.Student(mymessage.Student()) )
+			if ( teacher.Player(mymessage.Player()) )
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("%s submitted assignment with content: %s!\n"),
-							mymessage.Student().name,
+							mymessage.Player().name,
 							mymessage.Content()));
 			break;
 		default:
@@ -276,7 +276,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 			switch(mymessage.Type())
 			{
 			case ASSIGN:
-				if ( teacher.Assign(mymessage.Assignment()) )
+				if ( teacher.Assign(mymessage.Object()) )
 				{
 					while (tmp->next!=NULL)
 					{
@@ -285,13 +285,13 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 						ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Teacher sent %d bytes to student (%s,%d).\n"),
 							numbytes,
-							teacher.Student(tmp->ID),
+							teacher.Player(tmp->ID),
 							tmp->ID));
 					}
 				}
 				break;
 			case REPLY:
-				if ( teacher.Reply(mymessage.Assignment()) )
+				if ( teacher.Reply(mymessage.Object()) )
 				{
 					while (tmp->next!=NULL)
 					{
@@ -300,7 +300,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 						ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Teacher sent %d bytes to student (%s,%d).\n"),
 							numbytes,
-							teacher.Student(tmp->ID),
+							teacher.Player(tmp->ID),
 							tmp->ID));
 					}
 				}
@@ -313,7 +313,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 					ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("Teacher sent %d bytes to student (%s,%d).\n"),
 						numbytes,
-						teacher.Student(tmp->ID),
+						teacher.Player(tmp->ID),
 						tmp->ID));
 				}
 				teacher.Dismiss();

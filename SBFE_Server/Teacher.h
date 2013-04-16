@@ -14,6 +14,7 @@
 #define _CS387_TEACHER_H_
 
 #include "Message.h"
+#include <string>
 
 #include <iostream>
 using namespace std;
@@ -22,72 +23,39 @@ using namespace std;
 
 class Teacher_c {
 private:
-	Assignment_s	*assignments;
-	Student_s		*students;
-	Assignment_s	*questions;
+	Object_s	*objects;
+	Player_s	*players;
+	string		*chats;
 public:
-	Teacher_c() {assignments=NULL;students=NULL;questions=NULL;}
+	Teacher_c() {objects=NULL;players=NULL;chats=NULL;}
 	Teacher_c(Teacher_c& t) {*this=t;}
-	~Teacher_c() {delete assignments,students,this;}
+	~Teacher_c() {delete objects,players,this;}
 
 	Teacher_c & operator=(Teacher_c& t)
 	{
 		if (this != &t) // protect against invalid self-assignment
         {
-			assignments = t.Assignments();
-			students = t.Students();
-			questions = t.Questions();
+			objects = t.Assignments();
+			players = t.Students();
+			chats = t.Questions();
         }
         // by convention, always return *this
         return *this;
 	}
 
-	Assignment_s * Assignments() {return assignments;}
-	Student_s *	Students() {return students;}
-	Assignment_s * Questions() {return questions;}
+	Object_s * Assignments() {return objects;}
+	Player_s * Students() {return players;}
+	string * Questions() {return chats;}
 
-	void Questions(Assignment_s& q)
-	{
-		char str[3];
-		switch (q.type)
-		{
-		case HW:
-			sprintf(str,"HW");
-			break;
-		case TQ:
-			sprintf(str,"TQ");
-			break;
-		case PA:
-			sprintf(str,"PA");
-			break;
-		default:
-			break;
-		}
-		ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Question about Assignment: (%s,%d) is: %s\n"),
-				str,
-				q.id,
-				q.content_));
-		Assignment_s* tmp;
-		if (questions==NULL)
-		{
-			questions = new Assignment_s(q);
-		}
-		else
-		{
-			for (tmp=questions;tmp->next!=NULL;tmp=tmp->next);
-			Assignment_s* link = new Assignment_s(q);
-			tmp->Link(link);
-		}
+	void Questions(Object_s& q) {
 	}
 
-	bool Student(Student_s& s)
-	{
-		if (students != NULL)
+	bool Player(Player_s& s) {
+		if (players != NULL)
 		{
-			if ( s == *students )
+			if ( s == *players )
 				return true;
-			Student_s* tmp=Students();
+			Player_s* tmp=Students();
 			while (tmp!=NULL)
 			{
 				if ( s == *tmp ) 
@@ -100,13 +68,12 @@ public:
 		return false;
 	}
 
-	char* Student(ACE_CDR::Long id)
-	{
-		if (students != NULL)
+	char* Player(ACE_CDR::Long id) {
+		if (players != NULL)
 		{
-			if ( id == students->id )
-				return students->name;
-			Student_s* tmp=Students();
+			if ( id == players->id )
+				return players->name;
+			Player_s* tmp=Students();
 			while (tmp!=NULL)
 			{
 				if ( id == tmp->id ) 
@@ -119,27 +86,26 @@ public:
 		return NULL;
 	}
 
-	void RemoveStudent(ACE_CDR::Long id)
-	{
-		if ( students!=NULL)
+	void RemovePlayer(ACE_CDR::Long id) {
+		if ( players!=NULL)
 		{
-			Student_s* tmp = students;
+			Player_s* tmp = players;
 			if ( tmp->id == id ) 
 			{
-				students = tmp->next;
+				players = tmp->next;
 				delete tmp;
 				return;
 			}
-			else if (students->next != NULL)
+			else if (players->next != NULL)
 			{
 				tmp = tmp->next;
 				if ( tmp->id == id  ) 
 				{
-					students->next = tmp->next;
+					players->next = tmp->next;
 					delete tmp;
 					return;
 				}
-				Student_s* prev = students;
+				Player_s* prev = players;
 				for (;tmp->next!=NULL;tmp=tmp->next)
 				{
 					if ( tmp->id == id  ) 
@@ -154,21 +120,21 @@ public:
 		}
 	}
 	
-	bool Register(Student_s& s)
+	bool Register(Player_s& s)
 	{
-		if ( students==NULL)
-			students=new Student_s(s);
+		if ( players==NULL)
+			players=new Player_s(s);
 		else
 		{
-			if ( s == *students ) 
+			if ( s == *players ) 
 			{
 				ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("Error, %s has already registered!\n"),
 					s.name));
 				return false;
 			}
-			Student_s* tmp;
-			for (tmp=students;tmp->next!=NULL;tmp=tmp->next)
+			Player_s* tmp;
+			for (tmp=players;tmp->next!=NULL;tmp=tmp->next)
 			{
 				if ( s == *tmp ) 
 				{
@@ -178,7 +144,7 @@ public:
 					return false;
 				}
 			}
-			Student_s* link = new Student_s(s);
+			Player_s* link = new Player_s(s);
 			tmp->Link(link);
 		}
 		ACE_DEBUG ((LM_DEBUG,
@@ -187,25 +153,25 @@ public:
 		return true;
 	}
 
-	void Dismiss() {delete students,assignments,questions;students=NULL;assignments=NULL;questions=NULL;}
+	void Dismiss() {delete players,objects,chats;players=NULL;objects=NULL;chats=NULL;}
 
-	bool Assign(Assignment_s& a)
+	bool Assign(Object_s& a)
 	{
-		if ( assignments==NULL)
+		if ( objects==NULL)
 		{
-			assignments=new Assignment_s(a);
+			objects=new Object_s(a);
 			return true;
 		}
 		else
 		{
-			if ( a == *assignments ) 
+			if ( a == *objects ) 
 			{
 				ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("Error, you have already assigned this!\n")));
 				return false;
 			}
-			Assignment_s* tmp;
-			for (tmp=assignments;tmp->next!=NULL;tmp=tmp->next)
+			Object_s* tmp;
+			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next)
 			{
 				if ( a == *tmp ) 
 				{
@@ -214,32 +180,14 @@ public:
 					return false;
 				}
 			}
-			Assignment_s* link = new Assignment_s(a);
+			Object_s* link = new Object_s(a);
 			tmp->Link(link);
 			return true;
 		}
 	}
 
-	bool Reply(Assignment_s& a)
-	{
-		if (questions==NULL)
-		{
-			ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("Error, no questions have been asked!\n")));
-			return false;
-		}
-		else
-		{
-			Assignment_s* tmp;
-			if ( a == *questions) return true;
-			for (tmp=questions;tmp->next!=NULL;tmp=tmp->next)
-			{
-				if ( a == *tmp ) return true;
-			}
-			ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("Error, a question has not been asked about this!\n")));
-			return false;
-		}
+	bool Reply(Object_s& a) {
+		return true;
 	}
 };
 
