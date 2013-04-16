@@ -121,41 +121,41 @@ void Object::generateCube(float size)
 	master.clear();
 
 	//stores in objects master list
-	master.push_back(Poly( Vertex(size, size, size,1,0,0),Vertex(size, -size, size,1,0,1), 
-						   Vertex(-size, size, size,1,1,0),Vertex(),3,Vector3D(0,0,1),TEXTURED));
+	master.push_back(Poly( Vertex(size, size, size,1,0,0),Vertex(size, -size, size,1,0,1),Vertex(-size, size, size,1,1,0),
+						   Vertex(),3,Vector3D(0,0,1),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, -size, size,1,0,1), Vertex(-size, size, size,1,1,0),
-						   Vertex(-size, -size, size,1,1,1),Vertex(),3,Vector3D(0,0,1),TEXTURED));
+	master.push_back(Poly( Vertex(size, -size, size,1,0,1), Vertex(-size, size, size,1,1,0),Vertex(-size, -size, size,1,1,1),
+						   Vertex(),3,Vector3D(0,0,1),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, size, -size,1,1,0), Vertex(size, -size, -size,1,1,1),
-						   Vertex(-size, size, -size,1,0,0),Vertex(),3,Vector3D(0,0,-1),TEXTURED));
+	master.push_back(Poly( Vertex(size, size, -size,1,1,0), Vertex(size, -size, -size,1,1,1),Vertex(-size, size, -size,1,0,0),
+						   Vertex(),3,Vector3D(0,0,-1),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, -size, -size,1,1,1),Vertex(-size, size, -size,1,0,0),
-						   Vertex(-size, -size, -size,1,0,1),Vertex(),3,Vector3D(0,0,-1),TEXTURED));
+	master.push_back(Poly( Vertex(size, -size, -size,1,1,1),Vertex(-size, -size, -size,1,0,1),Vertex(-size, size, -size,1,0,0),
+						   Vertex(),3,Vector3D(0,0,-1),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, size, -size,1,0,0), Vertex(size, size, size,1,1,0),
-						   Vertex(size, -size, size,1,1,1),Vertex(),3,Vector3D(1,0,0),TEXTURED));
+	master.push_back(Poly( Vertex(size, size, -size,1,0,0), Vertex(size, size, size,1,1,0),Vertex(size, -size, size,1,1,1),
+						   Vertex(),3,Vector3D(1,0,0),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, size, -size,1,0,0),Vertex(size, -size, -size,1,0,1),
-						   Vertex(size, -size, size,1,1,1),Vertex(),3,Vector3D(1,0,0),TEXTURED));
+	master.push_back(Poly( Vertex(size, size, -size,1,0,0),Vertex(size, -size, -size,1,0,1),Vertex(size, -size, size,1,1,1),
+						   Vertex(),3,Vector3D(1,0,0),TEXTURED));
 
-	master.push_back(Poly( Vertex(-size, size, -size,1,1,0),Vertex(-size, size, size,1,0,0),
-						   Vertex(-size, -size, -size,1,1,1),Vertex(),3,Vector3D(-1,0,0),TEXTURED));
+	master.push_back(Poly( Vertex(-size, size, -size,1,1,0),Vertex(-size, size, size,1,0,0),Vertex(-size, -size, -size,1,1,1),
+						   Vertex(),3,Vector3D(-1,0,0),TEXTURED));
 
-	master.push_back(Poly( Vertex(-size, size, size,1,0,0),Vertex(-size, -size, size,1,0,1),
-						   Vertex(-size, -size, -size,1,1,1),Vertex(),3,Vector3D(-1,0,0),TEXTURED));
+	master.push_back(Poly( Vertex(-size, size, size,1,0,0),Vertex(-size, -size, size,1,0,1),Vertex(-size, -size, -size,1,1,1),
+						   Vertex(),3,Vector3D(-1,0,0),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, size, size,1,1,0),Vertex(-size, size, size,1,0,0),
-						   Vertex(size, size, -size,1,1,1),Vertex(),3,Vector3D(0,1,0),TEXTURED));
+	master.push_back(Poly( Vertex(size, size, size,1,1,0),Vertex(-size, size, size,1,0,0),Vertex(size, size, -size,1,1,1),
+						   Vertex(),3,Vector3D(0,1,0),TEXTURED));
 
-	master.push_back(Poly( Vertex(-size, size, -size,1,0,1),Vertex(-size, size, size,1,0,0),
-						   Vertex(size, size, -size,1,1,1),Vertex(),3,Vector3D(0,1,0),TEXTURED));
+	master.push_back(Poly( Vertex(-size, size, -size,1,0,1),Vertex(-size, size, size,1,0,0),Vertex(size, size, -size,1,1,1),
+						   Vertex(),3,Vector3D(0,1,0),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, -size, size,1,1,1),Vertex(size, -size, -size,1,1,0),
-						   Vertex(-size, -size, -size,1,0,0),Vertex(),3,Vector3D(0,-1,0),TEXTURED));
+	master.push_back(Poly( Vertex(size, -size, size,1,1,1),Vertex(size, -size, -size,1,1,0),Vertex(-size, -size, -size,1,0,0),
+						   Vertex(),3,Vector3D(0,-1,0),TEXTURED));
 
-	master.push_back(Poly( Vertex(size, -size, size,1,1,1),Vertex(-size, -size, size,1,0,1),
-						   Vertex(-size, -size, -size,1,0,0),Vertex(),3,Vector3D(0,-1,0),TEXTURED));
+	master.push_back(Poly( Vertex(size, -size, size,1,1,1),Vertex(-size, -size, size,1,0,1),Vertex(-size, -size, -size,1,0,0),
+						   Vertex(),3,Vector3D(0,-1,0),TEXTURED));
 
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
@@ -215,7 +215,7 @@ void Object::generateFloor(float length, float depth)
 	master.clear();
 	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(-length,0,length,1,0,0),Vertex(length,0,length,1,1,0),
 							Vertex(),3,Vector3D(0,1,0),TEXTURED));
-	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(length,0,-length,1,1,1),Vertex(length,0,length,1,1,0),
+	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(length,0,length,1,1,0),Vertex(length,0,-length,1,1,1),
 							Vertex(),3,Vector3D(0,1,0),TEXTURED));
 
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)

@@ -218,11 +218,8 @@ int main(int argc, char **argv)
 
 	testobj3.generateFloor(30,-10);
 
-#ifndef TEST_OPTIMIZE
 	objectlist.push_back(testobj);
-	objectlist.push_back(testobj2);
-#endif
-	
+	objectlist.push_back(testobj2);	
 	objectlist.push_back(testobj3);
 	objectlist.push_back(testobj4);
 

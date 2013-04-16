@@ -274,10 +274,10 @@ void Poly::HomogeneousDivide( ) {
 }
 
 void Poly::SetupRasterization( ) {
-	float a1,a2;
+	float al,ar;
 	
 	YSort(ySorted);
-	Vertex v01,v02,v12;
+	Vertex vl,vr;
 
 	switch ( rType ) {
 	default:
@@ -298,48 +298,96 @@ void Poly::SetupRasterization( ) {
 		break;
 	}
 
-	a1 = 1/(ySorted[0].y - ySorted[1].y - 1);
-	a2 = 1/(ySorted[0].y - ySorted[2].y - 1);
-	v01 = ySorted[0] + (ySorted[1] - ySorted[0])*a1;
-	v02 = ySorted[0] + (ySorted[2] - ySorted[0])*a2;
+	int ind = edges[0],
+		indl= (ind > 0) ? ind - 1 : numVertices-1,
+		indr= (ind + 1) % numVertices,
+		tmp;
 
-	if ( ySorted[2].x < ySorted[1].x ) {	// RIGHT TRIANGLE
-		for (int i=0;i<NUM_VERTEX_DATA;i++) {
-			increments[0][0][i] = v02[i] - ySorted[0][i];
-			increments[0][1][i] = v01[i] - ySorted[0][i];
-			starts[0][0][i] = ySorted[0][i];
-			starts[0][1][i] = ySorted[0][i];
-		}
-	}
-	else {		// LEFT TRIANGLE
-		for (int i=0;i<NUM_VERTEX_DATA;i++) {
-			increments[0][0][i] = v01[i] - ySorted[0][i];
-			increments[0][1][i] = v02[i] - ySorted[0][i];
-			starts[0][0][i] = ySorted[0][i];
-			starts[0][1][i] = ySorted[0][i];
-		}
-	}
+	al = 1/(v[ind].y - v[indl].y - 1);
+	ar = 1/(v[ind].y - v[indr].y - 1);
+	vl = (v[indl] - v[ind])*al;
+	vr = (v[indr] - v[ind])*ar;
 
-	if ( numVertices == 3 ) {	// RENDERING A TRIANGLE
-		if ( ySorted[2].x < ySorted[1].x ) {	// RIGHT triangle
-			a2 = 1/(ySorted[1].y - ySorted[2].y - 1);
-			v12 = ySorted[1] + (ySorted[2] - ySorted[1])*a2;
+	for (int i=0;i<NUM_VERTEX_DATA;i++) {
+		increments[0][0][i] = vl[i];
+		increments[0][1][i] = vr[i];
+	}
+	sides[0][0] = ind;
+	sides[0][1] = ind;
+
+	for (int j = 1;j<3;j++) {
+		if ( v[indr].y > v[indl].y ) {	// go down right of poly
+			ind = indr;
+			indr = (indr + 1) % numVertices;
+			ar = 1/(v[ind].y - v[indr].y - 1);
+			vr = (v[indr] - v[ind])*ar;
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				increments[1][0][i] = v02[i] - ySorted[0][i];
-				increments[1][1][i] = v12[i] - ySorted[1][i];
+				increments[j][0][i] = increments[0][0][i];
+				increments[j][1][i] = vr[i];
+			}
+			sides[j][0] = sides[j-1][0];
+			sides[j][1] = ind;
+		}
+		else {	// go down left of poly
+			ind = indl;
+			indl = (indl > 0) ? indl - 1 : numVertices-1;
+			al = 1/(v[ind].y - v[indl].y - 1);
+			vl = (v[indl] - v[ind])*al;
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[j][0][i] = vl[i];
+				increments[j][1][i] = increments[0][1][i];
+			}
+			sides[j][0] = ind;
+			sides[j][1] = sides[j-1][1];
+		}
+	}
+#if 0
+	ind = edges[1],
+	ind1= (ind > 0) ? ind - 1 : numVertices-1,
+	ind2= (ind + 1) % numVertices;
+	
+	al = 1/(v[ind].y - v[ind1].y - 1);
+	ar = 1/(v[ind].y - v[ind2].y - 1);
+	vl = (v[ind1] - v[ind])*al;
+	vr = (v[ind2] - v[ind])*ar;
+
+	if ( edges[1] > edges[0] ) { // RIGHT
+		for (int i=0;i<NUM_VERTEX_DATA;i++) {
+			increments[1][0][i] = increments[0][0][i];
+			increments[1][1][i] = vr[i];
+		}
+	}
+	else {			// LEFT
+		for (int i=0;i<NUM_VERTEX_DATA;i++) {
+			increments[1][0][i] = vl[i];
+			increments[1][1][i] = increments[0][1][i];
+		}
+	}
+
+	if ( numVertices == 4 ) {	// Rendering a QUAD
+		ind = edges[2],
+		ind1= (ind > 0) ? ind - 1 : numVertices-1,
+		ind2= (ind + 1) % numVertices;
+	
+		al = 1/(v[ind].y - v[ind1].y - 1);
+		ar = 1/(v[ind].y - v[ind2].y - 1);
+		vl = v[ind] + (v[ind1] - v[ind])*al;
+		vr = v[ind] + (v[ind2] - v[ind])*ar;
+
+		if ( edges[2] == (edges[1]+1)%numVertices ) { // RIGHT
+			for (int i=0;i<NUM_VERTEX_DATA;i++) {
+				increments[2][0][i] = increments[1][0][i];
+				increments[2][1][i] = vr[i] - v[ind][i];
 			}
 		}
-		else {						// LEFT triangle
-			a1 = 1/(ySorted[1].y - ySorted[2].y - 1);
-			v12 = ySorted[1] + (ySorted[2] - ySorted[1])*a1;
+		else {			// LEFT
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				increments[1][0][i] = v12[i] - ySorted[1][i];
-				increments[1][1][i] = v02[i] - ySorted[0][i];
+				increments[2][0][i] = vl[i] - v[ind][i];
+				increments[2][1][i] = increments[1][1][i];
 			}
 		}
 	}
-	else {		// RENDERING A QUAD
-	}
+#endif
 }
 
 // Rasterization Methods
@@ -640,58 +688,52 @@ void Poly::RasterizeFast( ) {
 
 void Poly::RasterizeFast( const int y ) {
 	if ( y > ySorted[0].y || 
-		 y < ySorted[2].y ||
+		 ( y < ySorted[2].y && numVertices==3 ) ||
 		 y < ySorted[3].y )
 		 return;
 
 	float interp[2][NUM_VERTEX_DATA];	// on the stack for speed, but only use numInterps
 	float px[NUM_VERTEX_DATA];			// For the pixel in the scanline
 	
-	float dy,al,ar,ai;
+	float dyl,dyr,ai;
 	float dx;
+	int depthindex = 0,
+		leftindex = 0,
+		rightindex = 0;
 
 	if ( y < ySorted[0].y &&
-		 y > ySorted[1].y ) {
-		dy = -(y - ySorted[0].y);
-		for (int i=0;i<NUM_VERTEX_DATA;i++) {
-			interp[0][i] = increments[0][0][i] * dy + ySorted[0][i];
-			interp[1][i] = increments[0][1][i] * dy + ySorted[0][i];
-		}
+		 y > ySorted[1].y ) {			// We are between 1st and 2nd vertex
 	}
-	else if ( y < ySorted[1].y && 
+	else if ( y < ySorted[1].y &&		// We are between 2nd and 3rd vertex
 			  y > ySorted[2].y ) {
-		dy = -(y - ySorted[1].y);
-		if ( ySorted[2].x < ySorted[1].x ) {	// RIGHT triangle
-			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				interp[0][i] = increments[1][0][i] * -(y - ySorted[0].y) + ySorted[0][i];
-				interp[1][i] = increments[1][1][i] * dy + ySorted[1][i];
-			}
-		}
-		else {									// LEFT triangle
-			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				interp[0][i] = increments[1][0][i] * dy + ySorted[1][i];
-				interp[1][i] = increments[1][1][i] * -(y - ySorted[0].y) + ySorted[0][i];
-			}
-		}
+		depthindex = 1;
 	}
-	else if ( numVertices == 4 &&			// This is a QUAD and we are at bottom vertex
+	else if ( numVertices == 4 &&		// QUAD: we are between 3rd and 4th vertex
 			  y <= ySorted[2].y &&
 			  y > ySorted[3].y ) {
-		dy = ySorted[2].y - y;
+		depthindex = 2;
+	}
+	leftindex = sides[depthindex][0],
+	rightindex= sides[depthindex][1];
+	dyl = v[leftindex].y - y;
+	dyr = v[rightindex].y - y;
+
+	for (int i=0;i<NUM_VERTEX_DATA;i++) {
+		interp[0][i] = increments[depthindex][0][i]*dyl + v[leftindex][i];
+		interp[1][i] = increments[depthindex][1][i]*dyr + v[rightindex][i];
 	}
 
-	int x = interp[0][0],ex=interp[1][0];
+	float sx = ceil(interp[0][0]),ex=floor(interp[1][0]);
 	ai = 1/(interp[0][0] - interp[1][0] - 1);
-	if ( ex < 0 )
+	if ( ex < 0 || sx >= SIZE_X )
 		return;
-	if ( x < 0 )
-		x=0;
-	if ( ex >= SIZE_X ) {
+	if ( sx < 0 )
+		sx=0;
+	if ( ex >= SIZE_X )
 		ex = SIZE_X-1;
-	}
 
-	for (;x<=ex;x++) {
-		dx = -(x-interp[0][0]);
+	for (int x=sx;x<=ex;x++) {
+		dx = (interp[0][0]-x);
 		for (int i=0;i<NUM_VERTEX_DATA;i++)
 			px[i] = interp[0][i] + (interp[1][i] - interp[0][i])*ai*dx;
 		if ( px[6]/px[NUM_VERTEX_DATA-1] < z_buffer[x + y*SIZE_X] ) {
@@ -785,50 +827,57 @@ void Poly::YSort( Vertex* temp ) {
 	temp[1] = v[1];
 	temp[2] = v[2];
 	temp[3] = v[3];
-	if ( numVertices == 3 ) {
-		if ( v[0].y < v[1].y ) {
-			temp[0] = v[1];
-			temp[1] = v[0];
-		}
-		if ( temp[0].y < v[2].y ) {	// v[2] has largest y
-			temp[2] = temp[1];
-			temp[1] = temp[0];
-			temp[0] = v[2];
-		}
-		else if ( temp[1].y < v[2].y ) {	// v[2] has 2nd largest y
-			temp[2] = temp[1];
-			temp[1] = v[2];
-		}
+	edges[0] = 0;
+	edges[1] = 1;
+	edges[2] = 2;
+	edges[3] = 3;
+
+	if ( v[0].y < v[1].y ) {
+		temp[0] = v[1];
+		temp[1] = v[0];
+		edges[0] = 1;
+		edges[1] = 0;
 	}
-	else {	// numVertices must equal 4
-		if ( v[0].y < v[1].y ) {
-			temp[0] = v[1];
-			temp[1] = v[0];
-		}
-		if ( temp[0].y < v[2].y ) {	// v[2] has largest y
-			temp[2] = temp[1];
-			temp[1] = temp[0];
-			temp[0] = v[2];
-		}
-		else if ( temp[1].y < v[2].y ) {	// v[2] has 2nd largest y
-			temp[2] = temp[1];
-			temp[1] = v[2];
-		}
+	if ( temp[0].y < v[2].y ) {	// v[2] has largest y
+		temp[2] = temp[1];
+		temp[1] = temp[0];
+		temp[0] = v[2];
+		edges[2] = edges[1];
+		edges[1] = edges[0];
+		edges[0] = 2;
+	}
+	else if ( temp[1].y < v[2].y ) {	// v[2] has 2nd largest y
+		temp[2] = temp[1];
+		temp[1] = v[2];
+		edges[2] = edges[1];
+		edges[1] = 2;
+	}
+
+	if ( numVertices == 4 ) {
 		if ( temp[0].y < v[3].y ) {
 			temp[3] = temp[2];
 			temp[2] = temp[1];
 			temp[1] = temp[0];
 			temp[0] = v[3];
+			edges[3] = edges[2];
+			edges[2] = edges[1];
+			edges[1] = edges[0];
+			edges[0] = 3;
 		}
 		else {
 			if ( temp[1].y < v[3].y ) {
 				temp[3] = temp[2];
 				temp[2] = temp[1];
 				temp[1] = v[3];
+				edges[3] = edges[2];
+				edges[2] = edges[1];
+				edges[1] = 3;
 			}
 			else if ( temp[2].y < v[3].y ) {
 				temp[3] = temp[2];
 				temp[2] = v[3];
+				edges[3] = edges[2];
+				edges[2] = 3;
 			}
 		}
 	}
@@ -839,35 +888,22 @@ void Poly::XSort( Vertex* temp ) {
 	temp[1] = v[1];
 	temp[2] = v[2];
 	temp[3] = v[3];
-	if ( numVertices == 3 ) {
-		if ( v[0].x < v[1].x ) {
-			temp[0] = v[1];
-			temp[1] = v[0];
-		}
-		if ( temp[0].x < v[2].x ) {	// v[2] has largest x
-			temp[2] = temp[1];
-			temp[1] = temp[0];
-			temp[0] = v[2];
-		}
-		else if ( temp[1].x < v[2].x ) {	// v[2] has 2nd largest x
-			temp[2] = temp[1];
-			temp[1] = v[2];
-		}
+
+	if ( v[0].x < v[1].x ) {
+		temp[0] = v[1];
+		temp[1] = v[0];
 	}
-	else {	// numVertices must equal 4
-		if ( v[0].x < v[1].x ) {
-			temp[0] = v[1];
-			temp[1] = v[0];
-		}
-		if ( temp[0].x < v[2].x ) {	// v[2] has largest x
-			temp[2] = temp[1];
-			temp[1] = temp[0];
-			temp[0] = v[2];
-		}
-		else if ( temp[1].x < v[2].x ) {	// v[2] has 2nd largest x
-			temp[2] = temp[1];
-			temp[1] = v[2];
-		}
+	if ( temp[0].x < v[2].x ) {	// v[2] has largest x
+		temp[2] = temp[1];
+		temp[1] = temp[0];
+		temp[0] = v[2];
+	}
+	else if ( temp[1].x < v[2].x ) {	// v[2] has 2nd largest x
+		temp[2] = temp[1];
+		temp[1] = v[2];
+	}
+
+	if ( numVertices == 4 ) {
 		if ( temp[0].x < v[3].x ) {
 			temp[3] = temp[2];
 			temp[2] = temp[1];
@@ -893,35 +929,20 @@ void Poly::ZSort( Vertex* temp ) {
 	temp[1] = v[1];
 	temp[2] = v[2];
 	temp[3] = v[3];
-	if ( numVertices == 3 ) {
-		if ( v[0].z < v[1].z ) {
-			temp[0] = v[1];
-			temp[1] = v[0];
-		}
-		if ( temp[0].z < v[2].z ) {	// v[2] has largest z
-			temp[2] = temp[1];
-			temp[1] = temp[0];
-			temp[0] = v[2];
-		}
-		else if ( temp[1].z < v[2].z ) {	// v[2] has 2nd largest z
-			temp[2] = temp[1];
-			temp[1] = v[2];
-		}
+	if ( v[0].z < v[1].z ) {
+		temp[0] = v[1];
+		temp[1] = v[0];
 	}
-	else {	// numVertices must equal 4
-		if ( v[0].z < v[1].z ) {
-			temp[0] = v[1];
-			temp[1] = v[0];
-		}
-		if ( temp[0].z < v[2].z ) {	// v[2] has largest z
-			temp[2] = temp[1];
-			temp[1] = temp[0];
-			temp[0] = v[2];
-		}
-		else if ( temp[1].z < v[2].z ) {	// v[2] has 2nd largest z
-			temp[2] = temp[1];
-			temp[1] = v[2];
-		}
+	if ( temp[0].z < v[2].z ) {	// v[2] has largest z
+		temp[2] = temp[1];
+		temp[1] = temp[0];
+		temp[0] = v[2];
+	}
+	else if ( temp[1].z < v[2].z ) {	// v[2] has 2nd largest z
+		temp[2] = temp[1];
+		temp[1] = v[2];
+	}
+	if ( numVertices == 4 ) {
 		if ( temp[0].z < v[3].z ) {
 			temp[3] = temp[2];
 			temp[2] = temp[1];

@@ -35,7 +35,8 @@ public:
 	// THESE ARE FOR RENDERING QUICKLY
 	Vertex ySorted[POLY_MAX_VERTICES];		// may not need this; just sort v[]
 	float increments[POLY_MAX_VERTICES][2][NUM_VERTEX_DATA];	// increments along edges of left & right slopes
-	float starts[POLY_MAX_VERTICES][2][NUM_VERTEX_DATA];		// starting point of each edge
+	int edges[POLY_MAX_VERTICES];			// maintains connectivity after sorting
+	int sides[POLY_MAX_VERTICES][2];		// indices for starting vertices of each edge 
 	int numInterps;			// should use this for further optimization
 
     Poly() {
