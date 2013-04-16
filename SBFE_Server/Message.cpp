@@ -170,4 +170,5 @@ bool Message::FormMessage(bool isServer)
 	}
 	else {
 	}
+	return true;
 }

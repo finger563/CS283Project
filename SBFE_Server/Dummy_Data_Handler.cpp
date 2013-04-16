@@ -145,16 +145,20 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				con_peers.Push(newpeer);
 			}
 			break;
-		case QUESTION:
+		case CHAT:
 			if ( teacher.Player(mymessage.Player()) )
 				teacher.Questions(mymessage.Object());
 			break;
-		case SUBMIT:
+		case SHOOT:
 			if ( teacher.Player(mymessage.Player()) )
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("%s submitted assignment with content: %s!\n"),
 							mymessage.Player().name,
 							mymessage.Content()));
+			break;
+		case MOVE:
+			break;
+		case LEAVE:
 			break;
 		default:
 			ACE_ERROR ((LM_ERROR,
@@ -275,7 +279,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 			peer_s *tmp = &con_peers;
 			switch(mymessage.Type())
 			{
-			case ASSIGN:
+			case ACCEPT:
 				if ( teacher.Assign(mymessage.Object()) )
 				{
 					while (tmp->next!=NULL)
@@ -290,7 +294,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 					}
 				}
 				break;
-			case REPLY:
+			case CHAT:
 				if ( teacher.Reply(mymessage.Object()) )
 				{
 					while (tmp->next!=NULL)
@@ -305,7 +309,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 					}
 				}
 				break;
-			case DISMISS:
+			case CREATE:
 				while (tmp->next!=NULL)
 				{
 					tmp = tmp->next;
@@ -318,6 +322,10 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 				}
 				teacher.Dismiss();
 				con_peers.RemoveALL();
+				break;
+			case MOVE:
+				break;
+			case REMOVE:
 				break;
 			default:
 				break;
@@ -347,7 +355,7 @@ int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 #endif
   // Stop and cancel the periodic timer associated with this reactor
   this->reactor()->cancel_timer(this);
-  teacher.RemoveStudent(myid);
+  teacher.RemovePlayer(myid);
   con_peers.Remove(myid);
 
   m = ACE_Event_Handler::ALL_EVENTS_MASK |
