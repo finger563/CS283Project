@@ -11,10 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3C781167-E1EC-4CD8-A508-9D419F2EA255}</ProjectGuid>
+    <ProjectGuid>{54B48CD7-A5E5-423B-A733-52E3CF061C8F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>framebufferobject</RootNamespace>
-    <ProjectName>SBFE_Client</ProjectName>
+    <RootNamespace>SBFE_Server</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -40,17 +39,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <ExcludePath>dlls;$(ExcludePath)</ExcludePath>
-    <IncludePath>include\VSL;include;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
-    <LibraryPath>lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
-    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <ExcludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;$(MSBuildToolsPath32);$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib;</ExcludePath>
-    <IncludePath>include;include/vsl;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
-    <LibraryPath>lib;$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib</LibraryPath>
-    <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -59,12 +50,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include;include/VSL/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ACE_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>.;$(ACE_ROOT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ACEd.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,38 +71,23 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Engine\camera.cpp" />
-    <ClCompile Include="src\Engine\object.cpp" />
-    <ClCompile Include="src\Engine\matrix.cpp" />
-    <ClCompile Include="src\Engine\point.cpp" />
-    <ClCompile Include="src\Engine\Polygon.cpp" />
-    <ClCompile Include="src\Engine\Vertex.cpp" />
-    <ClCompile Include="src\glInfo.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Timer.cpp" />
+    <ClCompile Include="Dummy_Accept_Handler.cpp" />
+    <ClCompile Include="Dummy_Data_Handler.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="server.cpp" />
+    <ClCompile Include="Teacher.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Engine\camera.h" />
-    <ClInclude Include="src\Engine\constants.h" />
-    <ClInclude Include="src\Engine\object.h" />
-    <ClInclude Include="src\Engine\matrix.h" />
-    <ClInclude Include="src\Engine\point.h" />
-    <ClInclude Include="src\Engine\Polygon.h" />
-    <ClInclude Include="src\Engine\Vertex.h" />
-    <ClInclude Include="src\main.h" />
-    <ClInclude Include="src\Sprites\box.h" />
-    <ClInclude Include="src\Sprites\checkerboard.h" />
-    <ClInclude Include="src\Sprites\defaulttexture.h" />
-    <ClInclude Include="src\Sprites\floor.h" />
-    <ClInclude Include="src\Sprites\floorsmall.h" />
-    <ClInclude Include="src\Textures.h" />
+    <ClInclude Include="Dummy_Accept_Handler.h" />
+    <ClInclude Include="Dummy_Data_Handler.h" />
+    <ClInclude Include="Message.h" />
+    <ClInclude Include="Teacher.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

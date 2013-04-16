@@ -1,7 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "framebufferobject", "framebufferobject\framebufferobject.vcxproj", "{3C781167-E1EC-4CD8-A508-9D419F2EA255}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SBFE_Client", "framebufferobject\framebufferobject.vcxproj", "{3C781167-E1EC-4CD8-A508-9D419F2EA255}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SBFE_Server", "SBFE_Server\SBFE_Server.vcxproj", "{54B48CD7-A5E5-423B-A733-52E3CF061C8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +15,10 @@ Global
 		{3C781167-E1EC-4CD8-A508-9D419F2EA255}.Debug|Win32.Build.0 = Debug|Win32
 		{3C781167-E1EC-4CD8-A508-9D419F2EA255}.Release|Win32.ActiveCfg = Release|Win32
 		{3C781167-E1EC-4CD8-A508-9D419F2EA255}.Release|Win32.Build.0 = Release|Win32
+		{54B48CD7-A5E5-423B-A733-52E3CF061C8F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{54B48CD7-A5E5-423B-A733-52E3CF061C8F}.Debug|Win32.Build.0 = Debug|Win32
+		{54B48CD7-A5E5-423B-A733-52E3CF061C8F}.Release|Win32.ActiveCfg = Release|Win32
+		{54B48CD7-A5E5-423B-A733-52E3CF061C8F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

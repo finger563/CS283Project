@@ -1,0 +1,36 @@
+//
+// Created: Mar 15, 2012
+//
+// Author: William Emfinger
+//
+// Developed for CS 387.
+
+This is a modification of my assignment 1 code.
+
+The server side runs the teacher application - it waits for incoming connections (students)
+  and makes a data handler for each student.  It then prints into the command window the options
+  that the user has for sending to the students.
+  
+The client side code runs the student application - it prints the options for the students 
+  to send to the teacher into the command window.
+  
+A student must first register before doing anything else.  A teacher must have registered students
+  before they can send anything.  A homework must be assigned by the teacher before it can be 
+  submitted by the registered students.  It must also be assigned before the students can ask
+  questions about it.  A question about an assigned homework must be asked before the teacher 
+  can reply to the question.  
+  
+For the applications to receive data, they must exit their blocking console input commands.  This
+  is done by entering the exit command to receive data.
+
+Make the project files using the same mwc.pl arguments. (-type vc10)
+
+usage:
+
+* server.exe:
+  * no arguments
+  * prints port number
+  * Periodically prints options commands
+* client.exe:
+  * arguments : <server hostname> <server port num>
+  * Periodically prints options commands

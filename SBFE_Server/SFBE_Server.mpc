@@ -1,0 +1,17 @@
+project : acelib {
+  exename = SFBE_Server
+  Source_Files {
+    server.cpp
+    Dummy_Accept_Handler.cpp
+    Dummy_Data_Handler.cpp
+    Message.cpp
+    Teacher.cpp
+  }
+  Header_Files {
+    Dummy_Accept_Handler.h
+    Dummy_Data_Handler.h
+    Message.h
+    Teacher.h
+  }
+}
+
