@@ -556,9 +556,6 @@ void updatePixels(GLubyte* dst, int size)
 #if 1
 	renderlist.clear();
 
-	
-	
-
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		
 
@@ -598,8 +595,7 @@ void updatePixels(GLubyte* dst, int size)
 		it->Rotate(rot);	
 
 		//if shot needs to be deleted
-		if(it->getKill())
-		{
+		if(it->getKill()) {
 			it = objectlist.erase(it);
 			--it;
 		}
@@ -694,6 +690,7 @@ void showInfo()
 		ss << "Press SPACE key to toggle PBO on/off." << ends;
 		drawString(ss.str().c_str(), 1, 1, color, font);
 	//}
+
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
 
@@ -738,7 +735,7 @@ void chat()
 		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
 		ss.str("");
 
-		print = false;
+		//print = false;
 	}
 
     // unset floating format
