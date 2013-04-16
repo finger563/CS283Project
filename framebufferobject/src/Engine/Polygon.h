@@ -75,43 +75,29 @@ public:
 
 	// Polygon variable setter methods
 	void SetTexture( const unsigned short *tex, 
-					 const int width,
-					 const int height) { 
+					 const int width, const int height) { 
 		texture = tex; texwidth = width; texheight = height;
 	}
 	void SetTexture( const unsigned short *tex, 
-					 const int width,
-					 const int height,
+					 const int width, const int height,
 					 Point2D u1,
 					 Point2D u2,
 					 Point2D u3,
 					 Point2D u4) { 
 		texture = tex; texwidth = width; texheight = height;
-		v[0].u = u1.x;
-		v[0].v = u1.y;
-		v[1].u = u2.x;
-		v[1].v = u2.y;
-		v[2].u = u3.x;
-		v[2].v = u3.y;
-		v[3].u = u4.x;
-		v[3].v = u4.y;
+		v[0].u = u1.x; v[0].v = u1.y;
+		v[1].u = u2.x; v[1].v = u2.y;
+		v[2].u = u3.x; v[2].v = u3.y;
+		v[3].u = u4.x; v[3].v = u4.y;
 	}
 	void SetRenderType( const RenderType rt ) { rType =rt; }
 	void SetNormal( const Vector3D n ) { normal = n; }
 	void SetColor( const float _r, const float _g, const float _b ) { r=_r; g=_g; b=_b; }
 	void SetVertexColors( 
-		const float _r1, 
-		const float _g1, 
-		const float _b1, 
-		const float _r2, 
-		const float _g2, 
-		const float _b2, 
-		const float _r3, 
-		const float _g3, 
-		const float _b3, 
-		const float _r4=1, 
-		const float _g4=1, 
-		const float _b4=1) {
+		const float _r1, const float _g1, const float _b1, 
+		const float _r2, const float _g2, const float _b2, 
+		const float _r3, const float _g3, const float _b3, 
+		const float _r4=1, const float _g4=1, const float _b4=1) {
 			v[0].r = _r1;
 			v[0].g = _g1;
 			v[0].b = _b1;

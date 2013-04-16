@@ -85,33 +85,6 @@ void Poly::TransformToPixel( const Matrix& _m ) {
 
 // Pipeline function methods
 void Poly::Clip( ) {
-	// Can simplify this into the operations instead of
-	// needing vectors
-	// X = 0, x
-	// X = 1, w - x
-	// Y = 0, y
-	// Y = 1, w - y
-	// Z = 0, z
-	// Z = 1, w - z
-
-	//Matrix perspectiveToClip=Matrix(),
-	//	   clipToPerspective=Matrix();
-	//perspectiveToClip.data[0][0] = 0.5;
-	//perspectiveToClip.data[1][1] = 0.5;
-	//perspectiveToClip.data[2][2] = 0.5;
-	//perspectiveToClip.data[3][0] = 0.5;
-	//perspectiveToClip.data[3][1] = 0.5;
-	//perspectiveToClip.data[3][2] = 0.5;
-	//
-	//clipToPerspective.data[0][0] = 2;
-	//clipToPerspective.data[1][1] = 2;
-	//clipToPerspective.data[2][2] = 2;
-	//clipToPerspective.data[3][0] = -1;
-	//clipToPerspective.data[3][1] = -1;
-	//clipToPerspective.data[3][2] = -1;
-
-	//Transform( perspectiveToClip );
-
 	float BC[POLY_MAX_VERTICES][6] = {};		// boundary tests
 	int line[POLY_MAX_VERTICES][6] = {};		// which lines cross
 	int lines[6] = {};
@@ -218,8 +191,8 @@ void Poly::Clip( ) {
 			break;
 		}
 	}
-	else {
-		return;
+	else {		
+		return;		// don't support quad clipping right now
 		switch ( lines[4] ) {
 		default:
 			break;
@@ -261,8 +234,6 @@ void Poly::Clip( ) {
 			break;
 		}
 	}
-	
-	//Transform( clipToPerspective );
 }
 
 void Poly::HomogeneousDivide( ) {
@@ -315,14 +286,14 @@ void Poly::SetupRasterization( ) {
 	sides[0][0] = ind;
 	sides[0][1] = ind;
 
-	for (int j = 1;j<3;j++) {
+	for (int j = 1;j<4;j++) {
 		if ( v[indr].y > v[indl].y ) {	// go down right of poly
 			ind = indr;
 			indr = (indr + 1) % numVertices;
 			ar = 1/(v[ind].y - v[indr].y - 1);
 			vr = (v[indr] - v[ind])*ar;
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
-				increments[j][0][i] = increments[0][0][i];
+				increments[j][0][i] = increments[j-1][0][i];
 				increments[j][1][i] = vr[i];
 			}
 			sides[j][0] = sides[j-1][0];
@@ -335,7 +306,7 @@ void Poly::SetupRasterization( ) {
 			vl = (v[indl] - v[ind])*al;
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
 				increments[j][0][i] = vl[i];
-				increments[j][1][i] = increments[0][1][i];
+				increments[j][1][i] = increments[j-1][1][i];
 			}
 			sides[j][0] = ind;
 			sides[j][1] = sides[j-1][1];
@@ -655,7 +626,8 @@ void Poly::RasterizeFast( const int y ) {
 		rightindex = 0;
 
 	if ( y < ySorted[0].y &&
-		 y > ySorted[1].y ) {			// We are between 1st and 2nd vertex
+		 y > ySorted[1].y && 
+		 (ySorted[0].y) != (ySorted[1].y) ) {			// We are between 1st and 2nd vertex
 	}
 	else if ( y < ySorted[1].y &&		// We are between 2nd and 3rd vertex
 			  y > ySorted[2].y ) {
@@ -676,7 +648,7 @@ void Poly::RasterizeFast( const int y ) {
 		interp[1][i] = increments[depthindex][1][i]*dyr + v[rightindex][i];
 	}
 
-	float sx = ceil(interp[0][0]),ex=floor(interp[1][0]);
+	float sx = (interp[0][0]),ex=(interp[1][0]);
 	ai = 1/(interp[0][0] - interp[1][0] - 1);
 	if ( ex < 0 || sx >= SIZE_X )
 		return;
