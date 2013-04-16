@@ -1,20 +1,11 @@
 // $Id$
 
 /*
-  Date: Created: Feb 14, 2007
-        Updated: Feb  2, 2008
-        Updated: Feb 21, 2009
-        UpdatedL Feb 9, 2012
+  Date: April 16, 2013
 
-  Author: Aniruddha Gokhale
+  Author: William Emfinger
 
-  Originally used in CS 283; Updated for CS 387.
-
-  Demonstrate the use of Acceptor and Connector to setup connection
-  and data transfer in conjunction with a Reactor.  We use the simplest Reactor
-  available in ACE. It also demonstrates the use of a Singleton pattern used
-  for Reactor.  Notice that the ACE Reactor uses a Bridge pattern to decouple
-  the interface from its implementation.
+  Updated for CS283 from Andy's CS 387 Sample Code.
 */
 
 #include <iostream>

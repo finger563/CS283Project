@@ -1,20 +1,17 @@
 // $Id$
 //
 // Author: William Emfinger
-// CS387 HW 1 header file
-// Date Created : Feb 16, 2012
+// CS283 Project: Super Block Fighter Extreme
+// Date Created : April 16, 2013
 //
 //
 // Message header file.
 // 
-// We define the message format for Assignment 2
-//  with member and helper functions.
+// We define the message format for the SBFE application
 //
 
-// notice how we protect double inclusion of declarations by virtue of
-// having these preprocessor symbols
-#if !defined (_CS387_MESSAGE_H_)
-#define _CS387_MESSAGE_H_
+#if !defined (_SBFE_MESSAGE_H_)
+#define _SBFE_MESSAGE_H_
 
 //#define DEBUG		// used for printing out messages received
 
@@ -25,33 +22,34 @@
 
 #include <ace/CDR_Stream.h>
 
-const int MAX_NAME_LEN=100;
-const int MAX_CONT_LEN=256;
+const int MAX_NAME_LEN=100;		// Max length of username
+const int MAX_CONT_LEN=256;		// Max length of single chat message
 
 enum MessageType {
-	REGISTER,
-	ASSIGN,
-	QUESTION,
-	REPLY,
-	SUBMIT,
-	DISMISS,
-	DEBUG_M
+	REGISTER,	// Players REGISTER with the server initially
+	ACCEPT,		//	Then the server responds using ACCEPT with a player ID, and the initial position/heading
+	CHAT,		// Players send CHAT messages with username and text to server, it relays the message to other players
+	SHOOT,		// Players send SHOOT command to Server, it replies/relays CREATE message to *all* players
+	CREATE,		// Server sends CREATE message when a new object is created by a player (shot, player, etc.)
+	MOVE,		// Server sends MOVE message when a created object needs to be moved (i.e. shot update, player update, etc.)
+	LEAVE,		// Player sends LEAVE message when they disconnect from the server
+	REMOVE		//	Then the server removes the player from it's list and sends REMOVE to remove the object from other players' games
 };
 
-enum AssignmentType {
+enum ObjectType {
 	HW, PA, TQ,DEBUG_A
 };
 
-struct Student_s {
+struct Player_s {
 	char			name[MAX_NAME_LEN];
 	ACE_CDR::Long	id;
-	Student_s*		next;
+	Player_s*		next;
 	
-	Student_s() {next=NULL;id=0;memset(name,0,MAX_NAME_LEN);}
-	Student_s(const Student_s &s){next=NULL;id=s.id;memset(name,0,MAX_NAME_LEN);strcpy(name,s.name);}
-	Student_s(char* n,ACE_CDR::Long i){next=NULL;id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
+	Player_s() {next=NULL;id=0;memset(name,0,MAX_NAME_LEN);}
+	Player_s(const Player_s &s){next=NULL;id=s.id;memset(name,0,MAX_NAME_LEN);strcpy(name,s.name);}
+	Player_s(char* n,ACE_CDR::Long i){next=NULL;id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	
-	Student_s & operator=(const Student_s &s) 
+	Player_s & operator=(const Player_s &s) 
 	{
 		if (this != &s) // protect against invalid self-assignment
         {
@@ -62,9 +60,9 @@ struct Student_s {
         return *this;
 	}
 	
-	void Link(Student_s* s){next = s;}
+	void Link(Player_s* s){next = s;}
 	
-	bool operator==(const Student_s &b)
+	bool operator==(const Player_s &b)
 	{
 		if ( id ==b.id && strcmp(name,b.name)==0 )
 			return true;
@@ -73,17 +71,17 @@ struct Student_s {
 	}
 };
 
-struct Assignment_s {
-	AssignmentType	type;
+struct Object_s {
+	ObjectType		type;
 	ACE_CDR::Long	id;
 	char			content_[MAX_CONT_LEN];
-	Assignment_s*	next;
+	Object_s*	next;
 	
-	Assignment_s() {next=NULL;type=HW;id=0;memset(content_,0,MAX_CONT_LEN);}
-	Assignment_s(const Assignment_s &a){next=NULL;type=a.type;id=a.id;strcpy(content_,a.content_);}
-	Assignment_s(AssignmentType t, ACE_CDR::Long i,char* c){next=NULL;type=t;id=i;strcpy(content_,c);}
+	Object_s() {next=NULL;type=HW;id=0;memset(content_,0,MAX_CONT_LEN);}
+	Object_s(const Object_s &a){next=NULL;type=a.type;id=a.id;strcpy(content_,a.content_);}
+	Object_s(ObjectType t, ACE_CDR::Long i,char* c){next=NULL;type=t;id=i;strcpy(content_,c);}
 	
-	Assignment_s & operator=(const Assignment_s &a) 
+	Object_s & operator=(const Object_s &a) 
 	{
 		if (this != &a) // protect against invalid self-assignment
         {
@@ -95,9 +93,9 @@ struct Assignment_s {
         return *this;
 	}
 
-	void Link(Assignment_s* a){next = a;}
+	void Link(Object_s* a){next = a;}
 
-	bool operator==(const Assignment_s &b)
+	bool operator==(const Object_s &b)
 	{
 		if ( id ==b.id && type == b.type )
 			return true;
@@ -109,22 +107,22 @@ struct Assignment_s {
 class Message {
 private:
 	MessageType type_;
-	Assignment_s	assignment_;
-	Student_s		student_;
+	Object_s	object_;
+	Player_s	player_;
 	char		content_[MAX_CONT_LEN];
 public:
-	Message() : assignment_(),student_()
+	Message() : object_(),player_()
 	{
 		type_ = REGISTER;
 		memset(content_,0,MAX_CONT_LEN);
 	}
-	Message(const Message &m) : assignment_(m.Assignment()),student_(m.Student())
+	Message(const Message &m) : object_(m.Object()),player_(m.Player())
 	{
 		this->type_ = m.Type();
 		memset(content_,0,MAX_CONT_LEN);
 		strcpy(this->content_,m.Content());
 	}
-	Message(MessageType t,Assignment_s &a,Student_s &s, char* c) : assignment_(a),student_(s)
+	Message(MessageType t,Object_s &o,Player_s &p, char* c) : object_(o),player_(p)
 	{
 		this->type_ = t;
 		memset(content_,0,MAX_CONT_LEN);
@@ -136,8 +134,8 @@ public:
 		if (this != &m) // protect against invalid self-assignment
         {
 			type_ = m.Type();
-			assignment_ = m.Assignment();
-			student_ = m.Student();
+			object_ = m.Object();
+			player_ = m.Player();
 			strcpy(content_,m.Content());
         }
         // by convention, always return *this
@@ -149,11 +147,11 @@ public:
 	void		Type(const MessageType type) {type_=type;}
 	MessageType Type() const {return type_;}
 
-	void			Assignment(const Assignment_s& a) {assignment_=a;}
-	Assignment_s	Assignment() const  {return assignment_;}
+	void			Object(const Object_s& o) {object_=o;}
+	Object_s		Object() const  {return object_;}
 
-	void		Student(const Student_s& s) {student_=s;}
-	Student_s	Student() const  {return student_;}
+	void		Player(const Player_s& p) {player_=p;}
+	Player_s	Player() const  {return player_;}
 
 	const char*		Content() const {return content_;}
 	void			Content(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}
@@ -165,4 +163,4 @@ public:
 int operator<< (ACE_OutputCDR &cdr, const Message &message);
 int operator>> (ACE_InputCDR &cdr, Message &message);
 
-#endif /* _CS387_MESSAGE_H_ */
+#endif /* _SBFE_MESSAGE_H_ */

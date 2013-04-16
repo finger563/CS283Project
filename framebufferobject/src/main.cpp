@@ -230,7 +230,7 @@ int main(int argc, char **argv)
 	testobj2.generateCube();
 	testobj2.SetRenderType(COLORED);
 
-	testobj3.generateFloor(30,-10);
+	testobj3.generateFloor(75,-10);
 
 	//projectile code
 	shot.projectileInit(camera.getForward());
