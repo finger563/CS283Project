@@ -218,9 +218,9 @@ int main(int argc, char **argv)
 
 	testobj3.generateFloor(30,-10);
 
-	//objectlist.push_back(testobj);
-	//objectlist.push_back(testobj2);	
-	//objectlist.push_back(testobj3);
+	objectlist.push_back(testobj);
+	objectlist.push_back(testobj2);	
+	objectlist.push_back(testobj3);
 	objectlist.push_back(testobj4);
 
     initSharedMem();
