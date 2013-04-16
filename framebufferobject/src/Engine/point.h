@@ -4,20 +4,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "constants.h"
 #include "..\main.h"
+
+// Note: 3D and 2D (e.g. Point3D and Point2D) are with respect to world space
+// coordinates.  All types of points/vectors are stored in homogeneous coordinates
+// which encapsulates the 2/3D point in a higher dimension to become 3/4D.  
+// This is done for mathematical ease of use and correctness with respect to 
+// projection.  
 
 class Point3D
 {
 public:
-    float x,y,z;	// 3D coords of point
-    Point3D() {x=y=z=0;}
-    Point3D(const float _x,const float _y,const float _z) { x = _x; y = _y; z = _z; }
+    float x,y,z,w;	// 3D coords of point
+    Point3D() {x=y=z=0;w=1;}
+    Point3D(const float _x,const float _y,const float _z) { x = _x; y = _y; z = _z; w = 1; }
+    Point3D(const float _x,const float _y,const float _z,const float _w) { x = _x; y = _y; z = _z; w = _w; }
     ~Point3D(){}
 
     void Print() {}
     
-    Point3D operator -() const { return Point3D(-x,-y,-z); }
+    Point3D operator -() const { return Point3D(-x,-y,-z,w); }
 
     Point3D& operator= (const Point3D& rhs);
     
@@ -54,14 +60,15 @@ inline static Vector3D crossProduct(const Vector3D a, const Vector3D b)
 class Point2D
 {
 public:
-    float x,y;	// 2D coords of point
-    Point2D() {x=y=0;}
-    Point2D(const float _x,const float _y) { x = _x; y = _y; }
+    float x,y,w;	// 2D coords of point
+    Point2D() {x=y=0;w=1;}
+    Point2D(const float _x,const float _y) { x = _x; y = _y; w = 1; }
+    Point2D(const float _x,const float _y,const float _w) { x = _x; y = _y; w = _w; }
     ~Point2D(){}
 
     void Print() {}
     
-    Point2D operator -() const { return Point2D(-x,-y); }
+    Point2D operator -() const { return Point2D(-x,-y,w); }
 
     Point2D& operator= (const Point2D& rhs);
     

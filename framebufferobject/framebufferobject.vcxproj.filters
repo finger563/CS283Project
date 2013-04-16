@@ -13,9 +13,6 @@
     <ClCompile Include="src\Engine\point.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\triangle.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\glInfo.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -23,6 +20,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\camera.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Vertex.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Polygon.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -42,9 +45,6 @@
     <ClInclude Include="src\Engine\point.h">
       <Filter>headers\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\triangle.h">
-      <Filter>headers\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\main.h">
       <Filter>headers</Filter>
     </ClInclude>
@@ -57,12 +57,21 @@
     <ClInclude Include="src\Engine\constants.h">
       <Filter>headers\Engine</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders\color.frag" />
-    <None Include="shaders\color.vert" />
-    <None Include="shaders\pixeldirdifambspec.frag" />
-    <None Include="shaders\pixeldirdifambspec.vert" />
+    <ClInclude Include="src\Sprites\checkerboard.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Vertex.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\Polygon.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprites\defaulttexture.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Textures.h">
+      <Filter>headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

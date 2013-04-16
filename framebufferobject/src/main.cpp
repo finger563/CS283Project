@@ -26,11 +26,7 @@ using std::endl;
 using std::ends;
 
 #include "main.h"
-#include "Engine\triangle.h"
 #include "Engine\Object.h"
-#include "Sprites\box.h"
-#include "Sprites\floor.h"
-#include "Sprites\floorsmall.h"
 #include "Engine\camera.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
@@ -47,21 +43,35 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 	 rotz = 0,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
-Object testobj = Object(box,boxtexwidth,Vector3D(),Point3D(-10,-5,15));
-Object testobj2 = Object(box,boxtexwidth,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(floortexsmall,floortexsmallwidth);
+#if 1
+Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
+					 Vertex(13.333,6.666,0,1,1,0),
+					 Vertex(-6.666,-13.333,0,1,0,1),
+					 Vertex(),3,Vector3D(0,0,-1),TEXTURED);
+#else
+Poly testpoly = Poly(Vertex(-10,10,0,1,0,0),
+					 Vertex(10,10,0,1,1,0),
+					 Vertex(10,-10,0,1,1,1),
+					 Vertex(-10,-10,0,1,0,1),
+					 4,Vector3D(0,0,-1),TEXTURED,Vector3D(1,1,1),
+					 box,boxtexwidth,boxtexheight);
+#endif
+Poly renderpoly;
 
+Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
+Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
 //shoot will be the projectile
 Object shot = Object(box,boxtexwidth,Vector3D(),Point3D(0, 0, 5));
+Object testobj3 = Object(floortex,floortexwidth,floortexheight);
+Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
 
-// a predicate implemented as a function:
-//bool killShot (Object value) { return value.getKill(); }
 
-//hopefully a trigger to create chat window
-bool type = false;
+Matrix worldToCamera=Matrix(),
+	   perspectiveProjection=Matrix(),
+	   projectionToPixel=Matrix();
 
 std::list<Object> objectlist;
-std::list<Triangle> renderlist;
+std::list<Poly> renderlist;
 
 //For chat
 std::stack<std::string> conversation;
@@ -71,13 +81,14 @@ bool print = false;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
+		neg_rmy = Matrix(),
         rmx = Matrix(),
         rmxy = Matrix(),
 		rmxz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
-Matrix tm = Matrix();				// transformation matrix (scale to screen)
-float rot_angle = 3.141/1200;
+
+float rot_angle = 3.141/120;
 		
 Matrix rot;		// debug/testing for rotating objects
 
@@ -166,6 +177,11 @@ int main(int argc, char **argv)
     rmy.data[0][2] = -sin(rot_angle);
     rmy.data[2][0] = sin(rot_angle);
     rmy.data[2][2] = cos(rot_angle);
+
+    neg_rmy.data[0][0] = cos(-rot_angle);
+    neg_rmy.data[0][2] = -sin(-rot_angle);
+    neg_rmy.data[2][0] = sin(-rot_angle);
+    neg_rmy.data[2][2] = cos(-rot_angle);
     
     rmx.data[1][1] = cos(rot_angle);
     rmx.data[1][2] = -sin(rot_angle);
@@ -176,24 +192,51 @@ int main(int argc, char **argv)
 	rmxz = rmx*rmz;
 	rmyz = rmy*rmz;
     rmxyz = rmz*rmxy;
+	//rmz.SetRotation(rot_angle,Vector3D(0,0,1));
+	//rmy.SetRotation(rot_angle,Vector3D(0,1,0));
+	//rmx.SetRotation(rot_angle,Vector3D(1,0,0));
+	//rmxy.SetRotation(rot_angle,Vector3D(1,1,0));
+	//rmxz.SetRotation(rot_angle,Vector3D(1,0,1));
+	//rmyz.SetRotation(rot_angle,Vector3D(0,1,1));
+	//rmxyz.SetRotation(rot_angle,Vector3D(1,1,1));
 
-    tm.data[0][3] = SIZE_X/2;	// how much to translate x?
-    tm.data[1][3] = SIZE_Y/2;	// how much to translate y?
-    tm.data[2][3] = 1;	// how much to translate z?
-    tm.data[0][0] = SIZE_X/2;	// for the distance from eye to screen (scale factor x)
-    tm.data[1][1] = SIZE_Y/2;	// same (scale factor y)
+	// Structure of a transformation matrix:
+	// ( r=rotation, p=projection, t=translation )
+	// [ x y z w ]	| r r r p | = [ x' y' z' w']
+	//				| r r r p |
+	//				| r r r p |
+	//				| t t t s |
+	//				or 
+	// | r r r t | | x | = | x' |
+	// | r r r t | | y |   | y' |
+	// | r r r t | | z |   | z' |
+	// | p p p s | | w |   | w' |
 	tm.data[3][2] = 1;
 
+	// We use ROW vector notation
+		
+	perspectiveProjection.data[3][2] = -1;	// translate z
+	perspectiveProjection.data[2][3] = 1;	// project z
+
+	projectionToPixel.data[3][0] = (float)SIZE_X*0.5;	// translate x
+	projectionToPixel.data[3][1] = (float)SIZE_Y*0.5;	// translate y
+	projectionToPixel.data[0][0] = (float)SIZE_X*0.5;	// scale x
+	projectionToPixel.data[1][1] = (float)SIZE_Y*0.5;	// scale y
+
 	testobj.generateCube();
+
 	testobj2.generateCube();
+	testobj2.SetRenderType(COLORED);
+
 	testobj3.generateFloor(30,-10);
 
 	//projectile code
 	shot.projectileInit(camera.getForward());
 
 	objectlist.push_back(testobj);
-	objectlist.push_back(testobj2);
+	objectlist.push_back(testobj2);	
 	objectlist.push_back(testobj3);
+	objectlist.push_back(testobj4);
 
     initSharedMem();
 
@@ -504,10 +547,11 @@ void updatePixels(GLubyte* dst, int size)
 	
 	for (int y=0;y<SIZE_Y;y++)
 		for (int x = 0; x<SIZE_X;x++) {
-			display_buffer[x + y*SIZE_X] = 0;
-			z_buffer[x + y*SIZE_X] = 0;
+			display_buffer[x + y*SIZE_X] = BACKGROUND_COLOR;
+			z_buffer[x + y*SIZE_X] = DEFAULT_Z_BUFFER;
 		}
 
+#if 1
 	renderlist.clear();
 
 	
@@ -523,17 +567,27 @@ void updatePixels(GLubyte* dst, int size)
 			it->projectileMove();
 
 		it->updateList();
-		it->Translate( it->getPosition() + camera.getPosition() );
-		it->rotateTemp(camera.getRotation());
-		it->TransformToScreen( tm );
-		std::list<Triangle> templist = it->getRenderList();
+		Vector3D tmp = it->getPosition() - camera.getPosition();
+		it->TranslateTemp(tmp);
+		worldToCamera.SetIdentity();
+		worldToCamera = worldToCamera*camera.getRotation();
+		it->TransformToCamera( worldToCamera );
+		it->TransformToPerspective( perspectiveProjection );
+		std::list<Poly> templist = it->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
 
 	}
 
+	for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
+		it->Clip();
+		it->HomogeneousDivide();
+		it->TransformToPixel( projectionToPixel );
+		it->SetupRasterization( );		// for speed optimization
+	}
+
     for (int y=SIZE_Y-1;y>=0;y--) {
-		for (std::list<Triangle>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
-			it->DrawTexturedZbuffer(y);
+		for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
+			it->RasterizeFast(y);
 		}
 	}
 
@@ -548,6 +602,25 @@ void updatePixels(GLubyte* dst, int size)
 			--it;
 		}
 	}
+#else
+	renderpoly = testpoly;
+			
+	Vector3D tmp = Vector3D(0,0,30) + camera.getPosition();
+	worldToCamera.SetIdentity();
+	worldToCamera.data[3][0] = tmp.x;
+	worldToCamera.data[3][1] = tmp.y;
+	worldToCamera.data[3][2] = tmp.z;
+	worldToCamera = worldToCamera*camera.getRotation();
+	renderpoly.TransformToCamera( worldToCamera );
+	renderpoly.TransformToPerspective( perspectiveProjection );
+	renderpoly.Clip();
+	renderpoly.HomogeneousDivide();
+	renderpoly.TransformToPixel( projectionToPixel );
+    for (int y=SIZE_Y-1;y>=0;y--) {
+		renderpoly.Rasterize(y);
+	}
+	testpoly.Transform(rot);
+#endif
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i)
@@ -555,9 +628,9 @@ void updatePixels(GLubyte* dst, int size)
         for(int j = 0; j < IMAGE_WIDTH; ++j)
         {	// 0xAARRGGBB
 			if (display_z_buffer) {
-				*ptr = ((int)(1/z_buffer[j+i*SIZE_X]) << 16) 
-					+ ((int)(1/z_buffer[j+i*SIZE_X]) << 8)
-					+ (int)(1/z_buffer[j+i*SIZE_X]);
+				*ptr = ((int)(z_buffer[j+i*SIZE_X]) << 16) 
+					+ ((int)(z_buffer[j+i*SIZE_X]) << 8)
+					+ (int)(z_buffer[j+i*SIZE_X]);
 			}
 			else {
 				*ptr = ((int)RED_RGB(display_buffer[j+i*SIZE_X]) << 16) 
@@ -1009,35 +1082,35 @@ void keyboardCB(unsigned char key, int x, int y)
 		break;
 
 	case 'q':	// rotate left
-		camera.Rotate(.1,Vector3D(0,1,0));
+		camera.Rotate(rmy);
 		break;
 
 	case 'e':	// rotate right
-		camera.Rotate(-.1,Vector3D(0,1,0));
+		camera.Rotate(neg_rmy);
 		break;
 
 	case 'w': // Up
-		camera.Translate(Vector3D(0,0,-1));
-		break;
-
-	case 's': // down
 		camera.Translate(Vector3D(0,0,1));
 		break;
 
-	case 'a': // left
-		camera.Translate(Vector3D(1,0,0));
+	case 's': // down
+		camera.Translate(Vector3D(0,0,-1));
 		break;
 
-	case 'd': // right
+	case 'a': // left
 		camera.Translate(Vector3D(-1,0,0));
 		break;
 
+	case 'd': // right
+		camera.Translate(Vector3D(1,0,0));
+		break;
+
 	case ' ': // space
-		camera.Translate(Vector3D(0,-1,0));
+		camera.Translate(Vector3D(0,1,0));
 		break;
 
 	case 'c': // c
-		camera.Translate(Vector3D(0,1,0));
+		camera.Translate(Vector3D(0,-1,0));
 		break;
 
     case 'p':

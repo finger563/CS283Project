@@ -85,17 +85,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="shaders\color.frag" />
-    <None Include="shaders\color.vert" />
-    <None Include="shaders\pixeldirdifambspec.frag" />
-    <None Include="shaders\pixeldirdifambspec.vert" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\Engine\camera.cpp" />
     <ClCompile Include="src\Engine\object.cpp" />
     <ClCompile Include="src\Engine\matrix.cpp" />
     <ClCompile Include="src\Engine\point.cpp" />
-    <ClCompile Include="src\Engine\triangle.cpp" />
+    <ClCompile Include="src\Engine\Polygon.cpp" />
+    <ClCompile Include="src\Engine\Vertex.cpp" />
     <ClCompile Include="src\glInfo.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Timer.cpp" />
@@ -106,11 +101,15 @@
     <ClInclude Include="src\Engine\object.h" />
     <ClInclude Include="src\Engine\matrix.h" />
     <ClInclude Include="src\Engine\point.h" />
-    <ClInclude Include="src\Engine\triangle.h" />
+    <ClInclude Include="src\Engine\Polygon.h" />
+    <ClInclude Include="src\Engine\Vertex.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\Sprites\box.h" />
+    <ClInclude Include="src\Sprites\checkerboard.h" />
+    <ClInclude Include="src\Sprites\defaulttexture.h" />
     <ClInclude Include="src\Sprites\floor.h" />
     <ClInclude Include="src\Sprites\floorsmall.h" />
+    <ClInclude Include="src\Textures.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

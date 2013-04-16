@@ -2,8 +2,7 @@
 #define MAIN_H
 
 #include <limits>
-
-//#define CLIPPING_TEST
+#include "Engine\constants.h"
 
 // constants
 const int    SCREEN_WIDTH    = 400;
@@ -55,6 +54,12 @@ const int    DATA_SIZE = IMAGE_WIDTH * IMAGE_HEIGHT * CHANNEL_COUNT;
 #define RED_RGB(xRGB)    ( ( (xRGB) & 0x1F ) * 8 )
 #define GRN_RGB(xRGB)    ( ( (xRGB >> 5 ) & 0x3F ) * 4 )
 #define BLU_RGB(xRGB)    ( ( (xRGB >> 11 ) & 0x1F ) * 8 )
+#define RGB_MAKE(xR,xG,xB)    ( ( (((xG>>2) << 5)))  +      \
+                                ( ((xB)>>3) << 11 )          +      \
+                                ( ((xR)>>3) ) )
 #endif
+
+#define BACKGROUND_COLOR	RGB_BLACK
+#define DEFAULT_Z_BUFFER	((float)10000)
 
 #endif

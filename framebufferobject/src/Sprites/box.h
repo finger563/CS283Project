@@ -10,6 +10,7 @@
 // target height : 512
 // ############################################
 const int boxtexwidth = 512;
+const int boxtexheight = 512;
 const unsigned short box[] = 
 {
 	0x636E,0x4AEC,0x2A09,0x1966,0x1966,0x1946,0x29E8,0x324A,

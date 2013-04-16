@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string>
 #include <list>
-#include "triangle.h"
+#include "Polygon.h"
 
 class Object
 {
@@ -15,42 +15,43 @@ public:
 	Object();
 
 	//Alternate Constructor
-	Object(const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
+	Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
 		Point3D pos = Point3D(0,0,0));
 
 	//Alternate Constructor
-	Object(Triangle poly, const unsigned short* texture, const int texWid, Vector3D vel = Vector3D(0,0,0), 
+	Object(Poly poly, const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
 		Point3D pos = Point3D(0,0,0));
 
 	//Destructor
-	~Object();
+	~Object(){}
 
 	//Updates Temp last with any changes to the master list
 	bool updateList();
 
 	//Updates Temp list to whatever list is passed (i.e. Render list)
-	bool updateList(std::list<Triangle> poly);
+	bool updateList(std::list<Poly> poly);
 
 	//Clears Temp list
 	void clearTemp();
 
-	//Rotate Temp list
-	void rotateTemp(Matrix m);
+	//Temp list operations
+	void RotateTemp(const Matrix& m);
+	void TranslateTemp(const Vector3D& v);
 
 	//add polygon to lists
-	void add(Triangle poly);
+	void add(Poly poly);
 
-	//Generates cube with default size being 5
-	//5 here is half the length of the cube
-	//total length will = 10 but 5 works well with polygons
+	//Generates cube with with sidelength = size*2
 	void generateCube(float size = 5);
 
 	//Generates tetrahedron
 	void generateTetra(float size = 5);
 
+	// Generates a floor at depth, with sidelength = length
 	void generateFloor(float length = 50, float depth = -10);
 
 	//fileParser()<-- future function
+
 	bool updateTime(int time);
 
 	//sets velocity
@@ -59,22 +60,24 @@ public:
 	//sets position
 	bool setPosition(Point3D pos);
 
+	// sets rendertype for all polygons
+	bool SetRenderType( RenderType rt );
+
 	//gets Position
 	Point3D getPosition(void);
 
 	//assumes that only the temp list is being passed through
-	std::list<Triangle> Rotate(Matrix& m);
+	void Rotate(Matrix& m);
 
 	//assumes that only the temp list is being passed through
-	std::list<Triangle> Translate(Vector3D& v);
+	void Translate(Vector3D& v);
 
 	//transforms polygons to screen
-	//assumes that only the temp list is being passed through
-	//may need to add return feature to TransformtoScreen()
-	std::list<Triangle> TransformToScreen(Matrix& m);
-
-	//returns final render list
-	std::list<Triangle> getRenderList();
+	void TransformToCamera(Matrix& m);
+	void TransformToPerspective(Matrix& m);
+	void TransformToPixel(Matrix& m);
+	
+	std::list<Poly> getRenderList();
 
 	////////////////////////////////////////
 	/////////////////Projectile functons////
@@ -91,16 +94,19 @@ public:
 
 private:
 
-	std::list<Triangle> master;
-	std::list<Triangle> temp;
+	std::list<Poly> master;
+	std::list<Poly> temp;
 	Vector3D heading, velocity; 
 	Point3D position;
 	const unsigned short* tex;
 	int texWidth;
+<<<<<<< HEAD
 	size_t counter;
 	bool kill;
+=======
+	int texHeight;
+>>>>>>> feature-homogeneous-coordinates
 	//Object* next;
-
 };
 
 #endif
