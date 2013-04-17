@@ -87,10 +87,6 @@ Camera camera;
 
 #include "Network\helper_funcs.h"
 
-ACE_INET_Addr   server_addr;			// server address
-string ip_addr = "127.0.0.1:9999";		// IP address from command line
-
-
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
 void displayCB();
 void reshapeCB(int w, int h);

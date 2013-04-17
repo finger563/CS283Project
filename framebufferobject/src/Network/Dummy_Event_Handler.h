@@ -11,6 +11,9 @@
 #if !defined (_CS283_DUMMY_EVENT_HANDLER_H_)
 #define _CS283_DUMMY_EVENT_HANDLER_H_
 
+#include <string>
+using namespace std;
+
 #include <ace/INET_Addr.h>        // for addressing
 #include <ace/Event_Handler.h>    // for event handling
 #include <ace/Reactor.h>          // for reactor functionality
@@ -31,7 +34,7 @@ public:
   Dummy_Event_Handler (ACE_Reactor *r = ACE_Reactor::instance ());
 
   // define an initialization method 
-  virtual int open (ACE_TCHAR *argv []);
+  virtual int open (string server_ip);
 
   /* now define the event handler's callback methods.  These are the
      methods that we will get dispatched on the events */

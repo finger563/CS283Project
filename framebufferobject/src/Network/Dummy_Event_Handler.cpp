@@ -42,26 +42,18 @@ Dummy_Event_Handler::~Dummy_Event_Handler (void)
 }
 
 // initialization method that registers ourselves with the reactor. 
-int Dummy_Event_Handler::open (ACE_TCHAR *argv [])
+int Dummy_Event_Handler::open (string server_ip)
 {
 #if defined(DEBUG)
   // for debugging
   cout << "Dummy_Event_Handler::open invoked" << endl;
 #endif
   
-  u_short port_num;                // port number is unsigned short
-  string  server_host;             // host we want to connect to
-  
-  // let us grab the two arguments
-  server_host = argv [1];
-  port_num = (u_short) atoi (argv[2]);  // note we have to convert to
-                                        // a number 
-
   // initialize the address data structure. 
-  if (server_addr_.set (port_num, server_host.c_str ()) == -1) {
+  if (server_addr_.set (server_ip.c_str()) == -1) {
     ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] client - "),
-                ACE_TEXT ("failed to set port and hostname (%m)\n")));
+                ACE_TEXT ("[%t] Player : Network Thread - "),
+                ACE_TEXT ("failed to set IP address and port (%m)\n")));
     return 1;
   }
   
@@ -71,7 +63,7 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv [])
   // connect. 
   if (this->connector_.connect (this->peer_, server_addr_) == -1) {
     ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] client - "),
+                ACE_TEXT ("[%t] Player : Network Thread - "),
                 ACE_TEXT ("cannot connect to server (%m)\n")));
     return 1;
   }
