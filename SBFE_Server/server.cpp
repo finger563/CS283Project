@@ -29,32 +29,26 @@ string ip_addr = "127.0.0.1:9999";		// IP address from command line
 
 // command line parsing
 int parse_args (int argc, ACE_TCHAR *argv[]) {
-  int c;
-  ACE_Get_Opt get_opt (argc, argv, "i:");
-  while ((c = get_opt ()) != -1)
-    switch (c)
-      {
-      case 'i':
-        ip_addr = get_opt.opt_arg ();
-        break;
-      case '?':
-      default:
-        ACE_ERROR_RETURN ((LM_ERROR,
-                           "usage:  %s "
-						   "-i <IP address>:<port number> "
-                           "\n",
-                           argv [0]),
-                          -1);
-      }
-  // Indicates successful parsing of the command line
-  return 0;
+	int c;
+	ACE_Get_Opt get_opt (argc, argv, "i:");
+	while ((c = get_opt ()) != -1) {
+		switch (c) {
+		case 'i':
+			ip_addr = get_opt.opt_arg ();
+			break;
+		case '?':
+		default:
+			ACE_ERROR_RETURN ((LM_ERROR,
+								"usage:  %s "
+								"-i <IP address>:<port number> "
+								"\n",
+								argv [0]),
+								-1);
+		}
+	}
+	return 0; // Have successfully parsed command line args
 }
 
-// notice how we have use ACE macros for the main function and the
-// second argument. This helps write portable code across char and
-// wchar supported platforms, and make the code Unicode compliant. See
-// ACE programming guidelines for more details under ACE_wrappers/docs
-// 
 int ACE_TMAIN (int argc, ACE_TCHAR *argv [])
 {
 	// parse the arguments

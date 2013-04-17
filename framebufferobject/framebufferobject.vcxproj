@@ -64,8 +64,9 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>libcmt.lib;ACEd.lib;iphlpapi.lib;%(AdditionalDependencies)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmt.lib;</IgnoreSpecificDefaultLibraries>
       <AdditionalLibraryDirectories>.;$(ACE_ROOT)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ACEd.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -87,6 +88,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\SBFE_Server\Message.cpp" />
     <ClCompile Include="src\Engine\camera.cpp" />
     <ClCompile Include="src\Engine\object.cpp" />
     <ClCompile Include="src\Engine\matrix.cpp" />
@@ -95,9 +97,12 @@
     <ClCompile Include="src\Engine\Vertex.cpp" />
     <ClCompile Include="src\glInfo.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Network\Dummy_Event_Handler.cpp" />
+    <ClCompile Include="src\Network\Player.cpp" />
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\SBFE_Server\Message.h" />
     <ClInclude Include="src\Engine\camera.h" />
     <ClInclude Include="src\Engine\constants.h" />
     <ClInclude Include="src\Engine\object.h" />
@@ -106,6 +111,8 @@
     <ClInclude Include="src\Engine\Polygon.h" />
     <ClInclude Include="src\Engine\Vertex.h" />
     <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\Network\Dummy_Event_Handler.h" />
+    <ClInclude Include="src\network\Player.h" />
     <ClInclude Include="src\Sprites\box.h" />
     <ClInclude Include="src\Sprites\checkerboard.h" />
     <ClInclude Include="src\Sprites\defaulttexture.h" />

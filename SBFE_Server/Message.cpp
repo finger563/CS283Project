@@ -161,7 +161,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message)
 		break;
 	}
 
-	return cdr.good_bit();;
+	return cdr.good_bit();
 }
 
 bool Message::FormMessage(bool isServer)
