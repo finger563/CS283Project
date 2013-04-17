@@ -68,7 +68,7 @@ std::string msg = "";
 bool print = false;
 
 //hopefully a trigger to create chat window
-bool type = false;
+bool typing = false;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -731,13 +731,19 @@ void chat()
 	userName = "myUsername: ";
 
 	
-    if(print)
+    if(print && msg == "")
 	{
 		ss << conversation.top() << ends;
 		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
 		ss.str("");
 
 		//print = false;
+	}
+	else //hopefully shows each letter as typed.
+	{
+		ss << userName + msg << ends;
+		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+		ss.str("");
 	}
 
     // unset floating format
@@ -995,7 +1001,7 @@ void displayCB()
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	if(type == true)
+	if(typing)
 	{
 		chat();
 		
@@ -1044,23 +1050,31 @@ void keyboardCB(unsigned char key, int x, int y)
     switch(key)
     {
     case 27: // ESCAPE
-		if(!type)
+		if(!typing)
 			exit(0);
 		else
 		{//send final string array
 			//to be named later to stack
 			//shouldn't that be done already though??
-			type = false;
+			typing = false;
 			print = false;
 		}
         break;
 
 	case 13: //ENTER
-		if(type)
+		if(typing)
 		{
-			conversation.push(userName + msg);
+			if(msg != "")
+				conversation.push(userName + msg);
 			msg = "";
 			print = true;
+		}
+	case 8: //BACKSPACE
+		if(typing)
+		{
+			
+			msg.erase(msg.size()-1);
+			return;
 		}
 		//else
 			//send string array
@@ -1068,7 +1082,7 @@ void keyboardCB(unsigned char key, int x, int y)
         break;
 	}
 
-	if(type)
+	if(typing)
 	{
 		//append character to string
 		//being typed
@@ -1079,7 +1093,7 @@ void keyboardCB(unsigned char key, int x, int y)
 	switch(key)
 	{
 	case 't': //chat function
-		type = true;
+		typing = true;
 		break;
 
 	case 'q':	// rotate left

@@ -90,6 +90,7 @@
   <ItemGroup>
     <ClCompile Include="..\SBFE_Server\Message.cpp" />
     <ClCompile Include="src\Engine\camera.cpp" />
+    <ClCompile Include="src\Engine\chat.cpp" />
     <ClCompile Include="src\Engine\object.cpp" />
     <ClCompile Include="src\Engine\matrix.cpp" />
     <ClCompile Include="src\Engine\point.cpp" />
@@ -105,6 +106,7 @@
   <ItemGroup>
     <ClInclude Include="..\SBFE_Server\Message.h" />
     <ClInclude Include="src\Engine\camera.h" />
+    <ClInclude Include="src\Engine\chat.h" />
     <ClInclude Include="src\Engine\constants.h" />
     <ClInclude Include="src\Engine\object.h" />
     <ClInclude Include="src\Engine\matrix.h" />

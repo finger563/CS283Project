@@ -40,6 +40,9 @@
     <ClCompile Include="src\Network\helper_funcs.cpp">
       <Filter>src\Network</Filter>
     </ClCompile>
+    <ClCompile Include="src\Engine\chat.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -95,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="src\Network\helper_funcs.h">
       <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine\chat.h">
+      <Filter>headers\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

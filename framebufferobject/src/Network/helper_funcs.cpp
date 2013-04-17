@@ -1,6 +1,6 @@
 #include "helper_funcs.h"
 
-string ip_addr = "127.0.0.1:9999";		// IP address from command line
+string ip_addr = "129.59.105.21:10001";		// IP address from command line
 string username = "TestUser";
 
 // lock variable for mutual exclusion
