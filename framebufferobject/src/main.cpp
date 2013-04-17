@@ -362,7 +362,7 @@ int initGLUT(int argc, char **argv)
 
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_ALPHA); // display mode
 
-    glutInitWindowSize(400, 300);               // window size
+    glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);               // window size
 
     glutInitWindowPosition(100, 100);           // window location
 

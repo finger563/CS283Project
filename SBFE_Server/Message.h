@@ -49,8 +49,7 @@ struct Player_s {
 	Player_s(const Player_s &s){next=NULL;id=s.id;memset(name,0,MAX_NAME_LEN);strcpy(name,s.name);}
 	Player_s(char* n,ACE_CDR::Long i){next=NULL;id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	
-	Player_s & operator=(const Player_s &s) 
-	{
+	Player_s & operator=(const Player_s &s) {
 		if (this != &s) // protect against invalid self-assignment
         {
 			id = s.id;
@@ -59,11 +58,13 @@ struct Player_s {
         // by convention, always return *this
         return *this;
 	}
+
+	void SetName(const char* n) {memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
+	void SetID(ACE_CDR::Long i) {id = i;}
 	
 	void Link(Player_s* s){next = s;}
 	
-	bool operator==(const Player_s &b)
-	{
+	bool operator==(const Player_s &b) {
 		if ( id ==b.id && strcmp(name,b.name)==0 )
 			return true;
 		else
@@ -81,8 +82,7 @@ struct Object_s {
 	Object_s(const Object_s &a){next=NULL;type=a.type;id=a.id;strcpy(content_,a.content_);}
 	Object_s(ObjectType t, ACE_CDR::Long i,char* c){next=NULL;type=t;id=i;strcpy(content_,c);}
 	
-	Object_s & operator=(const Object_s &a) 
-	{
+	Object_s & operator=(const Object_s &a) {
 		if (this != &a) // protect against invalid self-assignment
         {
 			type = a.type;
@@ -95,8 +95,7 @@ struct Object_s {
 
 	void Link(Object_s* a){next = a;}
 
-	bool operator==(const Object_s &b)
-	{
+	bool operator==(const Object_s &b) {
 		if ( id ==b.id && type == b.type )
 			return true;
 		else
@@ -111,26 +110,22 @@ private:
 	Player_s	player_;
 	char		content_[MAX_CONT_LEN];
 public:
-	Message() : object_(),player_()
-	{
+	Message() : object_(),player_() {
 		type_ = REGISTER;
 		memset(content_,0,MAX_CONT_LEN);
 	}
-	Message(const Message &m) : object_(m.Object()),player_(m.Player())
-	{
+	Message(const Message &m) : object_(m.Object()),player_(m.Player()) {
 		this->type_ = m.Type();
 		memset(content_,0,MAX_CONT_LEN);
 		strcpy(this->content_,m.Content());
 	}
-	Message(MessageType t,Object_s &o,Player_s &p, char* c) : object_(o),player_(p)
-	{
+	Message(MessageType t,Object_s &o,Player_s &p, char* c) : object_(o),player_(p) {
 		this->type_ = t;
 		memset(content_,0,MAX_CONT_LEN);
 		strcpy(this->content_,c);
 	}
 	~Message(){}
-	Message & operator=(const Message & m)
-	{
+	Message & operator=(const Message & m) {
 		if (this != &m) // protect against invalid self-assignment
         {
 			type_ = m.Type();

@@ -31,6 +31,8 @@ using namespace std;
 Teacher_c teacher;
 
 peer_s con_peers;
+	
+ACE_Time_Value period_t (1);
 
 // constructor (pass a pointer to the reactor). By default we assume
 // a system-wide default reactor that ACE defines
@@ -51,37 +53,36 @@ Dummy_Data_Handler::~Dummy_Data_Handler (void)
 int Dummy_Data_Handler::open (void)
 {
 #if defined(DEBUG)
-  // for debugging
-  cout << "Dummy_Data_Handler::open invoked" << endl;
+	// for debugging
+	cout << "Dummy_Data_Handler::open invoked" << endl;
 #endif
 
-  // we need to register ourselves (note that we are of the type
-  // Event_Handler) with the reactor. The event that we as a data
-  // handler are interested in is incoming data, which is added using
-  // the READ_MASK
-  //
-  // Note that in the constructor we had passed a pointer to the
-  // reactor to our underlying event handler. We can retrieve that
-  // pointer by invoking the "reactor ()" method. Invoke the register
-  // handler method on that reactor
-  if (this->reactor ()
-      ->register_handler (this,  // register ourselves with the reactor
-                                 // indicating it that we are interested
-                                 // in reading data
-                          ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] Dummy_Data_Handler::open - "),
-                ACE_TEXT ("failed to register handler (%m)\n")));
-    return -1;
-  }
+	// we need to register ourselves (note that we are of the type
+	// Event_Handler) with the reactor. The event that we as a data
+	// handler are interested in is incoming data, which is added using
+	// the READ_MASK
+	//
+	// Note that in the constructor we had passed a pointer to the
+	// reactor to our underlying event handler. We can retrieve that
+	// pointer by invoking the "reactor ()" method. Invoke the register
+	// handler method on that reactor
+	if (this->reactor ()
+		->register_handler (this,  // register ourselves with the reactor
+									// indicating it that we are interested
+									// in reading data
+							ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%P] Dummy_Data_Handler::open - "),
+					ACE_TEXT ("failed to register handler (%m)\n")));
+		return -1;
+	}
   
-  ACE_Time_Value period_t (1);
-  this->reactor()->schedule_timer(this,
-								  0,
-								  period_t);
+	this->reactor()->schedule_timer(this,
+									0,
+									period_t);
 
-  // everything went well. Return success
-  return 0;
+	// everything went well. Return success
+	return 0;
 }
 
 /* now define the event handler's callback methods  */
@@ -90,42 +91,42 @@ int Dummy_Data_Handler::open (void)
 int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 {
 #if defined(DEBUG)
-  // for debugging
-  ACE_DEBUG ((LM_DEBUG,
-              ACE_TEXT ("Dummy_Data_Handler::handle_input invoked\n")));
+	// for debugging
+	ACE_DEBUG ((LM_DEBUG,
+				ACE_TEXT ("Dummy_Data_Handler::handle_input invoked\n")));
 #endif
-  // here is where we receive all data. In our case this is just a dummy
-  // program where we receive some data and we send a reply back.
-  string reply;
+	// here is where we receive all data. In our case this is just a dummy
+	// program where we receive some data and we send a reply back.
+	string reply;
 
-  // note that unless there is a well defined protocol between the two
-  // ends we never 
-  //ssize_t bytesReceived = this->peer_.recv (buffer, 1024);
+	// note that unless there is a well defined protocol between the two
+	// ends we never 
+	//ssize_t bytesReceived = this->peer_.recv (buffer, 1024);
 
 	Message mymessage;
-  ssize_t bytesReceived = this->recv_message(mymessage);
+	ssize_t bytesReceived = this->recv_message(mymessage);
 	  
-  if (bytesReceived == 0) {
-    // we need to handle this case since it would mean that the connection is
-    // closed from the other side.  So it is time for this handler to go too.
-    ACE_DEBUG ((LM_DEBUG,
-                ACE_TEXT ("Dummy_Data_Handler::handle_input - 0 bytes received")
-                ACE_TEXT (" => peer closed connection\n")));
+	if (bytesReceived == 0) {
+		// we need to handle this case since it would mean that the connection is
+		// closed from the other side.  So it is time for this handler to go too.
+		ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Dummy_Data_Handler::handle_input - 0 bytes received")
+					ACE_TEXT (" => peer closed connection\n")));
 
-    // we let the reactor trigger the handle close by returning a -1 to
-    // the reactor
-    return -1;
+		// we let the reactor trigger the handle close by returning a -1 to
+		// the reactor
+		return -1;
 
-  } else if (bytesReceived == -1) {
-    // this is an error condition
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("%s force quit their client application!\n"),
-				teacher.Player(myid)));
-    // we let the reactor trigger the handle close
-    return -1;
+	} else if (bytesReceived == -1) {
+		// this is an error condition
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("%s force quit their client application!\n"),
+					teacher.Player(myid)));
+		// we let the reactor trigger the handle close
+		return -1;
 
-  } else {
-    // some data is received.
+	} else {
+		// some data is received.
 #if defined(DEBUG)
 		cout << "Message type: " << mymessage.Type() << endl
 			<< "Object type: " << mymessage.Object().type << endl
@@ -165,9 +166,9 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
                 ACE_TEXT ("Error: Not a valid message type!\n")));
 			break;
 		}
-  }
-  // success
-  return 0;
+	}
+	// success
+	return 0;
 }
 
 int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
@@ -348,8 +349,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 			}
 		}
 	}
-	
-  ACE_Time_Value period_t (1);
+
   this->reactor()->schedule_timer(this,
 								  0,
 								  period_t);

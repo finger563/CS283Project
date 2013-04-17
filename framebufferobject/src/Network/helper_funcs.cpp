@@ -3,12 +3,15 @@
 string ip_addr = "127.0.0.1:9999";		// IP address from command line
 string username = "TestUser";
 
+extern Player_c player;
+
 // lock variable for mutual exclusion
 ACE_Thread_Mutex  lock;
 
 // command line parsing
 int parse_args (int argc, ACE_TCHAR *argv[]) {
 	int c;
+	Player_s info;
 	ACE_Get_Opt get_opt (argc, argv, "i:n:");
 	while ((c = get_opt ()) != -1) {
 		switch (c) {
@@ -29,6 +32,8 @@ int parse_args (int argc, ACE_TCHAR *argv[]) {
 								-1);
 		}
 	}
+	info.SetName(username.c_str());
+	player.Info(info);
 	return 0; // Have successfully parsed command line args
 }
 

@@ -23,8 +23,10 @@ using namespace std;
 #include "ace/OS_NS_string.h"
 #include "Dummy_Event_Handler.h"
 
-#include "Player.h"
 Player_c player;
+
+ACE_Time_Value period_t (1);
+
 
 // constructor (pass a pointer to the reactor). By default we assume
 // a system-wide default reactor that ACE defines
@@ -49,55 +51,61 @@ int Dummy_Event_Handler::open (string server_ip)
   cout << "Dummy_Event_Handler::open invoked" << endl;
 #endif
   
-  // initialize the address data structure. 
-  if (server_addr_.set (server_ip.c_str()) == -1) {
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%t] Player : Network Thread - "),
-                ACE_TEXT ("failed to set IP address and port (%m)\n")));
-    return 1;
-  }
+	// initialize the address data structure. 
+	if (server_addr_.set (server_ip.c_str()) == -1) {
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%t] Player : Network Thread - "),
+					ACE_TEXT ("failed to set IP address and port (%m)\n")));
+		return 1;
+	}
   
-  // now let the client connect to the server.  Note how the connect
-  // factory method creates a SOCK_Stream for us. Note that since the
-  // third parameter (which is a timeout) is zero, we do a blocking
-  // connect. 
-  if (this->connector_.connect (this->peer_, server_addr_) == -1) {
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%t] Player : Network Thread - "),
-                ACE_TEXT ("cannot connect to server (%m)\n")));
-    return 1;
-  }
+	// now let the client connect to the server.  Note how the connect
+	// factory method creates a SOCK_Stream for us. Note that since the
+	// third parameter (which is a timeout) is zero, we do a blocking
+	// connect. 
+	if (this->connector_.connect (this->peer_, server_addr_) == -1) {
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%t] Player : Network Thread - "),
+					ACE_TEXT ("cannot connect to server (%m)\n")));
+		return 1;
+	}
 
-  // we need to register ourselves (note that we are of the type
-  // Event_Handler) with the reactor. The event that we as a data
-  // handler are interested in is incoming data, which is added using
-  // the READ_MASK
-  //
-  // Note that in the constructor we had passed a pointer to the
-  // reactor to our underlying event handler. We can retrieve that
-  // pointer by invoking the "reactor ()" method. Invoke the register
-  // handler method on that reactor
-  if (this->reactor ()
-      ->register_handler (this,  // register ourselves with the reactor
-                                 // indicating it that we are interested
-                                 // in reading data
-                          ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] Dummy_Event_Handler::open - "),
-                ACE_TEXT ("failed to register handler (%m)\n")));
-    return -1;
-  }
+	// we need to register ourselves (note that we are of the type
+	// Event_Handler) with the reactor. The event that we as a data
+	// handler are interested in is incoming data, which is added using
+	// the READ_MASK
+	//
+	// Note that in the constructor we had passed a pointer to the
+	// reactor to our underlying event handler. We can retrieve that
+	// pointer by invoking the "reactor ()" method. Invoke the register
+	// handler method on that reactor
+	if (this->reactor ()
+			->register_handler (this,  // register ourselves with the reactor
+										// indicating it that we are interested
+										// in reading data
+								ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%P] Dummy_Event_Handler::open - "),
+					ACE_TEXT ("failed to register handler (%m)\n")));
+		return -1;
+	}
 
-  // disable non blocking I/O
-  this->peer_.disable (ACE_NONBLOCK);
-  
-  ACE_Time_Value period_t (1);
-  this->reactor()->schedule_timer(this,
-								  0,
-								  period_t);
+	// disable non blocking I/O
+	this->peer_.disable (ACE_NONBLOCK);
 
-  // everything went well. Return success
-  return 0;
+	this->reactor()->schedule_timer(this,
+									0,
+									period_t);
+
+	// REGISTER THE PLAYER WITH THE SERVER
+	Message mymessage;
+	mymessage.Type(REGISTER);
+	mymessage.Player(player.Info());
+	player.Register();
+	this->send(mymessage);
+
+	// everything went well. Return success
+	return 0;
 }
 
 /* now define the event handler's callback methods  */
@@ -288,20 +296,17 @@ int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, co
 		switch(mymessage.Type())
 		{
 		case REGISTER:
-			if ( player.Registered() )
-			{
+			if ( player.Registered() ) {
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Already Registered!\n")));
 				break;
 			}
 			player.Register();
-			player.Info(mymessage.Player());
 			this->send(mymessage);
 			break;
 		case SHOOT:
 		case CHAT:
-			if ( ! player.Registered() )
-			{
+			if ( ! player.Registered() ) {
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Need to be registered first!\n")));
 				break;
@@ -315,7 +320,6 @@ int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, co
 		}
 	}
 	
-  ACE_Time_Value period_t (1);
   this->reactor()->schedule_timer(this,
 								  0,
 								  period_t);
