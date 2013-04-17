@@ -31,6 +31,8 @@ using namespace std;
 Teacher_c teacher;
 
 peer_s con_peers;
+
+ACE_CDR::Long numPlayers = 0;
 	
 ACE_Time_Value period_t (1);
 
@@ -139,6 +141,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 		switch (mymessage.Type())
 		{
 		case REGISTER:
+			mymessage.Player().SetID(numPlayers++);
 			if ( teacher.Register(mymessage.Player()) )
 			{
 				myid = mymessage.Player().id;
