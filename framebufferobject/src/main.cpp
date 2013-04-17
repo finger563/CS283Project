@@ -380,6 +380,8 @@ int initGLUT(int argc, char **argv)
 	glutSpecialFunc(specialKeyCB);			// used for the arrow keys etc.
     glutMouseFunc(mouseCB);
     glutMotionFunc(mouseMotionCB);
+	
+	glutSetCursor(GLUT_CURSOR_NONE);		// used to hide the cursor
 
     return handle;
 }
@@ -1227,7 +1229,8 @@ void mouseCB(int button, int state, int x, int y)
         if(state == GLUT_DOWN)
         {
             mouseLeftDown = true;
-
+			
+			shot.projectileInit(camera.getForward(),camera.getPosition());
 			objectlist.push_back(shot);
         }
         else if(state == GLUT_UP)
@@ -1248,12 +1251,15 @@ void mouseCB(int button, int state, int x, int y)
 
 void mouseMotionCB(int x, int y)
 {
+    static int centerX = glutGet(SCREEN_WIDTH) / 2;
+    static int centerY = glutGet(SCREEN_HEIGHT) / 2;
+
     if(mouseLeftDown)
     {
         //cameraAngleY += (x - mouseX);
         //cameraAngleX += (y - mouseY);
-        mouseX = x;
-        mouseY = y;
+        //mouseX = x;
+        //mouseY = y;
     }
     if(mouseRightDown)
     {
@@ -1261,8 +1267,9 @@ void mouseMotionCB(int x, int y)
         //if(cameraDistance < 2.0f)
         //    cameraDistance = 2.0f;
 
-        mouseY = y;
+        //mouseY = y;
     }
+    glutWarpPointer(centerX, centerY);
 }
 
 
