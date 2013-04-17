@@ -43,6 +43,9 @@ enum ObjectType {	// These are the types of dynamic objects which need to be tra
 struct Player_s {
 	char			name[MAX_NAME_LEN];
 	ACE_CDR::Long	id;
+	float x,y,z;		// position vector
+	float hx,hy,hz;		// heading vector
+	float vx,vy,vz;		// velocity vector
 	Player_s*		next;
 	
 	Player_s() {next=NULL;id=0;memset(name,0,MAX_NAME_LEN);}
@@ -61,6 +64,9 @@ struct Player_s {
 
 	void SetName(const char* n) {memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	void SetID(ACE_CDR::Long i) {id = i;}
+	void SetPos(const float _x, const float _y, const float _z) { x=_x;y=_y;z=_z;}
+	void SetHeading(const float _x, const float _y, const float _z) { hx=_x;hy=_y;hz=_z;}
+	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
 	
 	void Link(Player_s* s){next = s;}
 	
@@ -75,6 +81,9 @@ struct Player_s {
 struct Object_s {
 	ObjectType		type;
 	ACE_CDR::Long	id;
+	float x,y,z;		// position vector
+	float hx,hy,hz;		// heading vector
+	float vx,vy,vz;		// velocity vector
 	char			content_[MAX_CONT_LEN];
 	Object_s*	next;
 	
@@ -92,6 +101,13 @@ struct Object_s {
         // by convention, always return *this
         return *this;
 	}
+	
+	void SetID(ACE_CDR::Long i) {id = i;}
+	void SetType(ObjectType t) { type = t; }
+	void SetContent(const char* n) {memset(content_,0,MAX_NAME_LEN);strcpy(content_,n);}
+	void SetPos(const float _x, const float _y, const float _z) { x=_x;y=_y;z=_z;}
+	void SetHeading(const float _x, const float _y, const float _z) { hx=_x;hy=_y;hz=_z;}
+	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
 
 	void Link(Object_s* a){next = a;}
 
