@@ -5,7 +5,7 @@
 // Date Created : Feb 16, 2012
 //
 //
-// Teacher header file.
+// Server header file.
 //
 
 #if !defined (_CS387_TEACHER_H_)
@@ -19,17 +19,17 @@ using namespace std;
 
 #include <ace/SOCK_Stream.h>      // for data comm functionality
 
-class Teacher_c {
+class Server_c {
 private:
 	Object_s	*objects;
 	Player_s	*players;
 	string		*chats;
 public:
-	Teacher_c() {objects=NULL;players=NULL;chats=NULL;}
-	Teacher_c(Teacher_c& t) {*this=t;}
-	~Teacher_c() {delete objects,players,this;}
+	Server_c() {objects=NULL;players=NULL;chats=NULL;}
+	Server_c(Server_c& t) {*this=t;}
+	~Server_c() {delete objects,players,this;}
 
-	Teacher_c & operator=(Teacher_c& t)
+	Server_c & operator=(Server_c& t)
 	{
 		if (this != &t) // protect against invalid self-assignment
         {

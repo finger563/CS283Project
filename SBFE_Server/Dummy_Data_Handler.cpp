@@ -26,9 +26,9 @@ using namespace std;
 #include "Dummy_Data_Handler.h"
 #include "Dummy_Accept_Handler.h"
 
-#include "Teacher.h"
+#include "Server.h"
 
-Teacher_c teacher;
+Server_c teacher;
 
 peer_s con_peers;
 

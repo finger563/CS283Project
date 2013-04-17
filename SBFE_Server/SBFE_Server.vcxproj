@@ -84,13 +84,12 @@
     <ClCompile Include="Dummy_Data_Handler.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="server.cpp" />
-    <ClCompile Include="Teacher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dummy_Accept_Handler.h" />
     <ClInclude Include="Dummy_Data_Handler.h" />
     <ClInclude Include="Message.h" />
-    <ClInclude Include="Teacher.h" />
+    <ClInclude Include="Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
