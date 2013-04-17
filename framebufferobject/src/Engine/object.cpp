@@ -303,8 +303,8 @@ void Object::projectileInit(Vector3D head, Vector3D pos)
 	//on where the mouse clicks
 	heading = head;
 	position = pos;
-	generateCube(2);
-	counter++;
+	generateCube(1);
+	counter=1;
 }
 
 void Object::projectileMove()
@@ -313,7 +313,7 @@ void Object::projectileMove()
 	position.z++; //moves cube forward
 	counter++;
 
-	if(counter == 25)
+	if(counter >= 25)
 		kill = true;
 }
 

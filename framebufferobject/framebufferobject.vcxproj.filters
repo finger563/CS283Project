@@ -28,6 +28,18 @@
     <ClCompile Include="src\Engine\Polygon.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\SBFE_Server\Message.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Network\Dummy_Event_Handler.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Network\Player.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Network\helper_funcs.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -72,6 +84,18 @@
     <ClInclude Include="src\Textures.h">
       <Filter>headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\SBFE_Server\Message.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\Dummy_Event_Handler.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\network\Player.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\helper_funcs.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -88,6 +112,12 @@
     </Filter>
     <Filter Include="headers\Sprites">
       <UniqueIdentifier>{ebc2d286-daf3-443d-9f40-82b9f8f55e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Network">
+      <UniqueIdentifier>{e4f1bcb1-ed0c-4850-bbd8-6970886aee33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Network">
+      <UniqueIdentifier>{79eaabac-9f8b-421f-ace5-875b1b71426c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

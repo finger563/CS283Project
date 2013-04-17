@@ -35,17 +35,17 @@ public:
 	{
 		if (this != &t) // protect against invalid self-assignment
         {
-			objects = t.Assignments();
-			players = t.Students();
-			chats = t.Questions();
+			objects = t.Objects();
+			players = t.Players();
+			chats = t.Chats();
         }
         // by convention, always return *this
         return *this;
 	}
 
-	Object_s * Assignments() {return objects;}
-	Player_s * Students() {return players;}
-	string * Questions() {return chats;}
+	Object_s * Objects() {return objects;}
+	Player_s * Players() {return players;}
+	string * Chats() {return chats;}
 
 	void Questions(Object_s& q) {
 	}
@@ -55,7 +55,7 @@ public:
 		{
 			if ( s == *players )
 				return true;
-			Player_s* tmp=Students();
+			Player_s* tmp=Players();
 			while (tmp!=NULL)
 			{
 				if ( s == *tmp ) 
@@ -64,7 +64,7 @@ public:
 			}
 		}
 		ACE_ERROR ((LM_ERROR,
-			ACE_TEXT ("Error, student has not registered!\n")));
+			ACE_TEXT ("Error, player has not registered!\n")));
 		return false;
 	}
 
@@ -73,7 +73,7 @@ public:
 		{
 			if ( id == players->id )
 				return players->name;
-			Player_s* tmp=Students();
+			Player_s* tmp=Players();
 			while (tmp!=NULL)
 			{
 				if ( id == tmp->id ) 
@@ -82,7 +82,7 @@ public:
 			}
 		}
 		ACE_ERROR ((LM_ERROR,
-			ACE_TEXT ("Error, student has not registered!\n")));
+			ACE_TEXT ("Error, player has not registered!\n")));
 		return NULL;
 	}
 
@@ -155,7 +155,7 @@ public:
 
 	void Dismiss() {delete players,objects,chats;players=NULL;objects=NULL;chats=NULL;}
 
-	bool Assign(Object_s& a)
+	bool Create(Object_s& a)
 	{
 		if ( objects==NULL)
 		{
@@ -167,7 +167,7 @@ public:
 			if ( a == *objects ) 
 			{
 				ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("Error, you have already assigned this!\n")));
+					ACE_TEXT ("Error, object has already been created!\n")));
 				return false;
 			}
 			Object_s* tmp;
@@ -176,7 +176,7 @@ public:
 				if ( a == *tmp ) 
 				{
 					ACE_ERROR ((LM_ERROR,
-						ACE_TEXT ("Error, you have already assigned this!\n")));
+						ACE_TEXT ("Error, object has already been created!\n")));
 					return false;
 				}
 			}

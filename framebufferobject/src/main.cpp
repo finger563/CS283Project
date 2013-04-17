@@ -7,7 +7,6 @@
 // GLUT is the toolkit to interface with the OS
 #include <GL/freeglut.h>
 
-
 #include "glext.h"
 #include <iostream>
 #include <sstream>
@@ -32,9 +31,6 @@ using std::ends;
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
-// THESE ARE DEBUGGING/TEST DEFINES:
-#define TEXTUREMAP			1
-
 short display_buffer[SIZE_X*SIZE_Y];
 float z_buffer[SIZE_X*SIZE_Y];
 
@@ -44,20 +40,10 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 	 rotz = 0,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
-#if 1
 Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
 					 Vertex(13.333,6.666,0,1,1,0),
 					 Vertex(-6.666,-13.333,0,1,0,1),
 					 Vertex(),3,Vector3D(0,0,-1),TEXTURED);
-#else
-Poly testpoly = Poly(Vertex(-10,10,0,1,0,0),
-					 Vertex(10,10,0,1,1,0),
-					 Vertex(10,-10,0,1,1,1),
-					 Vertex(-10,-10,0,1,0,1),
-					 4,Vector3D(0,0,-1),TEXTURED,Vector3D(1,1,1),
-					 box,boxtexwidth,boxtexheight);
-#endif
-Poly renderpoly;
 
 Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
@@ -99,6 +85,9 @@ Matrix rot;		// debug/testing for rotating objects
 
 Camera camera;
 
+// INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
+
+#include "Network\helper_funcs.h"
 
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
 void displayCB();
@@ -169,10 +158,46 @@ PFNGLUNMAPBUFFERARBPROC pglUnmapBufferARB = 0;                   // unmap VBO pr
 #define glUnmapBufferARB          pglUnmapBufferARB
 #endif
 
-
 ///////////////////////////////////////////////////////////////////////////////
-int main(int argc, char **argv)
+int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 {    
+	// parse the arguments
+	ACE_DEBUG ((LM_DEBUG,
+				"Player: parse the args\n"));
+	if (parse_args (argc,argv) == -1) {
+		ACE_ERROR ((LM_ERROR, ACE_TEXT ("(%P|%t) %p\n"), 
+					ACE_TEXT ("parse failed")));
+		return 0;
+	}
+	
+	// grab a thread manager (we get the global singleton instance)
+	ACE_Thread_Manager *thr_mgr = ACE_Thread_Manager::instance ();
+	FuncArg_t *args;
+	// declare a variable to hold the array of thread IDs
+	ACE_thread_t  tid [1];
+	
+	// now spawn off NUM_THREADS passing it the thread entry function
+	// and the argument we want to pass it. Here I am passing it a
+	// topology. If you want addtional things to be passed, either have
+	// them globally defined, which is not elegant, or have a complex
+	// data structure that holds all the info you want to be passed.
+	int group_id = 
+		thr_mgr->spawn_n (tid,          // all the threads created
+							1,			// tell how many
+							(ACE_THR_FUNC) thread_func,  // entry point to the thread
+							0,    // argument you want to pass
+							THR_NEW_LWP | THR_JOINABLE
+							// we want threads whose return status can be
+							// monitored. Moreover, we want a lightweight
+							// process.
+							);
+
+	if (group_id == -1) {
+		ACE_ERROR ((LM_ERROR, ACE_TEXT ("(%P|%t) %p\n"), 
+					ACE_TEXT ("spawn_n")));
+		return -1;
+	}
+
     rmz.data[0][0] = cos(rot_angle);
     rmz.data[0][1] = -sin(rot_angle);
     rmz.data[1][0] = sin(rot_angle);
@@ -197,13 +222,6 @@ int main(int argc, char **argv)
 	rmxz = rmx*rmz;
 	rmyz = rmy*rmz;
     rmxyz = rmz*rmxy;
-	//rmz.SetRotation(rot_angle,Vector3D(0,0,1));
-	//rmy.SetRotation(rot_angle,Vector3D(0,1,0));
-	//rmx.SetRotation(rot_angle,Vector3D(1,0,0));
-	//rmxy.SetRotation(rot_angle,Vector3D(1,1,0));
-	//rmxz.SetRotation(rot_angle,Vector3D(1,0,1));
-	//rmyz.SetRotation(rot_angle,Vector3D(0,1,1));
-	//rmxyz.SetRotation(rot_angle,Vector3D(1,1,1));
 
 	// Structure of a transformation matrix:
 	// ( r=rotation, p=projection, t=translation )
@@ -364,6 +382,8 @@ int initGLUT(int argc, char **argv)
 	glutSpecialFunc(specialKeyCB);			// used for the arrow keys etc.
     glutMouseFunc(mouseCB);
     glutMotionFunc(mouseMotionCB);
+	
+	glutSetCursor(GLUT_CURSOR_NONE);		// used to hide the cursor
 
     return handle;
 }
@@ -555,7 +575,6 @@ void updatePixels(GLubyte* dst, int size)
 			z_buffer[x + y*SIZE_X] = DEFAULT_Z_BUFFER;
 		}
 
-#if 1
 	renderlist.clear();
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
@@ -602,25 +621,6 @@ void updatePixels(GLubyte* dst, int size)
 			--it;
 		}
 	}
-#else
-	renderpoly = testpoly;
-			
-	Vector3D tmp = Vector3D(0,0,30) + camera.getPosition();
-	worldToCamera.SetIdentity();
-	worldToCamera.data[3][0] = tmp.x;
-	worldToCamera.data[3][1] = tmp.y;
-	worldToCamera.data[3][2] = tmp.z;
-	worldToCamera = worldToCamera*camera.getRotation();
-	renderpoly.TransformToCamera( worldToCamera );
-	renderpoly.TransformToPerspective( perspectiveProjection );
-	renderpoly.Clip();
-	renderpoly.HomogeneousDivide();
-	renderpoly.TransformToPixel( projectionToPixel );
-    for (int y=SIZE_Y-1;y>=0;y--) {
-		renderpoly.Rasterize(y);
-	}
-	testpoly.Transform(rot);
-#endif
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i)
@@ -1231,7 +1231,8 @@ void mouseCB(int button, int state, int x, int y)
         if(state == GLUT_DOWN)
         {
             mouseLeftDown = true;
-
+			
+			shot.projectileInit(camera.getForward(),camera.getPosition());
 			objectlist.push_back(shot);
         }
         else if(state == GLUT_UP)
@@ -1252,12 +1253,15 @@ void mouseCB(int button, int state, int x, int y)
 
 void mouseMotionCB(int x, int y)
 {
+    static int centerX = glutGet(SCREEN_WIDTH) / 2;
+    static int centerY = glutGet(SCREEN_HEIGHT) / 2;
+
     if(mouseLeftDown)
     {
         //cameraAngleY += (x - mouseX);
         //cameraAngleX += (y - mouseY);
-        mouseX = x;
-        mouseY = y;
+        //mouseX = x;
+        //mouseY = y;
     }
     if(mouseRightDown)
     {
@@ -1265,8 +1269,9 @@ void mouseMotionCB(int x, int y)
         //if(cameraDistance < 2.0f)
         //    cameraDistance = 2.0f;
 
-        mouseY = y;
+        //mouseY = y;
     }
+    glutWarpPointer(centerX, centerY);
 }
 
 

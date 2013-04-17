@@ -17,41 +17,56 @@
 #include "ace/OS_NS_unistd.h"
 //#include "ace/OS_NS_string.h"
 #include "ace/INET_Addr.h"
+#include "ace/Get_Opt.h"		// for parsing command line arguments
 
 #include "ace/Select_Reactor.h"  // we use the Select_Reactor
 #include "Dummy_Accept_Handler.h"  // this is the event handler we need
 
 using namespace std;
 
-// notice how we have use ACE macros for the main function and the
-// second argument. This helps write portable code across char and
-// wchar supported platforms, and make the code Unicode compliant. See
-// ACE programming guidelines for more details under ACE_wrappers/docs
-// 
+ACE_INET_Addr   server_addr;			// server address
+string ip_addr = "127.0.0.1:9999";		// IP address from command line
+
+// command line parsing
+int parse_args (int argc, ACE_TCHAR *argv[]) {
+	int c;
+	ACE_Get_Opt get_opt (argc, argv, "i:");
+	while ((c = get_opt ()) != -1) {
+		switch (c) {
+		case 'i':
+			ip_addr = get_opt.opt_arg ();
+			break;
+		case '?':
+		default:
+			ACE_ERROR_RETURN ((LM_ERROR,
+								"usage:  %s "
+								"-i <IP address>:<port number> "
+								"\n",
+								argv [0]),
+								-1);
+		}
+	}
+	return 0; // Have successfully parsed command line args
+}
+
 int ACE_TMAIN (int argc, ACE_TCHAR *argv [])
 {
-  ACE_INET_Addr   server_addr;     // server address
-  u_short port_num;                // port number is unsigned short
-
-
-  /* Now let us initialize the server */
-
-  // in order to ensure that there is no conflict on the listen
-  // port, I am going to use the process ID, which is unique on the
-  // OS, and add 10000 to it. 
-  // For our Linux labs, replace getpid with getuid.
-  port_num = 10000 + (u_short) ACE_OS::getpid ();
-  cout << "Server will use port = " << port_num << endl;
-
-
-  // initialize the address data structure.  INADDR_ANY is by
-  // default. 
-  if (server_addr.set (port_num) == -1) {
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] server - "),
-                ACE_TEXT ("failed to set port (%m)\n")));
-    return 1;
-  }
+	// parse the arguments
+	ACE_DEBUG ((LM_DEBUG,
+				"Server: parse the args\n"));
+	if (parse_args (argc,argv) == -1) {
+		ACE_ERROR ((LM_ERROR, ACE_TEXT ("(%P|%t) %p\n"), 
+					ACE_TEXT ("parse failed")));
+		return 0;
+	}
+	
+	// Set the IP address for the server
+	if (server_addr.set (ip_addr.c_str()) == -1) {
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%P] server - "),
+					ACE_TEXT ("failed to set ip address (%m)\n")));
+		return 1;
+	}
 
 #if 0
   /**********************  Correct and useful Code ******************
@@ -81,37 +96,40 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv [])
   // ACE's reactor
 #endif
 
-  /* For this demonstration we will use the ACE Reactor available from the
-     Singleton instance in ACE
-  */
-  ACE_Reactor *reactor = ACE_Reactor::instance ();  // static class method (returns the same instance every time - singleton pattern)
+	/* For this demonstration we will use the ACE Reactor available from the
+		Singleton instance in ACE
+	*/
+	ACE_Reactor *reactor = ACE_Reactor::instance ();  // static class method (returns the same instance every time - singleton pattern)
 
-  // instantiate our server object. Note that its constructor needs a
-  // pointer to a reactor. Let us pass it the reactor we just
-  // instantiated above.
-  Dummy_Accept_Handler  accept_handler (reactor); 
+	// instantiate our server object. Note that its constructor needs a
+	// pointer to a reactor. Let us pass it the reactor we just
+	// instantiated above.
+	Dummy_Accept_Handler  accept_handler (reactor); 
 
-  // the first step for a server is to initialize itself on the port
-  // and host network interface.
-  if (accept_handler.open (server_addr) == -1) {
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] server - "),
-                ACE_TEXT ("failed to initialize server (%m)\n")));
-    return 1;
-  }
+	// the first step for a server is to initialize itself on the port
+	// and host network interface.
+	if (accept_handler.open (server_addr) == -1) {
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%P] server - "),
+					ACE_TEXT ("failed to initialize server (%m)\n")));
+		return 1;
+	}
+	char myip[32];
+	server_addr.addr_to_string(myip,32);
+	cout << "Server running on " << myip << endl;
 
-  // now simply delegate everything to the reactor and let it call us
-  // back whenever there are events
-  if (reactor->run_reactor_event_loop () == -1) {
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] server - "),
-                ACE_TEXT ("failed in reactor's event loop (%m)\n")));
-    return 1;
-  }
+	// now simply delegate everything to the reactor and let it call us
+	// back whenever there are events
+	if (reactor->run_reactor_event_loop () == -1) {
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%P] server - "),
+					ACE_TEXT ("failed in reactor's event loop (%m)\n")));
+		return 1;
+	}
 
-  // unless we use the reactor's notify mechanism (not demonstrated in
-  // this sample), and if there are no errors that kick us out, we
-  // shall never reach this point :-) 
+	// unless we use the reactor's notify mechanism (not demonstrated in
+	// this sample), and if there are no errors that kick us out, we
+	// shall never reach this point :-) 
 
-  return 0;
+	return 0;
 }

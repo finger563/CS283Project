@@ -6,9 +6,12 @@ Camera::Camera():up(0, 1, 0), forward(0, 0, 1), right(1, 0, 0), position(0, 0, 0
 }
 
 void Camera::Normalize() {
-	up = up/up.w;
-	forward = forward/forward.w;
-	right = right/right.w;
+	//up = up/up.w;
+	up = normalize(up);
+	//forward = forward/forward.w;
+	forward = normalize(forward);
+	//right = right/right.w;
+	right = normalize(right);
 }
 
 Point3D Camera::getPosition() {
@@ -39,7 +42,7 @@ void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or sho
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 //Normalize();
+	 Normalize();
 }
 
 void Camera::Rotate (float x, float y, float z) 
@@ -52,7 +55,7 @@ void Camera::Rotate (float x, float y, float z)
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 //Normalize();
+	 Normalize();
 }
 
 void Camera::Rotate (float x, Vector3D v) 
@@ -65,7 +68,7 @@ void Camera::Rotate (float x, Vector3D v)
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
-	 //Normalize();
+	 Normalize();
 }
 
 Matrix Camera::getRotation()

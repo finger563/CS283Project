@@ -1,12 +1,10 @@
 // $Id$
 //
-// Author: Aniruddha Gokhale
-// Date  : Created: Feb 17, 2007
-//         Updated: Feb  4, 2008
-//         Updated: Feb 21, 2009
+// Author: William Emfinger
+// Date  : Created: Feb 21, 2012
 //
 //
-// Dummy_Data_Handler implementation file.
+// Dummy_Event_Handler implementation file.
 // 
 // We demonstrate the use of the reactor framework in conjunction with
 // the acceptor-connector framework
@@ -23,18 +21,14 @@ using namespace std;
 
 // headers necessary for this file
 #include "ace/OS_NS_string.h"
-#include "Dummy_Data_Handler.h"
-#include "Dummy_Accept_Handler.h"
+#include "Dummy_Event_Handler.h"
 
-#include "Teacher.h"
-
-Teacher_c teacher;
-
-peer_s con_peers;
+#include "Player.h"
+Player_c player;
 
 // constructor (pass a pointer to the reactor). By default we assume
 // a system-wide default reactor that ACE defines
-Dummy_Data_Handler::Dummy_Data_Handler (ACE_Reactor *r)
+Dummy_Event_Handler::Dummy_Event_Handler (ACE_Reactor *r)
 // simply pass on the pointer to the reactor to the underlying event
 // handler 
   : ACE_Event_Handler (r)
@@ -43,17 +37,36 @@ Dummy_Data_Handler::Dummy_Data_Handler (ACE_Reactor *r)
 
 
 // destructor (does nothing)
-Dummy_Data_Handler::~Dummy_Data_Handler (void)
+Dummy_Event_Handler::~Dummy_Event_Handler (void)
 {
 }
 
 // initialization method that registers ourselves with the reactor. 
-int Dummy_Data_Handler::open (void)
+int Dummy_Event_Handler::open (string server_ip)
 {
 #if defined(DEBUG)
   // for debugging
-  cout << "Dummy_Data_Handler::open invoked" << endl;
+  cout << "Dummy_Event_Handler::open invoked" << endl;
 #endif
+  
+  // initialize the address data structure. 
+  if (server_addr_.set (server_ip.c_str()) == -1) {
+    ACE_ERROR ((LM_ERROR,
+                ACE_TEXT ("[%t] Player : Network Thread - "),
+                ACE_TEXT ("failed to set IP address and port (%m)\n")));
+    return 1;
+  }
+  
+  // now let the client connect to the server.  Note how the connect
+  // factory method creates a SOCK_Stream for us. Note that since the
+  // third parameter (which is a timeout) is zero, we do a blocking
+  // connect. 
+  if (this->connector_.connect (this->peer_, server_addr_) == -1) {
+    ACE_ERROR ((LM_ERROR,
+                ACE_TEXT ("[%t] Player : Network Thread - "),
+                ACE_TEXT ("cannot connect to server (%m)\n")));
+    return 1;
+  }
 
   // we need to register ourselves (note that we are of the type
   // Event_Handler) with the reactor. The event that we as a data
@@ -70,10 +83,13 @@ int Dummy_Data_Handler::open (void)
                                  // in reading data
                           ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
     ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] Dummy_Data_Handler::open - "),
+                ACE_TEXT ("[%P] Dummy_Event_Handler::open - "),
                 ACE_TEXT ("failed to register handler (%m)\n")));
     return -1;
   }
+
+  // disable non blocking I/O
+  this->peer_.disable (ACE_NONBLOCK);
   
   ACE_Time_Value period_t (1);
   this->reactor()->schedule_timer(this,
@@ -87,46 +103,35 @@ int Dummy_Data_Handler::open (void)
 /* now define the event handler's callback methods  */
 
 // handle incoming data
-int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
+int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 {
 #if defined(DEBUG)
   // for debugging
   ACE_DEBUG ((LM_DEBUG,
-              ACE_TEXT ("Dummy_Data_Handler::handle_input invoked\n")));
+              ACE_TEXT ("Dummy_Event_Handler::handle_input invoked\n")));
 #endif
-  // here is where we receive all data. In our case this is just a dummy
-  // program where we receive some data and we send a reply back.
-  string reply;
+  
+	Message mymessage;
+  ssize_t bytesReceived = this->recv_message(mymessage);
 
   // note that unless there is a well defined protocol between the two
   // ends we never 
-  //ssize_t bytesReceived = this->peer_.recv (buffer, 1024);
 
-	Message mymessage;
-  ssize_t bytesReceived = this->recv_message(mymessage);
-	  
-  if (bytesReceived == 0) {
-    // we need to handle this case since it would mean that the connection is
-    // closed from the other side.  So it is time for this handler to go too.
-    ACE_DEBUG ((LM_DEBUG,
-                ACE_TEXT ("Dummy_Data_Handler::handle_input - 0 bytes received")
-                ACE_TEXT (" => peer closed connection\n")));
-
-    // we let the reactor trigger the handle close by returning a -1 to
-    // the reactor
-    return -1;
-
-  } else if (bytesReceived == -1) {
+  if (bytesReceived == -1) { 
     // this is an error condition
     ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("%s force quit their client application!\n"),
-				teacher.Player(myid)));
+                ACE_TEXT ("[%P] Dummy_Event_Handler::handle_input - "),
+                ACE_TEXT ("failed on recv (%m)\n")));
     // we let the reactor trigger the handle close
-    return -1;
-
-  } else {
-    // some data is received.
+	return -1;
+  } 
+  else 
+  {
 #if defined(DEBUG)
+	  ACE_DEBUG ((LM_DEBUG,
+				  ACE_TEXT ("Client received %d bytes.\n"),
+				  bytesReceived));
+    // some data is received.
 		cout << "Message type: " << mymessage.Type() << endl
 			<< "Object type: " << mymessage.Object().type << endl
 			<< "Object ID: " << mymessage.Object().id << endl
@@ -137,28 +142,35 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 		// Now process message
 		switch (mymessage.Type())
 		{
-		case REGISTER:
-			if ( teacher.Register(mymessage.Player()) )
+		case ACCEPT:		// the server has accepted us
+			break;
+		case CREATE:		// server has sent a create command for an object
+			char str[3];
+			switch (mymessage.Object().type)
 			{
-				myid = mymessage.Player().id;
-				peer_s *newpeer = new peer_s(&(this->peer()),myid);
-				con_peers.Push(newpeer);
+			case PLAYER:
+				sprintf(str,"Player");
+				break;
+			case SHOT:
+				sprintf(str,"Shot");
+				break;
+			default:
+				break;
 			}
+			ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Server created Object: (%s,%d) is: %s\n"),
+					str,
+					mymessage.Object().id,
+					mymessage.Object().content_));
 			break;
 		case CHAT:
-			if ( teacher.Player(mymessage.Player()) )
-				teacher.Questions(mymessage.Object());
-			break;
-		case SHOOT:
-			if ( teacher.Player(mymessage.Player()) )
-				ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("%s submitted assignment with content: %s!\n"),
-							mymessage.Player().name,
-							mymessage.Content()));
 			break;
 		case MOVE:
 			break;
-		case LEAVE:
+		case REMOVE:
+			player.Remove(mymessage.Object().id);
+			ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Class has been dismissed!\n")));
 			break;
 		default:
 			ACE_ERROR ((LM_ERROR,
@@ -166,11 +178,12 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			break;
 		}
   }
+
   // success
   return 0;
 }
 
-int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
+int Dummy_Event_Handler::send(const Message& message)
 {
 	size_t maxpayloadsize = message.Length();
 	maxpayloadsize += ACE_CDR::MAX_ALIGNMENT;
@@ -189,11 +202,11 @@ int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
 	iov[0].iov_len = 8;
 	iov[1].iov_base = payload.begin()->rd_ptr();
 	iov[1].iov_len = length;
+	
 #if defined(DEBUG)
 	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Server sent %d bytes.\n"),
-		length));
-	
+		ACE_TEXT ("Client sent %d bytes.\n"),
+		length));	
 	ACE_DEBUG ((LM_DEBUG,
 		ACE_TEXT ("Client sent %d bytes of header: %s\n"),
 		length, header.begin()->rd_ptr()));
@@ -202,10 +215,11 @@ int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
 		ACE_TEXT ("Client sent %d bytes of message: %s\n"),
 		length, payload.begin()->rd_ptr()));
 #endif
-	return p.sendv_n (iov, 2);
+	return peer_.sendv_n (iov, 2);
 }
 
-int Dummy_Data_Handler::recv_message(Message& message)
+
+int Dummy_Event_Handler::recv_message(Message& message)
 {
 #define MAXHOSTNAMELEN	100
 	ACE_INET_Addr peer_addr;
@@ -247,7 +261,7 @@ int Dummy_Data_Handler::recv_message(Message& message)
 			return length; // Return length of the message.
 		}
 		else 
-			ACE_DEBUG ((LM_ERROR,
+			ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("can't convert length!\n")));
 	}
 	payload->release();
@@ -257,95 +271,47 @@ int Dummy_Data_Handler::recv_message(Message& message)
 }
 
 // handle timeout events.
-// THIS IS WHERE THE STATE UPDATE & TRANSMISSION OCCURS
-// When the server needs to update each player with new object positions, etc.
-// this is the function timeout which will handle that.
-int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act)
+int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act)
 {	
 #if defined(DEBUG)
 	// for debugging
 	ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Dummy_Data_Handler::handle_timeout invoked\n")));
+				ACE_TEXT ("Dummy_Event_Handler::handle_timeout invoked\n")));
 #endif
-
+	
 	Message mymessage;
+	mymessage.Player(player.Info());	// need to make sure message contains info
 
-	if (mymessage.FormMessage(true))		// true because I am the server
+	if (mymessage.FormMessage(false))		// false because I am a player
 	{
-		if ( teacher.Players() == NULL)
+		
+		switch(mymessage.Type())
 		{
-			ACE_DEBUG ((LM_ERROR,
-						ACE_TEXT ("Error, there are no students!\n")));
-		}	
-		else 
-		{
-			peer_s *tmp = &con_peers;
-			switch(mymessage.Type())
+		case REGISTER:
+			if ( player.Registered() )
 			{
-			case ACCEPT:
-				if ( teacher.Create(mymessage.Object()) )
-				{
-					while (tmp->next!=NULL)
-					{
-						tmp = tmp->next;
-						int numbytes = this->send(*(tmp->p),mymessage);
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
-							numbytes,
-							teacher.Player(tmp->ID),
-							tmp->ID));
-					}
-				}
-				break;
-			case CHAT:
-				if ( teacher.Reply(mymessage.Object()) )
-				{
-					while (tmp->next!=NULL)
-					{
-						tmp = tmp->next;
-						int numbytes = this->send(*(tmp->p),mymessage);
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
-							numbytes,
-							teacher.Player(tmp->ID),
-							tmp->ID));
-					}
-				}
-				break;
-			case CREATE:
-				if ( teacher.Create(mymessage.Object()) )
-				{
-					while (tmp->next!=NULL)
-					{
-						tmp = tmp->next;
-						int numbytes = this->send(*(tmp->p),mymessage);
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
-							numbytes,
-							teacher.Player(tmp->ID),
-							tmp->ID));
-					}
-				}
-				break;
-			case MOVE:
-				break;
-			case REMOVE:
-				while (tmp->next!=NULL)
-				{
-					tmp = tmp->next;
-					int numbytes = this->send(*(tmp->p),mymessage);
-					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
-						numbytes,
-						teacher.Player(tmp->ID),
-						tmp->ID));
-				}
-				teacher.Dismiss();
-				con_peers.RemoveALL();
-				break;
-			default:
+				ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Already Registered!\n")));
 				break;
 			}
+			player.Register();
+			player.Info(mymessage.Player());
+			this->send(mymessage);
+			break;
+		case SHOOT:
+		case CHAT:
+			if ( ! player.Registered() )
+			{
+				ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Need to be registered first!\n")));
+				break;
+			}
+			if ( ! player.Question(mymessage.Object()) )
+				break;	// exit out, invalid assignment 
+			this->send(mymessage);
+			break;
+		default:
+			break;
 		}
 	}
 	
@@ -362,37 +328,22 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 // about these parameters. But complex applications could do various
 // things such as deregistering the handler only for that mask and when
 // the mask becomes 0, then delete ourself.
-int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
+int Dummy_Event_Handler::handle_close (ACE_HANDLE, ACE_Reactor_Mask mask)
 {
-#if defined(DEBUG)
   // for debugging
   ACE_DEBUG ((LM_DEBUG,
-              ACE_TEXT ("Dummy_Data_Handler::handle_close invoked\n")));
-#endif
-  // Stop and cancel the periodic timer associated with this reactor
-  this->reactor()->cancel_timer(this);
-  teacher.RemovePlayer(myid);
-  con_peers.Remove(myid);
+              ACE_TEXT ("Dummy_Event_Handler::handle_close invoked\n")));
 
-  m = ACE_Event_Handler::ALL_EVENTS_MASK |
+  mask = ACE_Event_Handler::ALL_EVENTS_MASK |
 	  ACE_Event_Handler::DONT_CALL;
-  this->reactor()->remove_handler(this,m);
-
+  this->reactor()->remove_handler(this,mask);
+  
   // time for us to cleanup. First cleanup the OS socket resources
   // that are held by the SOCK_Stream data member. Then follow up with
   // deallocating the memory allocated to hold us.
   this->peer_.close ();
-  
-  //this->reactor()->end_reactor_event_loop();
 
-  // notice how we clean up the allocated memory by deallocating
-  // ourselves :-). 
-  //
-  // Deallocation is absolutely necessary since recall that we had
-  // dynamically allocated ourselves. Also note that there can never be
-  // a case where we are allocated on the stack because our destructor
-  // was declared protected.
-  delete this;
+  this->reactor()->end_reactor_event_loop();
 
   return 0;
 }
@@ -401,12 +352,8 @@ int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 // keep a mapping between the underlying handle and the
 // corresponding handler.  Note that it is defined as a const method
 // since it does not modify any state.
-ACE_HANDLE Dummy_Data_Handler::get_handle (void) const
+ACE_HANDLE Dummy_Event_Handler::get_handle (void) const
 {
-#if defined(DEBUG)
-  // for debugging
-  cout << "Dummy_Data_Handler::get_handle invoked" << endl;
-#endif
   // since the ACE_SOCK_Stream class inherits from the ACE_SOCK
   // class, we simply invoke the get_handle method on the acceptor
   // data member which is the variable peer_
@@ -416,15 +363,10 @@ ACE_HANDLE Dummy_Data_Handler::get_handle (void) const
 // return a reference to the underlying peer.  This is a required method
 // used by the acceptor in its accept () method. Please see how it is
 // used in the handle_input of the Dummy_Accept_Handler.
-ACE_SOCK_Stream & Dummy_Data_Handler::peer (void)
+ACE_SOCK_Stream & Dummy_Event_Handler::peer (void)
 {
-#if defined(DEBUG)
-  // for debugging
-  cout << "Dummy_Data_Handler::peer invoked" << endl;
-#endif
   return this->peer_;
 }
-
 
 
 
