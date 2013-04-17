@@ -98,6 +98,7 @@
     <ClCompile Include="src\glInfo.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\Dummy_Event_Handler.cpp" />
+    <ClCompile Include="src\Network\helper_funcs.cpp" />
     <ClCompile Include="src\Network\Player.cpp" />
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
@@ -112,6 +113,7 @@
     <ClInclude Include="src\Engine\Vertex.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\Network\Dummy_Event_Handler.h" />
+    <ClInclude Include="src\Network\helper_funcs.h" />
     <ClInclude Include="src\network\Player.h" />
     <ClInclude Include="src\Sprites\box.h" />
     <ClInclude Include="src\Sprites\checkerboard.h" />

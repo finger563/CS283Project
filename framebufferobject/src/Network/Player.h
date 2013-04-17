@@ -10,8 +10,8 @@
 
 // notice how we protect double inclusion of declarations by virtue of
 // having these preprocessor symbols
-#if !defined (_CS283_STUDENT_H_)
-#define _CS387_STUDENT_H_
+#if !defined (_CS283_PLAYER_H_)
+#define _CS283_PLAYER_H_
 
 #include "..\..\..\SBFE_Server\Message.h"
 
@@ -94,4 +94,4 @@ public:
 	}
 };
 
-#endif /* _CS387_STUDENT_H_ */
+#endif /* _CS283_PLAYER_H_s */

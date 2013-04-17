@@ -37,6 +37,9 @@
     <ClCompile Include="src\Network\Player.cpp">
       <Filter>src\Network</Filter>
     </ClCompile>
+    <ClCompile Include="src\Network\helper_funcs.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -88,6 +91,9 @@
       <Filter>headers\Network</Filter>
     </ClInclude>
     <ClInclude Include="src\network\Player.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Network\helper_funcs.h">
       <Filter>headers\Network</Filter>
     </ClInclude>
   </ItemGroup>
