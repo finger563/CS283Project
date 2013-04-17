@@ -18,11 +18,11 @@ camera and object code is entirely written from scratch.  As such, this graphics
 library (contained within ./src/Engine) is portable to any device which has a C++ 
 compiler.  Modifications to the code to work in a C only environment are not difficult.
 
-The networked part of the code relies on ACE for the networking.  You can download ACE at
-[download][acedl], and you need Perl which can can be downloaded [here][perldl]
+The networked part of the code relies on ACE for the networking.  You can download ACE
+[here][acedl], and you need Perl which can can be downloaded [here][perldl]
 
 [acedl]: http://download.dre.vanderbilt.edu
-[perldl]: http://www.activestate.com
+[perldl]: http://www.activestate.com/activeperl/downloads
 
 Follow these steps to install ACE (in Windows):
  
