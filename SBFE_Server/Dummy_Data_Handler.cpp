@@ -32,7 +32,7 @@ Teacher_c teacher;
 
 peer_s con_peers;
 
-ACE_CDR::Long numPlayers = 0;
+static ACE_CDR::Long numPlayers = 0;
 	
 ACE_Time_Value period_t (1);
 
@@ -106,6 +106,8 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 	//ssize_t bytesReceived = this->peer_.recv (buffer, 1024);
 
 	Message mymessage;
+	Player_s myplayer;
+	Object_s myobject;
 	ssize_t bytesReceived = this->recv_message(mymessage);
 	  
 	if (bytesReceived == 0) {
@@ -141,10 +143,11 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 		switch (mymessage.Type())
 		{
 		case REGISTER:
-			mymessage.Player().SetID(numPlayers);
-			if ( teacher.Register(mymessage.Player()) )
+			myid = numPlayers++;
+			myplayer = mymessage.Player();
+			myplayer.SetID(myid);
+			if ( teacher.Register(myplayer) )
 			{
-				myid = mymessage.Player().id;
 				peer_s *newpeer = new peer_s(&(this->peer()),myid);
 				con_peers.Push(newpeer);
 			}
@@ -374,8 +377,8 @@ int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 #endif
   // Stop and cancel the periodic timer associated with this reactor
   this->reactor()->cancel_timer(this);
-  con_peers.Remove(myid);
   teacher.RemovePlayer(myid);
+  con_peers.Remove(myid);
 
   m = ACE_Event_Handler::ALL_EVENTS_MASK |
 	  ACE_Event_Handler::DONT_CALL;

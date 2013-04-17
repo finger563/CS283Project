@@ -69,84 +69,59 @@ public:
 	}
 
 	char* Player(ACE_CDR::Long id) {
-		if (players != NULL)
-		{
-			if ( id == players->id )
-				return players->name;
-			Player_s* tmp=Players();
-			while (tmp!=NULL)
-			{
-				if ( id == tmp->id ) 
-					return tmp->name;
-				tmp=tmp->next;
+		Player_s* tmp = players;
+		while ( tmp != NULL) {
+			if ( tmp->id == id ) {
+				return tmp->name;
 			}
+			tmp = tmp->next;
 		}
+
 		ACE_ERROR ((LM_ERROR,
 			ACE_TEXT ("Error, player has not registered!\n")));
 		return NULL;
 	}
 
 	void RemovePlayer(ACE_CDR::Long id) {
-		if ( players!=NULL)
-		{
-			Player_s* tmp = players;
-			if ( tmp->id == id ) 
-			{
-				players = tmp->next;
-				delete tmp;
+		Player_s* tmp = players;
+		Player_s* prev = tmp;
+		while ( tmp != NULL) {
+			if ( tmp->id == id ) {
+				prev->next = tmp->next;
+				ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("%s has been removed.\n"),
+						tmp->name));
+				if ( tmp != players )
+					delete tmp;
+				else {
+					delete tmp;
+					players = NULL;
+				}
 				return;
 			}
-			else if (players->next != NULL)
-			{
-				tmp = tmp->next;
-				if ( tmp->id == id  ) 
-				{
-					players->next = tmp->next;
-					delete tmp;
-					return;
-				}
-				Player_s* prev = players;
-				for (;tmp->next!=NULL;tmp=tmp->next)
-				{
-					if ( tmp->id == id  ) 
-					{
-						prev->next = tmp->next;
-						delete tmp;
-						return;
-					}
-					prev = prev->next;
-				}
-			}
+			prev = tmp;
+			tmp = tmp->next;
 		}
 	}
 	
 	bool Register(Player_s& s)
 	{
-		if ( players==NULL)
-			players=new Player_s(s);
-		else
-		{
-			if ( s == *players ) 
-			{
+		Player_s* tmp = players;
+		Player_s* prev = tmp;
+		while ( tmp != NULL) {
+			if ( *tmp == s ) {
 				ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("Error, %s has already registered!\n"),
 					s.name));
 				return false;
 			}
-			Player_s* tmp;
-			for (tmp=players;tmp->next!=NULL;tmp=tmp->next)
-			{
-				if ( s == *tmp ) 
-				{
-					ACE_ERROR ((LM_ERROR,
-						ACE_TEXT ("Error, %s has already registered!\n"),
-						s.name));
-					return false;
-				}
-			}
-			Player_s* link = new Player_s(s);
-			tmp->Link(link);
+			prev = tmp;
+			tmp = tmp->next;
 		}
+		if ( prev != NULL )
+			prev->Link(new Player_s(s));
+		else 
+			players = new Player_s(s);
 		ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("%s is now registered.\n"),
 				s.name));
@@ -196,7 +171,7 @@ struct peer_s {
 	peer_s *next, *prev;
 	ACE_CDR::Long ID;
 
-	peer_s() {p=NULL;next=prev=NULL;ID=0;}
+	peer_s() {p=NULL;next=prev=NULL;ID=-1;}
 	peer_s(ACE_SOCK_Stream* newpeer,ACE_CDR::Long id) {next=prev=NULL;p=newpeer;ID=id;}
 
 	void Push(peer_s *newpeer)
@@ -210,19 +185,18 @@ struct peer_s {
 	
 	void Remove(ACE_CDR::Long id)
 	{
-		peer_s *tmp=this;
-
-		while (tmp!=NULL)
-		{
-			if (  tmp->ID==id )
-				break;
+		peer_s *tmp = this;
+		peer_s* prev = this;
+		while (tmp != NULL) {
+			if ( tmp->ID == id ) {
+				prev->next = tmp->next;
+				if ( tmp->next != NULL )
+					tmp->next->prev = prev;
+				delete tmp;
+				return;
+			}
 			tmp=tmp->next;
 		}
-		if (tmp==NULL)
-			return;	// that ID doesn't exist in here
-		tmp->prev->next = tmp->next;
-		if ( tmp->next != NULL ) tmp->next->prev = tmp->prev;
-		delete tmp;
 	}
 
 	void RemoveALL()
