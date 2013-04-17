@@ -1,6 +1,7 @@
 #include "helper_funcs.h"
 
 string ip_addr = "127.0.0.1:9999";		// IP address from command line
+string username = "TestUser";
 
 // lock variable for mutual exclusion
 ACE_Thread_Mutex  lock;
@@ -8,17 +9,21 @@ ACE_Thread_Mutex  lock;
 // command line parsing
 int parse_args (int argc, ACE_TCHAR *argv[]) {
 	int c;
-	ACE_Get_Opt get_opt (argc, argv, "i:");
+	ACE_Get_Opt get_opt (argc, argv, "i:n:");
 	while ((c = get_opt ()) != -1) {
 		switch (c) {
 		case 'i':
 			ip_addr = get_opt.opt_arg ();
+			break;
+		case 'n':
+			username = get_opt.opt_arg();
 			break;
 		case '?':
 		default:
 			ACE_ERROR_RETURN ((LM_ERROR,
 								"usage:  %s "
 								"-i <IP address>:<port number> "
+								"-n <Username> "
 								"\n",
 								argv [0]),
 								-1);
