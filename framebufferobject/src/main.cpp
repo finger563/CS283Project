@@ -28,6 +28,7 @@ using std::ends;
 #include "main.h"
 #include "Engine\Object.h"
 #include "Engine\camera.h"
+#include "Engine\chat.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
@@ -74,6 +75,7 @@ std::list<Poly> renderlist;
 Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
 
 //For chat
+Chat conversationObj;
 std::stack<std::string> conversation;
 std::string userName = "";
 std::string msg = "";
