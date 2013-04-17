@@ -8,8 +8,6 @@
 // Teacher header file.
 //
 
-// notice how we protect double inclusion of declarations by virtue of
-// having these preprocessor symbols
 #if !defined (_CS387_TEACHER_H_)
 #define _CS387_TEACHER_H_
 

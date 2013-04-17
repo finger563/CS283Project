@@ -1,6 +1,6 @@
 #include "helper_funcs.h"
 
-string ip_addr = "129.59.105.21:10001";		// IP address from command line
+string ip_addr = "127.0.0.1:9999";		// IP address from command line
 string username = "TestUser";
 
 extern Player_c player;
@@ -76,6 +76,8 @@ void *thread_func (void *arg)
 	ACE_Reactor *reactor = ACE_Reactor::instance ();  // static class method (returns the same instance every time - singleton pattern)
 
 	Dummy_Event_Handler event_handler (reactor);
+	
+	cout << "Connecting to server on: " << ip_addr << endl;
 
 	// the first step for a server is to initialize itself on the port
 	// and host network interface.
