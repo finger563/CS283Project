@@ -5,8 +5,8 @@
 #include "Engine\constants.h"
 
 // constants
-const int    SCREEN_WIDTH    = 400;
-const int    SCREEN_HEIGHT   = 300;
+const int    SCREEN_WIDTH    = 1000;
+const int    SCREEN_HEIGHT   = 600;
 const float  CAMERA_DISTANCE = 2.0f;
 const int    TEXT_WIDTH      = 8;
 const int    TEXT_HEIGHT     = 13;

@@ -12,46 +12,80 @@
 #include <iostream>
 using namespace std;
 
-size_t Message::Length() const
-{
+size_t Message::Length() const {
 	size_t ret = 0;
 	switch (type_)
 	{
-	case REGISTER:
-		ret += 3 * sizeof(ACE_CDR::Long);
+	case REGISTER:	// Player registers themselves (name) with server
+		ret += 2 * sizeof(ACE_CDR::Long);
 			// 1 -> Message type
 			// 1 -> Player name length
-			// 1 -> Player ID
 		ret += strlen(player_.name);
 		break;
-	case ACCEPT:
-	case CHAT:
-	case SHOOT:
-	case CREATE:
-		ret += 6 * sizeof(ACE_CDR::Long);
+	case ACCEPT:	// Server returns player ID number and starting position/heading
+		ret += 2 * sizeof(ACE_CDR::Long);
 			// 1 -> Message type
-			// 1 -> Player name length
 			// 1 -> Player ID
-			// 1 -> Object type
-			// 1 -> Object ID
-			// 1 -> Message Content length
-		ret += strlen(player_.name);
+		ret += 6 * sizeof(ACE_CDR::Float);
+			// 1 -> x position
+			// 1 -> y position
+			// 1 -> z position
+			// 1 -> x heading
+			// 1 -> y heading
+			// 1 -> z heading
+		break;
+	case CHAT:		// Player sends to server & server propagates to other Players
+		ret += 2 * sizeof(ACE_CDR::Long);
+			// 1 -> Message type
+			// 1 -> Chat content length
 		ret += strlen(content_);
 		break;
-	case MOVE:
-		ret += 1 * sizeof(ACE_CDR::Long);
+	case SHOOT:		// Player sends position,heading to server, which will create the shot
+		ret += 2 * sizeof(ACE_CDR::Long);
 			// 1 -> Message type
+			// 1 -> Player ID
+		ret += 6 * sizeof(ACE_CDR::Float);
+			// 1 -> x position
+			// 1 -> y position
+			// 1 -> z position
+			// 1 -> x heading
+			// 1 -> y heading
+			// 1 -> z heading
 		break;
-	case LEAVE:
+	case CREATE:	// Server sends create message to players to create a dynamic object
+	case MOVE:		// create and move send same data
+		ret += 3 * sizeof(ACE_CDR::Long);
+			// 1 -> Message type
+			// 1 -> Object Type
+			// 1 -> Object ID/ Player ID
+		ret += 9 * sizeof(ACE_CDR::Float);
+			// 1 -> x position
+			// 1 -> y position
+			// 1 -> z position
+			// 1 -> x heading
+			// 1 -> y heading
+			// 1 -> z heading
+			// 1 -> x velocity
+			// 1 -> y velocity
+			// 1 -> z velocity
 		break;
-	case REMOVE:
+	case LEAVE:		// Player sends request to leave server
+		ret += 2 * sizeof(ACE_CDR::Long);
+			// 1 -> Message type
+			// 1 -> Player name length
+		ret += strlen(player_.name);
+		break;
+	case REMOVE:	// Server notifies other Players to delete dynamic object
+		ret += 3 * sizeof(ACE_CDR::Long);
+			// 1 -> Message type
+			// 1 -> Object Type
+			// 1 -> Object ID/ Player ID
 		break;
 	}
 	return ret;
 }
 
-int operator<< (ACE_OutputCDR &cdr, const Message &m)
-{
+int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 	cdr << ACE_CDR::Long (m.Type());
 	switch (m.Type())
 	{
@@ -92,8 +126,7 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m)
 	return cdr.good_bit();
 }
 
-int operator>> (ACE_InputCDR &cdr, Message &message)
-{
+int operator>> (ACE_InputCDR &cdr, Message &message) {
 	ACE_CDR::Long type;
 	ACE_CDR::Long object_type;
 	ACE_CDR::Long object_id;
@@ -164,11 +197,10 @@ int operator>> (ACE_InputCDR &cdr, Message &message)
 	return cdr.good_bit();
 }
 
-bool Message::FormMessage(bool isServer)
-{
+bool Message::FormMessage(bool isServer) {
 	if (isServer) {
 	}
 	else {
 	}
-	return true;
+	return false;
 }
