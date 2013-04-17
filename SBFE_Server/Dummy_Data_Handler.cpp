@@ -191,7 +191,7 @@ int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
 	iov[1].iov_len = length;
 #if defined(DEBUG)
 	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Teacher sent %d bytes.\n"),
+		ACE_TEXT ("Server sent %d bytes.\n"),
 		length));
 	
 	ACE_DEBUG ((LM_DEBUG,
@@ -257,6 +257,9 @@ int Dummy_Data_Handler::recv_message(Message& message)
 }
 
 // handle timeout events.
+// THIS IS WHERE THE STATE UPDATE & TRANSMISSION OCCURS
+// When the server needs to update each player with new object positions, etc.
+// this is the function timeout which will handle that.
 int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act)
 {	
 #if defined(DEBUG)
@@ -267,9 +270,9 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 
 	Message mymessage;
 
-	if (mymessage.FormMessage(true))		// true because I am the teacher
+	if (mymessage.FormMessage(true))		// true because I am the server
 	{
-		if ( teacher.Students() == NULL)
+		if ( teacher.Players() == NULL)
 		{
 			ACE_DEBUG ((LM_ERROR,
 						ACE_TEXT ("Error, there are no students!\n")));
@@ -280,14 +283,14 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 			switch(mymessage.Type())
 			{
 			case ACCEPT:
-				if ( teacher.Assign(mymessage.Object()) )
+				if ( teacher.Create(mymessage.Object()) )
 				{
 					while (tmp->next!=NULL)
 					{
 						tmp = tmp->next;
 						int numbytes = this->send(*(tmp->p),mymessage);
 						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Teacher sent %d bytes to student (%s,%d).\n"),
+							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
 							numbytes,
 							teacher.Player(tmp->ID),
 							tmp->ID));
@@ -302,7 +305,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 						tmp = tmp->next;
 						int numbytes = this->send(*(tmp->p),mymessage);
 						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Teacher sent %d bytes to student (%s,%d).\n"),
+							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
 							numbytes,
 							teacher.Player(tmp->ID),
 							tmp->ID));
@@ -310,22 +313,35 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 				}
 				break;
 			case CREATE:
+				if ( teacher.Create(mymessage.Object()) )
+				{
+					while (tmp->next!=NULL)
+					{
+						tmp = tmp->next;
+						int numbytes = this->send(*(tmp->p),mymessage);
+						ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
+							numbytes,
+							teacher.Player(tmp->ID),
+							tmp->ID));
+					}
+				}
+				break;
+			case MOVE:
+				break;
+			case REMOVE:
 				while (tmp->next!=NULL)
 				{
 					tmp = tmp->next;
 					int numbytes = this->send(*(tmp->p),mymessage);
 					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Teacher sent %d bytes to student (%s,%d).\n"),
+						ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
 						numbytes,
 						teacher.Player(tmp->ID),
 						tmp->ID));
 				}
 				teacher.Dismiss();
 				con_peers.RemoveALL();
-				break;
-			case MOVE:
-				break;
-			case REMOVE:
 				break;
 			default:
 				break;

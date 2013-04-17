@@ -99,7 +99,7 @@ int Dummy_Accept_Handler::handle_input (ACE_HANDLE h)
 
   // for debugging
   ACE_DEBUG ((LM_DEBUG,
-              ACE_TEXT ("New Student Client is connecting!\n")));	//Dummy_Accept_Handler::handle_input invoked\n
+              ACE_TEXT ("New Player is connecting!\n")));	//Dummy_Accept_Handler::handle_input invoked\n
 
   // Remember to dynamically allocate this object since otherwise it
   // will go out of scope at the end of the "handle_input" method. This is a
