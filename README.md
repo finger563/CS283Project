@@ -77,3 +77,27 @@ The username is used for chat display both locally and on other clients.  User n
 to TestUser. Also, if you want to show the command line options, just run
 
 	SBFE_Client -?
+
+Controls for the game:
+ * w/a,s/d: move forward/backward, strafe left/right
+ * space: move camera up
+ * c: move camera down
+ * q/e: rotate camera left/right
+ * t: initiate chat (during chat, keyboard commands are disabled)
+ * enter (during chat): send message
+ * backspace (during chat): remove last character added
+ * escape: quit program or (during chat) exit chat
+ * Mouse left click: fire projectile
+
+TODO
+----
+ * Use mouse movement for camera rotation
+ * Fix camera translation issue after camera has been rotated
+ * Fix rendering bug with partially degenerate triangles
+ * Finish SHOOT,CREATE,MOVE,LEAVE,REMOVE server/client implementations
+ * Collision detection
+ * Physics (for jumping)
+ * Build world
+ * Utilize server positions (ACCEPT message) as spawn location
+ * Allow killing of characters and their subsequent respawn
+ * Lighting system (smooth shading, shadowing, etc.)
