@@ -36,8 +36,8 @@ Follow these steps to install ACE (in Windows):
  * Update the path to be PATH=%PATH%;%ACE_ROOT%\bin;%ACE_ROOT%\lib
  * Create config.h in %ACE_ROOT%\ace directory, putting in the file:
  
-	#define ACE_HAS_STANDARD_CPP_LIBRARY 1
-	#include "ace/config-win32.h"
+	##define ACE_HAS_STANDARD_CPP_LIBRARY 1#
+	##include "ace/config-win32.h"#
 	
  * open command prompt, 
  
