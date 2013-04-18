@@ -163,7 +163,6 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			}
 			break;
 		case CHAT:
-			cout << mymessage.Player().id<< " " << mymessage.Player().name <<endl;
 			if ( true ) {//server.Player(mymessage.Player()) ) {	// Player is registered, propagate their chat
 				peer_s *tmp = &con_peers;
 				while (tmp->next!=NULL) {	// don't need to alter message, it is already chat!

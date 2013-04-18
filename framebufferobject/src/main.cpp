@@ -81,7 +81,7 @@ Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
 Chat conversationObj;
 std::stack<std::string> conversation;
 std::string userName = "";
-std::string msg = "";
+std::string typemessage = "";
 bool print = false;
 bool typing = false;	//hopefully a trigger to create chat window
 
@@ -262,6 +262,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	objectlist.push_back(testobj2);	
 	objectlist.push_back(testobj3);
 	objectlist.push_back(testobj4);
+
+	userName = string(player.Info().name) + ":";
+	conversation.push(userName);
+	//conversation.push(player.Info().name + ":" + typemessage);
 
     initSharedMem();
 
@@ -723,30 +727,15 @@ void chat()
     gluOrtho2D(0, screenWidth, 0, screenHeight); // set to orthogonal projection
 
     float color[4] = {1, 1, 1, 1};
-	//std::string input;
-
     stringstream ss;
-    
-    /*ss << "Switching to chat worked! Enter text below: " << ends;
-    drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
-	ss.str("");*/
 
-	//userName = "myUsername: ";
-
-	
-    if(print && msg == "")
-	{
+	if( typemessage.size() == 0 ) {
 		ss << conversation.top() << ends;
 		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
-		ss.str("");
-
-		//print = false;
 	}
-	else //hopefully shows each letter as typed.
-	{
-		ss << player.Info().name << ":"<< msg << ends;
+	else {		// user is currently typing
+		ss << userName << typemessage << ends;
 		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
-		ss.str("");
 	}
 
     // unset floating format
@@ -1067,25 +1056,24 @@ void keyboardCB(unsigned char key, int x, int y)
 	case 13: //ENTER
 		if(typing)
 		{
-			//if(msg != "")
-			//	conversation.push(userName + msg);
-			string chatstring = player.Info().name;
-			chatstring = chatstring + ": " + msg;
-			Message mymessage;
-			mymessage.Type(CHAT);
-			mymessage.Player(player.Info());
-			mymessage.Content(chatstring.c_str());
-			cout << endl << mymessage.Content() << " " << mymessage.Player().id << mymessage.Player().name<< endl;
-			event_handler.send(mymessage);
-			msg.clear();
-			print = true;
+			if( !typemessage.empty() ) {
+				string chatstring = userName + typemessage;
+				conversation.push(chatstring);
+				Message mymessage;
+				mymessage.Type(CHAT);
+				mymessage.Player(player.Info());
+				mymessage.Content(chatstring.c_str());
+				event_handler.send(mymessage);
+				typemessage.erase();
+			}
+			return;
 		}
 		break;
 	case 8: //BACKSPACE
 		if(typing)
 		{
-			
-			msg.erase(msg.size()-1);
+			if ( typemessage.size() > 0 )
+				typemessage.erase(typemessage.size()-1);
 			return;
 		}
 		//else
@@ -1098,7 +1086,7 @@ void keyboardCB(unsigned char key, int x, int y)
 	{
 		//append character to string
 		//being typed
-		msg += key;
+		typemessage += key;
 		return;
 	}
 
@@ -1106,6 +1094,7 @@ void keyboardCB(unsigned char key, int x, int y)
 	{
 	case 't': //chat function
 		typing = true;
+		print = true;
 		break;
 
 	case 'q':	// rotate left
