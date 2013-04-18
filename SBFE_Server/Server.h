@@ -1,15 +1,14 @@
 // $Id$
 //
 // Author: William Emfinger
-// CS387 HW 1 header file
-// Date Created : Feb 16, 2012
+// Date Created : April 17, 2013
 //
 //
-// Server header file.
+// Server class header file.
 //
 
-#if !defined (_CS387_TEACHER_H_)
-#define _CS387_TEACHER_H_
+#if !defined (_CS283_SERVER_H_)
+#define _CS283_SERVER_H_
 
 #include "Message.h"
 #include <string>
@@ -23,11 +22,17 @@ class Server_c {
 private:
 	Object_s	*objects;
 	Player_s	*players;
-	string		*chats;
+	//string		*chats;
 public:
-	Server_c() {objects=NULL;players=NULL;chats=NULL;}
+	Server_c() {
+		objects=NULL;players=NULL;
+		//chats=NULL;
+	}
 	Server_c(Server_c& t) {*this=t;}
-	~Server_c() {delete objects,players,this;}
+	~Server_c() {
+		delete objects,players,this;
+		//delete chats;
+	}
 
 	Server_c & operator=(Server_c& t)
 	{
@@ -35,7 +40,7 @@ public:
         {
 			objects = t.Objects();
 			players = t.Players();
-			chats = t.Chats();
+			//chats = t.Chats();
         }
         // by convention, always return *this
         return *this;
@@ -43,10 +48,7 @@ public:
 
 	Object_s * Objects() {return objects;}
 	Player_s * Players() {return players;}
-	string * Chats() {return chats;}
-
-	void Questions(Object_s& q) {
-	}
+	//string * Chats() {return chats;}
 
 	bool Player(Player_s& s) {
 		if (players != NULL)
@@ -126,7 +128,12 @@ public:
 		return true;
 	}
 
-	void Dismiss() {delete players,objects,chats;players=NULL;objects=NULL;chats=NULL;}
+	void Shutdown() {
+		delete players,objects;
+		players=NULL;
+		objects=NULL;
+		//delete chats; chats=NULL;
+	}
 
 	bool Create(Object_s& a)
 	{
@@ -158,10 +165,6 @@ public:
 			return true;
 		}
 	}
-
-	bool Reply(Object_s& a) {
-		return true;
-	}
 };
 
 struct peer_s {
@@ -172,8 +175,7 @@ struct peer_s {
 	peer_s() {p=NULL;next=prev=NULL;ID=-1;}
 	peer_s(ACE_SOCK_Stream* newpeer,ACE_CDR::Long id) {next=prev=NULL;p=newpeer;ID=id;}
 
-	void Push(peer_s *newpeer)
-	{
+	void Push(peer_s *newpeer) {
 		peer_s *tmp=this;
 		while (tmp->next!=NULL)
 			tmp=tmp->next;
@@ -181,8 +183,7 @@ struct peer_s {
 		newpeer->prev=tmp;
 	}
 	
-	void Remove(ACE_CDR::Long id)
-	{
+	void Remove(ACE_CDR::Long id) {
 		peer_s *tmp = this;
 		peer_s* prev = this;
 		while (tmp != NULL) {
@@ -197,11 +198,10 @@ struct peer_s {
 		}
 	}
 
-	void RemoveALL()
-	{
+	void RemoveALL() {
 		delete next;
 		next = NULL;
 	}
 };
 
-#endif /* _CS387_TEACHER_H_ */
+#endif /* _CS283_SERVER_H_ */

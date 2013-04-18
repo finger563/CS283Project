@@ -28,7 +28,7 @@ using namespace std;
 
 #include "Server.h"
 
-Server_c teacher;
+Server_c server;
 
 peer_s con_peers;
 
@@ -125,7 +125,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 		// this is an error condition
 		ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("%s force quit their client application!\n"),
-					teacher.Player(myid)));
+					server.Player(myid)));
 		// we let the reactor trigger the handle close
 		return -1;
 
@@ -146,18 +146,30 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			myid = numPlayers++;
 			myplayer = mymessage.Player();
 			myplayer.SetID(myid);
-			if ( teacher.Register(myplayer) )
+			if ( server.Register(myplayer) )
 			{
 				peer_s *newpeer = new peer_s(&(this->peer()),myid);
 				con_peers.Push(newpeer);
 			}
 			break;
 		case CHAT:
-			if ( teacher.Player(mymessage.Player()) )
-				teacher.Questions(mymessage.Object());
+			if ( server.Player(mymessage.Player()) ) {	// Player is registered, propagate their chat
+				peer_s *tmp = &con_peers;
+				while (tmp->next!=NULL) {	// don't need to alter message, it is already chat!
+					tmp = tmp->next;
+					if ( tmp->ID != myid ) {
+						int numbytes = this->send(*(tmp->p),mymessage);
+						ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
+							numbytes,
+							server.Player(tmp->ID),
+							tmp->ID));
+					}
+				}
+			}
 			break;
 		case SHOOT:
-			if ( teacher.Player(mymessage.Player()) )
+			if ( server.Player(mymessage.Player()) )
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("%s submitted assignment with content: %s!\n"),
 							mymessage.Player().name,
@@ -279,10 +291,10 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 
 	if (mymessage.FormMessage(true))		// true because I am the server
 	{
-		if ( teacher.Players() == NULL)
+		if ( server.Players() == NULL)
 		{
 			ACE_DEBUG ((LM_ERROR,
-						ACE_TEXT ("Error, there are no students!\n")));
+						ACE_TEXT ("Error, there are no players!\n")));
 		}	
 		else 
 		{
@@ -290,46 +302,46 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 			switch(mymessage.Type())
 			{
 			case ACCEPT:
-				if ( teacher.Create(mymessage.Object()) )
+				if ( server.Create(mymessage.Object()) )
 				{
 					while (tmp->next!=NULL)
 					{
 						tmp = tmp->next;
 						int numbytes = this->send(*(tmp->p),mymessage);
 						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
+							ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
 							numbytes,
-							teacher.Player(tmp->ID),
+							server.Player(tmp->ID),
 							tmp->ID));
 					}
 				}
 				break;
 			case CHAT:
-				if ( teacher.Reply(mymessage.Object()) )
-				{
-					while (tmp->next!=NULL)
-					{
-						tmp = tmp->next;
-						int numbytes = this->send(*(tmp->p),mymessage);
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
-							numbytes,
-							teacher.Player(tmp->ID),
-							tmp->ID));
-					}
-				}
+				//if ( server.Reply(mymessage.Object()) )
+				//{
+				//	while (tmp->next!=NULL)
+				//	{
+				//		tmp = tmp->next;
+				//		int numbytes = this->send(*(tmp->p),mymessage);
+				//		ACE_DEBUG ((LM_DEBUG,
+				//			ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
+				//			numbytes,
+				//			server.Player(tmp->ID),
+				//			tmp->ID));
+				//	}
+				//}
 				break;
 			case CREATE:
-				if ( teacher.Create(mymessage.Object()) )
+				if ( server.Create(mymessage.Object()) )
 				{
 					while (tmp->next!=NULL)
 					{
 						tmp = tmp->next;
 						int numbytes = this->send(*(tmp->p),mymessage);
 						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
+							ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
 							numbytes,
-							teacher.Player(tmp->ID),
+							server.Player(tmp->ID),
 							tmp->ID));
 					}
 				}
@@ -342,12 +354,12 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 					tmp = tmp->next;
 					int numbytes = this->send(*(tmp->p),mymessage);
 					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent %d bytes to student (%s,%d).\n"),
+						ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
 						numbytes,
-						teacher.Player(tmp->ID),
+						server.Player(tmp->ID),
 						tmp->ID));
 				}
-				teacher.Dismiss();
+				server.Shutdown();
 				con_peers.RemoveALL();
 				break;
 			default:
@@ -377,7 +389,7 @@ int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 #endif
   // Stop and cancel the periodic timer associated with this reactor
   this->reactor()->cancel_timer(this);
-  teacher.RemovePlayer(myid);
+  server.RemovePlayer(myid);
   con_peers.Remove(myid);
 
   m = ACE_Event_Handler::ALL_EVENTS_MASK |
