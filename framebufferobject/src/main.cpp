@@ -80,7 +80,7 @@ Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
 
 std::string userName = "";
 std::string playermsg = "";
-bool print = false;
+bool print = true;
 bool typing = false;	//hopefully a trigger to create chat window
 
 void PrintChat();
@@ -738,14 +738,16 @@ void PrintChat()
 		ss.str("");
 	}
 
-	if ( !playermsg.empty() ) {
-		ss << userName << playermsg << ends;
-		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
-	}
-	else {
-		ss << userName << ends;
-		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
-	}
+	if ( typing ) {
+		if ( !playermsg.empty() ) {
+			ss << userName << playermsg << ends;
+			drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+		}
+		else {
+			ss << userName << ends;
+			drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+		}
+		}
 	ss.str("");
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
@@ -1002,7 +1004,7 @@ void displayCB()
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	if(typing)
+	if(print)
 	{
 		PrintChat();
 		
@@ -1058,7 +1060,7 @@ void keyboardCB(unsigned char key, int x, int y)
 			//to be named later to stack
 			//shouldn't that be done already though??
 			typing = false;
-			print = false;
+			//print = false;
 		}
         break;
 
@@ -1103,7 +1105,7 @@ void keyboardCB(unsigned char key, int x, int y)
 	{
 	case 't': //chat function
 		typing = true;
-		print = true;
+		//print = true;
 		break;
 
 	case 'q':	// rotate left
