@@ -1,37 +1,42 @@
 #include "chat.h"
 
-//bleh constructor
-Chat::Chat(): place(conversation.rbegin()) 
+Chat_c::Chat_c(): place(conversation.rbegin()) 
 {
+	numChatsDisplayed = 4;
 }
 
-void Chat::addMessage(std::string msg)
+Chat_c::Chat_c(const int chats): place(conversation.rbegin()) 
+{
+	numChatsDisplayed = chats;
+}
+
+void Chat_c::addMessage(std::string msg)
 {
 	conversation.push_back(msg);
 	place = conversation.rbegin();
 }
 
-std::list<std::string> Chat::getList()
-{
-	return conversation;
-}
-
-std::list<std::string>::reverse_iterator Chat::getPlace()
-{
-	return place;
-}
-
-void Chat::Up()
+void Chat_c::Up()
 {
 	++place;
 }
 
-void Chat::Down()
+void Chat_c::Down()
 {
 	--place;
 }
 
-std::string Chat::getMsg()
+std::string Chat_c::getMsg()
 {
 	return *conversation.rbegin();
+}
+
+Chat_c& Chat_c::operator= (const Chat_c& rhs) {
+	if (this != &rhs) // protect against invalid self-assignment
+    {
+		conversation = rhs.Conversation();
+		place = rhs.Place();
+		numChatsDisplayed = rhs.NumChatsDisplayed();
+	}
+	return *this;
 }

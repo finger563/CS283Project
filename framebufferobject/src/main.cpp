@@ -78,14 +78,12 @@ Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
 // EVERYTHING FOR CHAT CODE ///////////////////////////////////////////////////
 #include "Engine\chat.h"
 
-Chat conversationObj;
-std::stack<std::string> conversation;
 std::string userName = "";
-std::string typemessage = "";
+std::string playermsg = "";
 bool print = false;
 bool typing = false;	//hopefully a trigger to create chat window
 
-void chat();
+void PrintChat();
 
 // INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
 #include "Network\helper_funcs.h"
@@ -264,8 +262,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	objectlist.push_back(testobj4);
 
 	userName = string(player.Info().name) + ":";
-	conversation.push(userName);
-	//conversation.push(player.Info().name + ":" + typemessage);
 
     initSharedMem();
 
@@ -691,7 +687,7 @@ void showInfo()
 
 	//if(type == true)
 	//{
-		//chat();
+		//PrintChat();
 		//type = false;
 	//}
 	//else
@@ -714,7 +710,7 @@ void showInfo()
 ///////////////////////////////////////////////////////////////////////////////
 // display chat messages
 ///////////////////////////////////////////////////////////////////////////////
-void chat()
+void PrintChat()
 {
     // backup current model-view matrix
     glPushMatrix();                     // save current modelview matrix
@@ -729,15 +725,28 @@ void chat()
     float color[4] = {1, 1, 1, 1};
     stringstream ss;
 
-	if( typemessage.size() == 0 ) {
-		ss << conversation.top() << ends;
-		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
-	}
-	else {		// user is currently typing
-		ss << userName << typemessage << ends;
-		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+	int numChats;
+	std::list<string> conversation = player.Chat().Conversation();
+	numChats = ( conversation.size() > player.Chat().NumChatsDisplayed() ) ? 
+		player.Chat().NumChatsDisplayed() : conversation.size() ;
+	std::list<string>::reverse_iterator riter = conversation.rbegin();
+
+	for (int i=0; i < numChats; i++) {
+		ss << *riter << ends;
+		++riter;
+		drawString(ss.str().c_str(), 1, 16+16*i, color, font);
+		ss.str("");
 	}
 
+	if ( !playermsg.empty() ) {
+		ss << userName << playermsg << ends;
+		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+	}
+	else {
+		ss << userName << ends;
+		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
+	}
+	ss.str("");
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
 
@@ -995,7 +1004,7 @@ void displayCB()
 
 	if(typing)
 	{
-		chat();
+		PrintChat();
 		
 	}
 	else
@@ -1056,15 +1065,15 @@ void keyboardCB(unsigned char key, int x, int y)
 	case 13: //ENTER
 		if(typing)
 		{
-			if( !typemessage.empty() ) {
-				string chatstring = userName + typemessage;
-				conversation.push(chatstring);
+			if( !playermsg.empty() ) {
+				string chatstring = userName + playermsg;
+				player.AddChat(chatstring);
 				Message mymessage;
 				mymessage.Type(CHAT);
 				mymessage.Player(player.Info());
 				mymessage.Content(chatstring.c_str());
 				event_handler.send(mymessage);
-				typemessage.erase();
+				playermsg.clear();
 			}
 			return;
 		}
@@ -1072,8 +1081,8 @@ void keyboardCB(unsigned char key, int x, int y)
 	case 8: //BACKSPACE
 		if(typing)
 		{
-			if ( typemessage.size() > 0 )
-				typemessage.erase(typemessage.size()-1);
+			if ( playermsg.size() > 0 )
+				playermsg.erase(playermsg.size()-1);
 			return;
 		}
 		//else
@@ -1086,7 +1095,7 @@ void keyboardCB(unsigned char key, int x, int y)
 	{
 		//append character to string
 		//being typed
-		typemessage += key;
+		playermsg += key;
 		return;
 	}
 

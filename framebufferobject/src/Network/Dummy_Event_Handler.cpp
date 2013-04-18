@@ -123,6 +123,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 	ssize_t bytesReceived = this->recv_message(mymessage);
 	Player_s myplayer;
 	Object_s myobject;
+	string chat;
 	char str[15];
 
   // note that unless there is a well defined protocol between the two
@@ -176,9 +177,8 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 					mymessage.Object().id));
 			break;
 		case CHAT:
-			ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Received chat: %s\n"),
-					mymessage.Content()));
+			chat = string(mymessage.Content());
+			player.AddChat(chat);
 			break;
 		case MOVE:
 			break;

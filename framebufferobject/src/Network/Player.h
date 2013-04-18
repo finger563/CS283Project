@@ -12,27 +12,27 @@
 #define _CS283_PLAYER_H_
 
 #include "..\..\..\SBFE_Server\Message.h"
+#include "..\Engine\chat.h"
 
 class Player_c {
 private:
 	bool registered;
 	Player_s	info;
 	Object_s*	objects;
+	Chat_c		chat;
 public:
-	Player_c() : info() {objects=NULL;registered=false;}
+	Player_c() : info() {objects=NULL;registered=false;chat=Chat();}
 	Player_c(const Player_s& s): info(s) {objects=NULL;registered=false;}
 	Player_c(Player_c& s){*this=s;}
 	~Player_c() {delete objects, this;}
 
-	Player_c & operator=(Player_c& s)
-	{
+	Player_c & operator=(Player_c& s) {
 		if (this != &s) // protect against invalid self-assignment
         {
 			info = s.Info();
 			objects = s.Objects();
         }
-        // by convention, always return *this
-        return *this;
+		return *this;		// by convention, always return *this
 	}
 
 	Player_s Info() const {return info;}
@@ -40,10 +40,16 @@ public:
 
 	Object_s* Objects() {return objects;}
 
+	Chat_c Chat() const { return chat; }
+	void Chat(const Chat_c& c) { chat = c; }
+
 	void Register() {registered=true;}
 	void Leave()	{registered=false;}
-
 	bool Registered() {return registered;}
+
+	void AddChat(const string& str) {
+		chat.addMessage(str);
+	}
 
 	void Create(Object_s& a) {
 		char str[3];
