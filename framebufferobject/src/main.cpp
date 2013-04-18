@@ -1055,12 +1055,9 @@ void keyboardCB(unsigned char key, int x, int y)
     case 27: // ESCAPE
 		if(!typing)
 			exit(0);
-		else
-		{//send final string array
-			//to be named later to stack
-			//shouldn't that be done already though??
+		else {
 			typing = false;
-			//print = false;
+			playermsg.clear();
 		}
         break;
 
