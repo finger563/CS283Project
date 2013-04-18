@@ -1,15 +1,13 @@
 // $Id$
 //
 // Author: William Emfinger
-// CS387 HW 1 header file
-// Date Created : Feb 16, 2012
+// CS283 Project 
+// Date Created : April 17,2013
 //
 //
 // Player header file.
 //
 
-// notice how we protect double inclusion of declarations by virtue of
-// having these preprocessor symbols
 #if !defined (_CS283_PLAYER_H_)
 #define _CS283_PLAYER_H_
 
@@ -76,21 +74,6 @@ public:
 	}
 
 	void Remove(const ACE_CDR::Long _id) {
-	}
-	
-	bool Question(Object_s& a) {
-		if ( objects!=NULL) {
-			if ( a == *objects )
-				return true;
-			Object_s* tmp;
-			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next) {
-				if ( a == *tmp )
-					return true;
-			}
-		}
-		ACE_ERROR ((LM_ERROR,
-			ACE_TEXT ("Error, this has not been assigned!\n")));
-		return false;
 	}
 };
 

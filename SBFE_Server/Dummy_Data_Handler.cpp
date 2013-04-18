@@ -150,10 +150,21 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			{
 				peer_s *newpeer = new peer_s(&(this->peer()),myid);
 				con_peers.Push(newpeer);
+				mymessage.Type(ACCEPT);
+				myplayer.SetHeading(0,0,1);
+				myplayer.SetPos(0,0,0);
+				mymessage.Player(myplayer);
+				int numbytes = this->send(this->peer(),mymessage);
+				ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
+					numbytes,
+					myplayer.name,
+					myplayer.id));
 			}
 			break;
 		case CHAT:
-			if ( server.Player(mymessage.Player()) ) {	// Player is registered, propagate their chat
+			cout << mymessage.Player().id<< " " << mymessage.Player().name <<endl;
+			if ( true ) {//server.Player(mymessage.Player()) ) {	// Player is registered, propagate their chat
 				peer_s *tmp = &con_peers;
 				while (tmp->next!=NULL) {	// don't need to alter message, it is already chat!
 					tmp = tmp->next;

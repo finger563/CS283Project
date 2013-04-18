@@ -8,6 +8,8 @@ extern Player_c player;
 // lock variable for mutual exclusion
 ACE_Thread_Mutex  lock;
 
+Dummy_Event_Handler event_handler;
+
 // command line parsing
 int parse_args (int argc, ACE_TCHAR *argv[]) {
 	int c;
@@ -75,7 +77,7 @@ void *thread_func (void *arg)
 	*/
 	ACE_Reactor *reactor = ACE_Reactor::instance ();  // static class method (returns the same instance every time - singleton pattern)
 
-	Dummy_Event_Handler event_handler (reactor);
+	event_handler = Dummy_Event_Handler(reactor);
 	
 	cout << "Connecting to server on: " << ip_addr << endl;
 

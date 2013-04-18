@@ -103,7 +103,6 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\Dummy_Event_Handler.cpp" />
     <ClCompile Include="src\Network\helper_funcs.cpp" />
-    <ClCompile Include="src\Network\Player.cpp" />
     <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>

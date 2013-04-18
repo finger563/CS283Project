@@ -14,20 +14,20 @@ private:
  
 public:
 
-//bleh constructor
-Chat();
+	//bleh constructor
+	Chat();
 
-void addMessage(std::string msg);
+	void addMessage(std::string msg);
 
-std::list<std::string> getList();
+	std::list<std::string> getList();
 
-std::list<std::string>::reverse_iterator getPlace();
+	std::list<std::string>::reverse_iterator getPlace();
 
-std::string getMsg();
+	std::string getMsg();
 
-void Up();
+	void Up();
 
-void Down();
+	void Down();
 
 };
 #endif

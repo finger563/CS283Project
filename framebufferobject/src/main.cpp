@@ -27,7 +27,6 @@ using std::ends;
 #include "main.h"
 #include "Engine\Object.h"
 #include "Engine\camera.h"
-#include "Engine\chat.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
@@ -57,18 +56,6 @@ Matrix worldToCamera=Matrix(),
 std::list<Object> objectlist;
 std::list<Poly> renderlist;
 
-//shoot will be the projectile
-Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
-
-//For chat
-Chat conversationObj;
-std::stack<std::string> conversation;
-std::string userName = "";
-std::string msg = "";
-bool print = false;
-
-//hopefully a trigger to create chat window
-bool typing = false;
 
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
@@ -85,9 +72,26 @@ Matrix rot;		// debug/testing for rotating objects
 
 Camera camera;
 
-// INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
+//shoot will be the projectile
+Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
 
+// EVERYTHING FOR CHAT CODE ///////////////////////////////////////////////////
+#include "Engine\chat.h"
+
+Chat conversationObj;
+std::stack<std::string> conversation;
+std::string userName = "";
+std::string msg = "";
+bool print = false;
+bool typing = false;	//hopefully a trigger to create chat window
+
+void chat();
+
+// INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
 #include "Network\helper_funcs.h"
+
+extern Player_c player;
+extern Dummy_Event_Handler event_handler;
 
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
 void displayCB();
@@ -112,7 +116,6 @@ void updatePixels(GLubyte* dst, int size);
 void drawString(const char *str, int x, int y, float color[4], void *font);
 void drawString3D(const char *str, float pos[3], float color[4], void *font);
 void showInfo();
-void chat();
 void showTransferRate();
 void printTransferRate();
 
@@ -728,7 +731,7 @@ void chat()
     drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
 	ss.str("");*/
 
-	userName = "myUsername: ";
+	//userName = "myUsername: ";
 
 	
     if(print && msg == "")
@@ -741,7 +744,7 @@ void chat()
 	}
 	else //hopefully shows each letter as typed.
 	{
-		ss << userName + msg << ends;
+		ss << player.Info().name << ":"<< msg << ends;
 		drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
 		ss.str("");
 	}
@@ -1064,11 +1067,20 @@ void keyboardCB(unsigned char key, int x, int y)
 	case 13: //ENTER
 		if(typing)
 		{
-			if(msg != "")
-				conversation.push(userName + msg);
-			msg = "";
+			//if(msg != "")
+			//	conversation.push(userName + msg);
+			string chatstring = player.Info().name;
+			chatstring = chatstring + ": " + msg;
+			Message mymessage;
+			mymessage.Type(CHAT);
+			mymessage.Player(player.Info());
+			mymessage.Content(chatstring.c_str());
+			cout << endl << mymessage.Content() << " " << mymessage.Player().id << mymessage.Player().name<< endl;
+			event_handler.send(mymessage);
+			msg.clear();
 			print = true;
 		}
+		break;
 	case 8: //BACKSPACE
 		if(typing)
 		{

@@ -120,7 +120,10 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 #endif
   
 	Message mymessage;
-  ssize_t bytesReceived = this->recv_message(mymessage);
+	ssize_t bytesReceived = this->recv_message(mymessage);
+	Player_s myplayer;
+	Object_s myobject;
+	char str[15];
 
   // note that unless there is a well defined protocol between the two
   // ends we never 
@@ -151,9 +154,11 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 		switch (mymessage.Type())
 		{
 		case ACCEPT:		// the server has accepted us
+			myplayer = player.Info();
+			myplayer.id = mymessage.Player().id;
+			player.Info(myplayer);	// update the data structure with the ID number from the server
 			break;
 		case CREATE:		// server has sent a create command for an object
-			char str[3];
 			switch (mymessage.Object().type)
 			{
 			case PLAYER:
@@ -166,19 +171,32 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 				break;
 			}
 			ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Server created Object: (%s,%d) is: %s\n"),
+					ACE_TEXT ("Received new Object: (%s,%d)\n"),
 					str,
-					mymessage.Object().id,
-					mymessage.Object().content_));
+					mymessage.Object().id));
 			break;
 		case CHAT:
+			ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Received chat: %s\n"),
+					mymessage.Content()));
 			break;
 		case MOVE:
 			break;
 		case REMOVE:
+			switch (mymessage.Object().type)
+			{
+			case PLAYER:
+				sprintf(str,"Player");
+				break;
+			case SHOT:
+				sprintf(str,"Shot");
+				break;
+			default:
+				break;
+			}
 			player.Remove(mymessage.Object().id);
 			ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Class has been dismissed!\n")));
+				ACE_TEXT ("Object (%s,%d) removed!\n"), str ,mymessage.Object().id));
 			break;
 		default:
 			ACE_ERROR ((LM_ERROR,
@@ -311,8 +329,6 @@ int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, co
 							ACE_TEXT ("Need to be registered first!\n")));
 				break;
 			}
-			if ( ! player.Question(mymessage.Object()) )
-				break;	// exit out, invalid assignment 
 			this->send(mymessage);
 			break;
 		default:

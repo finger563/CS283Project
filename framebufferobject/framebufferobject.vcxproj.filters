@@ -34,9 +34,6 @@
     <ClCompile Include="src\Network\Dummy_Event_Handler.cpp">
       <Filter>src\Network</Filter>
     </ClCompile>
-    <ClCompile Include="src\Network\Player.cpp">
-      <Filter>src\Network</Filter>
-    </ClCompile>
     <ClCompile Include="src\Network\helper_funcs.cpp">
       <Filter>src\Network</Filter>
     </ClCompile>
