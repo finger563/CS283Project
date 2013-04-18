@@ -28,6 +28,7 @@ The networked part of the code relies on ACE for the networking.  You can downlo
 [acedl]: http://download.dre.vanderbilt.edu
 [perldl]: http://www.activestate.com/activeperl/downloads
 
+Install Perl first, then install and build ACE.
 Follow these steps to install ACE (in Windows):
  
  * Uncompress ACE to C:\ACE_wrappers (or some other folder of your choice)
