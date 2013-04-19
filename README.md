@@ -22,6 +22,10 @@ System Requirements
 -------------------
 For the solution/project, it is recommended that you use MSVS2010.
 
+The graphics interface part of the code is handled by the GLUT dll which is included with the project.
+This dll handles the interface to the GPU for rendering to the screen.  The graphics library 
+is also entirely contained in the code, relying on the GLUT dll only for access to a pixel buffer.
+
 The networked part of the code relies on ACE for the networking.  You can download ACE
 [here][acedl], and you need Perl which can can be downloaded [here][perldl]
 
