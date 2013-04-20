@@ -1106,11 +1106,11 @@ void keyboardCB(unsigned char key, int x, int y)
 		break;
 
 	case 'q':	// rotate left
-		camera.Rotate(rmy);
+		camera.Rotate(neg_rmy);
 		break;
 
 	case 'e':	// rotate right
-		camera.Rotate(neg_rmy);
+		camera.Rotate(rmy);
 		break;
 
 	case 'w': // Up

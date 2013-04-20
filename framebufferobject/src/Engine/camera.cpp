@@ -6,11 +6,8 @@ Camera::Camera():up(0, 1, 0), forward(0, 0, 1), right(1, 0, 0), position(0, 0, 0
 }
 
 void Camera::Normalize() {
-	//up = up/up.w;
 	up = normalize(up);
-	//forward = forward/forward.w;
 	forward = normalize(forward);
-	//right = right/right.w;
 	right = normalize(right);
 }
 
@@ -36,7 +33,7 @@ void Camera::setRotation(Matrix m) //will we be passing the rotation matrix?? or
 
 void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or should I set a default matrix in the constructor?
 {
-	 rotation = m*rotation;
+	 rotation = rotation*m;
 	 
 	 //rotate each vector by rotation
 	 up = m * up;
@@ -73,6 +70,6 @@ void Camera::Rotate (float x, Vector3D v)
 
 Matrix Camera::getRotation()
 {
-	return rotation;
+	return rotation.Transpose();
 }
 

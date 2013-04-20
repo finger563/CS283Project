@@ -97,7 +97,6 @@ Controls for the game:
 TODO
 ----
  * Use mouse movement for camera rotation
- * Fix camera translation issue after camera has been rotated
  * Fix rendering bug with partially degenerate triangles
  * Finish SHOOT,CREATE,MOVE,LEAVE,REMOVE server/client implementations
  * Collision detection
