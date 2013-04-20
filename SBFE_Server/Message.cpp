@@ -88,8 +88,8 @@ size_t Message::Length() const {
 
 int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 	cdr << ACE_CDR::Long (m.Type());
-	Player_s myplayer = Player_s(m.Player());
-	Object_s myobject = Object_s(m.Object());
+	Player_s myplayer = m.Player();
+	Object_s myobject = m.Object();
 	switch (m.Type())
 	{
 	case REGISTER:
