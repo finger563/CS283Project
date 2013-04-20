@@ -158,9 +158,9 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 		case ACCEPT:		// the server has accepted us
 			myplayer = player.Info();
 			myplayer.id = mymessage.Player().id;
-			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().y);
+			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().z);
 			myeye.SetForward(mymessage.Player().hx,mymessage.Player().hy,mymessage.Player().hz);
-			myeye.SetUp(0,1,0);
+			myeye.SetUp(0,1,0);		// we will always face up
 			ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Player got position (%f,%f,%f).\n"),
 				mymessage.Player().x,
