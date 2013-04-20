@@ -256,7 +256,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	//projectile code
 	shot.projectileInit(camera.getForward());
 
-	//objectlist.push_back(testobj);
+	objectlist.push_back(testobj);
 	objectlist.push_back(testobj2);	
 	objectlist.push_back(testobj3);
 	objectlist.push_back(testobj4);
