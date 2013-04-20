@@ -273,9 +273,16 @@ void Poly::SetupRasterization( ) {
 		indl= (ind > 0) ? ind - 1 : numVertices-1,
 		indr= (ind + 1) % numVertices,
 		tmp;
+	
+	for (int v=0;v<POLY_MAX_VERTICES;v++) {
+		for (int i=0;i<NUM_VERTEX_DATA;i++) {
+			increments[v][0][i] = vl[i];
+			increments[v][1][i] = vr[i];
+		}
+	}
 
-	al = 1/(v[ind].y - v[indl].y - 1);
-	ar = 1/(v[ind].y - v[indr].y - 1);
+	al = 1/(v[ind].y - v[indl].y );//- 1);
+	ar = 1/(v[ind].y - v[indr].y );//- 1);
 	vl = (v[indl] - v[ind])*al;
 	vr = (v[indr] - v[ind])*ar;
 
@@ -290,7 +297,7 @@ void Poly::SetupRasterization( ) {
 		if ( v[indr].y > v[indl].y ) {	// go down right of poly
 			ind = indr;
 			indr = (indr + 1) % numVertices;
-			ar = 1/(v[ind].y - v[indr].y - 1);
+			ar = 1/(v[ind].y - v[indr].y );//- 1);
 			vr = (v[indr] - v[ind])*ar;
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
 				increments[j][0][i] = increments[j-1][0][i];
@@ -302,7 +309,7 @@ void Poly::SetupRasterization( ) {
 		else {	// go down left of poly
 			ind = indl;
 			indl = (indl > 0) ? indl - 1 : numVertices-1;
-			al = 1/(v[ind].y - v[indl].y - 1);
+			al = 1/(v[ind].y - v[indl].y );//- 1);
 			vl = (v[indl] - v[ind])*al;
 			for (int i=0;i<NUM_VERTEX_DATA;i++) {
 				increments[j][0][i] = vl[i];
@@ -613,7 +620,7 @@ void Poly::RasterizeFast( ) {
 void Poly::RasterizeFast( const int y ) {
 	if ( y > ySorted[0].y || 
 		 ( y < ySorted[2].y && numVertices==3 ) ||
-		 y < ySorted[3].y )
+		 y <= ySorted[3].y )
 		 return;
 
 	float interp[2][NUM_VERTEX_DATA];	// on the stack for speed, but only use numInterps
@@ -621,23 +628,26 @@ void Poly::RasterizeFast( const int y ) {
 	
 	float dyl,dyr,ai;
 	float dx;
-	int depthindex = 0,
+	int depthindex = -1,
 		leftindex = 0,
 		rightindex = 0;
 
 	if ( y < ySorted[0].y &&
-		 y >= ySorted[1].y && 
+		 y > ySorted[1].y && 
 		 (ySorted[0].y) != (ySorted[1].y) ) {			// We are between 1st and 2nd vertex
+		depthindex = 0;
 	}
-	else if ( y < ySorted[1].y &&		// We are between 2nd and 3rd vertex
-			  y >= ySorted[2].y ) {
+	else if ( y <= ySorted[1].y &&		// We are between 2nd and 3rd vertex
+			  y > ySorted[2].y ) {
 		depthindex = 1;
 	}
 	else if ( numVertices == 4 &&		// QUAD: we are between 3rd and 4th vertex
-			  y < ySorted[2].y &&
-			  y >= ySorted[3].y ) {
+			  y <= ySorted[2].y &&
+			  y > ySorted[3].y ) {
 		depthindex = 2;
 	}
+	if ( depthindex == -1 )
+		return;
 	leftindex = sides[depthindex][0],
 	rightindex= sides[depthindex][1];
 	dyl = v[leftindex].y - y;

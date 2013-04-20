@@ -46,7 +46,7 @@ Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
 
 Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
 Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(floortex,floortexwidth,floortexheight);
+Object testobj3 = Object(floorlarge,floorlargewidth,floorlargeheight);
 Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
 
 Matrix worldToCamera=Matrix(),
@@ -66,7 +66,7 @@ Matrix rmz = Matrix(),
 		rmyz = Matrix(),
         rmxyz = Matrix();
 
-float rot_angle = 3.141/120;
+float rot_angle = 3.141/60;
 		
 Matrix rot;		// debug/testing for rotating objects
 
@@ -256,7 +256,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	//projectile code
 	shot.projectileInit(camera.getForward());
 
-	objectlist.push_back(testobj);
+	//objectlist.push_back(testobj);
 	objectlist.push_back(testobj2);	
 	objectlist.push_back(testobj3);
 	objectlist.push_back(testobj4);

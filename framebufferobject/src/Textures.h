@@ -6,5 +6,6 @@
 #include "Sprites\defaulttexture.h"
 #include "Sprites\floor.h"
 #include "Sprites\floorsmall.h"
+#include "Sprites\floorlarge.h"
 
 #endif

@@ -123,6 +123,7 @@
     <ClInclude Include="src\Sprites\checkerboard.h" />
     <ClInclude Include="src\Sprites\defaulttexture.h" />
     <ClInclude Include="src\Sprites\floor.h" />
+    <ClInclude Include="src\Sprites\floorlarge.h" />
     <ClInclude Include="src\Sprites\floorsmall.h" />
     <ClInclude Include="src\Textures.h" />
   </ItemGroup>

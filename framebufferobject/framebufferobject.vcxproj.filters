@@ -99,6 +99,9 @@
     <ClInclude Include="src\Engine\chat.h">
       <Filter>headers\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="src\Sprites\floorlarge.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
