@@ -159,14 +159,14 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 			myplayer = player.Info();
 			myplayer.id = mymessage.Player().id;
 			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().y);
-			//myeye.SetForward(mymessage.Player().hx,mymessage.Player().hy,mymessage.Player().hz);
-			//myeye.SetUp(0,1,0);
+			myeye.SetForward(mymessage.Player().hx,mymessage.Player().hy,mymessage.Player().hz);
+			myeye.SetUp(0,1,0);
 			ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Player got position (%f,%f,%f).\n"),
 				mymessage.Player().x,
 				mymessage.Player().y,
 				mymessage.Player().z));
-			//player.Eye(myeye);
+			player.Eye(myeye);
 			player.Info(myplayer);	// update the data structure with the ID number from the server
 			break;
 		case CREATE:		// server has sent a create command for an object

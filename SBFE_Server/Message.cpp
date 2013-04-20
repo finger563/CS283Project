@@ -88,6 +88,8 @@ size_t Message::Length() const {
 
 int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 	cdr << ACE_CDR::Long (m.Type());
+	Player_s myplayer = Player_s(m.Player());
+	Object_s myobject = Object_s(m.Object());
 	switch (m.Type())
 	{
 	case REGISTER:
@@ -96,12 +98,12 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		break;
 	case ACCEPT:
 		cdr << ACE_CDR::Long ( m.Player().id );
-		cdr << ACE_CDR::Float ( m.Player().x );
-		cdr << ACE_CDR::Float ( m.Player().y );
-		cdr << ACE_CDR::Float ( m.Player().z );
-		cdr << ACE_CDR::Float ( m.Player().hx );
-		cdr << ACE_CDR::Float ( m.Player().hy );
-		cdr << ACE_CDR::Float ( m.Player().hz );
+		cdr << ACE_CDR::Float ( myplayer.x );
+		cdr << ACE_CDR::Float ( myplayer.y );
+		cdr << ACE_CDR::Float ( myplayer.z );
+		cdr << ACE_CDR::Float ( myplayer.hx );
+		cdr << ACE_CDR::Float ( myplayer.hy );
+		cdr << ACE_CDR::Float ( myplayer.hz );
 		break;
 	case CHAT:
 		cdr << ACE_CDR::Long ( strlen(m.Content()) );
@@ -109,12 +111,12 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		break;
 	case SHOOT:
 		cdr << ACE_CDR::Long (m.Player().id);
-		cdr << ACE_CDR::Float ( m.Player().x );
-		cdr << ACE_CDR::Float ( m.Player().y );
-		cdr << ACE_CDR::Float ( m.Player().z );
-		cdr << ACE_CDR::Float ( m.Player().hx );
-		cdr << ACE_CDR::Float ( m.Player().hy );
-		cdr << ACE_CDR::Float ( m.Player().hz );
+		cdr << ACE_CDR::Float ( myplayer.x );
+		cdr << ACE_CDR::Float ( myplayer.y );
+		cdr << ACE_CDR::Float ( myplayer.z );
+		cdr << ACE_CDR::Float ( myplayer.hx );
+		cdr << ACE_CDR::Float ( myplayer.hy );
+		cdr << ACE_CDR::Float ( myplayer.hz );
 		break;
 	case CREATE:
 	case MOVE:

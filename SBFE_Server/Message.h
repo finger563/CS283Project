@@ -43,13 +43,25 @@ enum ObjectType {	// These are the types of dynamic objects which need to be tra
 struct Player_s {
 	char			name[MAX_NAME_LEN];
 	ACE_CDR::Long	id;
-	float x,y,z;		// position vector
-	float hx,hy,hz;		// heading vector
-	float vx,vy,vz;		// velocity vector
+	float x,y,z,		// position vector
+		  hx,hy,hz,		// heading vector
+		  vx,vy,vz;		// velocity vector
 	Player_s*		next;
 	
 	Player_s() {next=NULL;id=0;memset(name,0,MAX_NAME_LEN);}
-	Player_s(const Player_s &s){next=NULL;id=s.id;memset(name,0,MAX_NAME_LEN);strcpy(name,s.name);}
+	Player_s(const Player_s &s) { 
+		id = s.id;
+		strcpy(name,s.name);
+		x = s.x;
+		y = s.y;
+		z = s.z;
+		hx = s.hx;
+		hy = s.hy;
+		hz = s.hz;
+		vx = s.vx;
+		vy = s.vy;
+		vz = s.vz;
+	}
 	Player_s(char* n,ACE_CDR::Long i){next=NULL;id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	
 	Player_s & operator=(const Player_s &s) {
@@ -90,9 +102,9 @@ struct Player_s {
 struct Object_s {
 	ObjectType		type;
 	ACE_CDR::Long	id;
-	float x,y,z;		// position vector
-	float hx,hy,hz;		// heading vector
-	float vx,vy,vz;		// velocity vector
+	float x,y,z,		// position vector
+		  hx,hy,hz,		// heading vector
+		  vx,vy,vz;		// velocity vector
 	char			content_[MAX_CONT_LEN];
 	Object_s*	next;
 	
@@ -106,6 +118,15 @@ struct Object_s {
 			type = a.type;
 			id = a.id;
 			strcpy(content_,a.content_);
+			x = a.x;
+			y = a.y;
+			z = a.z;
+			hx = a.hx;
+			hy = a.hy;
+			hz = a.hz;
+			vx = a.vx;
+			vy = a.vy;
+			vz = a.vz;
         }
         // by convention, always return *this
         return *this;
@@ -168,10 +189,10 @@ public:
 	MessageType Type() const {return type_;}
 
 	void			Object(const Object_s& o) {object_=o;}
-	Object_s		Object() const  {return object_;}
+	Object_s		Object() const {return object_;}
 
 	void		Player(const Player_s& p) {player_=p;}
-	Player_s	Player() const  {return player_;}
+	Player_s	Player() const {return player_;}
 
 	const char*		Content() const {return content_;}
 	void			Content(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}

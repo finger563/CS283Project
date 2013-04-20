@@ -1252,6 +1252,7 @@ void mouseCB(int button, int state, int x, int y)
 {
     mouseX = x;
     mouseY = y;
+	Camera tempcamera = player.Eye();
 
     if(button == GLUT_LEFT_BUTTON)
     {
@@ -1259,7 +1260,7 @@ void mouseCB(int button, int state, int x, int y)
         {
             mouseLeftDown = true;
 			
-			shot.projectileInit(camera.GetForward(),camera.GetPosition());
+			shot.projectileInit(tempcamera.GetForward(),tempcamera.GetPosition());
 			objectlist.push_back(shot);
         }
         else if(state == GLUT_UP)
