@@ -152,7 +152,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				con_peers.Push(newpeer);
 				mymessage.Type(ACCEPT);
 				myplayer.SetHeading(0,0,1);
-				myplayer.SetPos(0,0,0);
+				myplayer.SetPos(10,0,10);
 				mymessage.Player(myplayer);
 				int numbytes = this->send(this->peer(),mymessage);
 				ACE_DEBUG ((LM_DEBUG,

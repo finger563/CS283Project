@@ -11,65 +11,89 @@ void Camera::Normalize() {
 	right = normalize(right);
 }
 
-Point3D Camera::getPosition() {
-	return position;
-}
-
-Point3D Camera::getForward()
-{
-	return forward;
-}
-
-//sets position
-void Camera::Translate( Vector3D v)
-{
+void Camera::Translate( const Vector3D& v) {
 	position = right*(v.x) + up*(v.y) + forward*(v.z) + position; 
 }
 
-void Camera::setRotation(Matrix m) //will we be passing the rotation matrix?? or should I set a default matrix in the constructor?
-{
-	 rotation = m;
-}
-
-void Camera::Rotate (Matrix m) //will we be passing the rotation matrix?? or should I set a default matrix in the constructor?
-{
+void Camera::Rotate (const Matrix& m) {
 	 rotation = rotation*m;
 	 
-	 //rotate each vector by rotation
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
 	 Normalize();
 }
 
-void Camera::Rotate (float x, float y, float z) 
-{
+void Camera::Rotate (const float x, const float y, const float z) {
 	 Matrix m;
 	 m.SetRotation(x, y, z);
 	 rotation = m*rotation;
 
-	 //rotate each vector by rotation
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
 	 Normalize();
 }
 
-void Camera::Rotate (float x, Vector3D v) 
-{
+void Camera::Rotate (const float x, const Vector3D& v) {
 	 Matrix m;
 	 m.SetRotation(x,v);
 	 rotation = m*rotation;
 
-	 //rotate each vector by rotation
 	 up = m * up;
 	 forward = m * forward;
 	 right = m * right;
 	 Normalize();
 }
 
-Matrix Camera::getRotation()
-{
+Matrix Camera::GetWorldToCamera() {
 	return rotation.Transpose();
 }
 
+Matrix Camera::GetRotation() {
+	return rotation;
+}
+
+void Camera::SetRotation(const Matrix& m) {
+	 rotation = m;
+}
+
+Point3D Camera::GetPosition() {
+	return position;
+}
+
+void Camera::SetPosition( const float x, const float y, const float z ) {
+	position.x = x;
+	position.y = y;
+	position.z = z;
+}
+
+Point3D Camera::GetForward() {
+	return forward;
+}
+
+void Camera::SetForward( const float x, const float y, const float z) {
+	forward.x = x;
+	forward.y = y;
+	forward.z = z;
+}
+
+Point3D Camera::GetUp() {
+	return up;
+}
+
+void Camera::SetUp( const float x, const float y, const float z) {
+	up.x = x;
+	up.y = y;
+	up.z = z;
+}
+
+Point3D Camera::GetRight() {
+	return right;
+}
+
+void Camera::SetRight( const float x, const float y, const float z) {
+	right.x = x;
+	right.y = y;
+	right.z = z;
+}

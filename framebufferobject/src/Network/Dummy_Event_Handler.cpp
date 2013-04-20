@@ -122,6 +122,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 	Message mymessage;
 	ssize_t bytesReceived = this->recv_message(mymessage);
 	Player_s myplayer;
+	Camera myeye;
 	Object_s myobject;
 	string chat;
 	char str[15];
@@ -157,6 +158,15 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 		case ACCEPT:		// the server has accepted us
 			myplayer = player.Info();
 			myplayer.id = mymessage.Player().id;
+			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().y);
+			//myeye.SetForward(mymessage.Player().hx,mymessage.Player().hy,mymessage.Player().hz);
+			//myeye.SetUp(0,1,0);
+			ACE_DEBUG ((LM_DEBUG,
+				ACE_TEXT ("Player got position (%f,%f,%f).\n"),
+				mymessage.Player().x,
+				mymessage.Player().y,
+				mymessage.Player().z));
+			//player.Eye(myeye);
 			player.Info(myplayer);	// update the data structure with the ID number from the server
 			break;
 		case CREATE:		// server has sent a create command for an object

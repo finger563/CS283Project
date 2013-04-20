@@ -57,6 +57,15 @@ struct Player_s {
         {
 			id = s.id;
 			strcpy(name,s.name);
+			x = s.x;
+			y = s.y;
+			z = s.z;
+			hx = s.hx;
+			hy = s.hy;
+			hz = s.hz;
+			vx = s.vx;
+			vy = s.vy;
+			vz = s.vz;
         }
         // by convention, always return *this
         return *this;

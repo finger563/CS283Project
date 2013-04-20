@@ -13,6 +13,7 @@
 
 #include "..\..\..\SBFE_Server\Message.h"
 #include "..\Engine\chat.h"
+#include "..\Engine\camera.h"
 
 class Player_c {
 private:
@@ -20,9 +21,10 @@ private:
 	Player_s	info;
 	Object_s*	objects;
 	Chat_c		chat;
+	Camera		eye;
 public:
-	Player_c() : info() {objects=NULL;registered=false;chat=Chat();}
-	Player_c(const Player_s& s): info(s) {objects=NULL;registered=false;}
+	Player_c() : info(), chat(), eye() {objects=NULL;registered=false;}
+	Player_c(const Player_s& s): info(s), chat(), eye() {objects=NULL;registered=false;}
 	Player_c(Player_c& s){*this=s;}
 	~Player_c() {delete objects, this;}
 
@@ -31,6 +33,8 @@ public:
         {
 			info = s.Info();
 			objects = s.Objects();
+			chat = s.Chat();
+			eye = s.Eye();
         }
 		return *this;		// by convention, always return *this
 	}
@@ -42,6 +46,9 @@ public:
 
 	Chat_c Chat() const { return chat; }
 	void Chat(const Chat_c& c) { chat = c; }
+
+	Camera Eye() const { return eye; }
+	void Eye(const Camera& e) { eye = e; }
 
 	void Register() {registered=true;}
 	void Leave()	{registered=false;}

@@ -102,9 +102,11 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		cdr << ACE_CDR::Float ( m.Player().hx );
 		cdr << ACE_CDR::Float ( m.Player().hy );
 		cdr << ACE_CDR::Float ( m.Player().hz );
+		break;
 	case CHAT:
 		cdr << ACE_CDR::Long ( strlen(m.Content()) );
 		cdr.write_char_array(m.Content(),strlen(m.Content()));
+		break;
 	case SHOOT:
 		cdr << ACE_CDR::Long (m.Player().id);
 		cdr << ACE_CDR::Float ( m.Player().x );
@@ -186,11 +188,13 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		player.SetPos(x,y,z);
 		player.SetHeading(hx,hy,hz);
 		message.Player(player);
+		break;
 	case CHAT:
 		cdr >> cont_len;
 		cdr.read_char_array(cont,cont_len);
 		cont[cont_len]='\0';
 		message.Content(cont);
+		break;
 	case SHOOT:
 		cdr >> player_id;
 		cdr >> x;

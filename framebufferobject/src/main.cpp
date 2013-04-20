@@ -254,7 +254,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 	testobj3.generateFloor(75,-10);
 
 	//projectile code
-	shot.projectileInit(camera.getForward());
+	shot.projectileInit(camera.GetForward());
 
 	objectlist.push_back(testobj);
 	objectlist.push_back(testobj2);	
@@ -590,10 +590,10 @@ void updatePixels(GLubyte* dst, int size)
 			it->projectileMove();
 
 		it->updateList();
-		Vector3D tmp = it->getPosition() - camera.getPosition();
+		Vector3D tmp = it->getPosition() - player.Eye().GetPosition();
 		it->TranslateTemp(tmp);
 		worldToCamera.SetIdentity();
-		worldToCamera = worldToCamera*camera.getRotation();
+		worldToCamera = worldToCamera*player.Eye().GetWorldToCamera();
 		it->TransformToCamera( worldToCamera );
 		it->TransformToPerspective( perspectiveProjection );
 		std::list<Poly> templist = it->getRenderList();
@@ -1050,6 +1050,7 @@ void idleCB()
 
 void keyboardCB(unsigned char key, int x, int y)
 {
+	Camera tempcamera = player.Eye();
     switch(key)
     {
     case 27: // ESCAPE
@@ -1106,35 +1107,35 @@ void keyboardCB(unsigned char key, int x, int y)
 		break;
 
 	case 'q':	// rotate left
-		camera.Rotate(neg_rmy);
+		tempcamera.Rotate(neg_rmy);
 		break;
 
 	case 'e':	// rotate right
-		camera.Rotate(rmy);
+		tempcamera.Rotate(rmy);
 		break;
 
 	case 'w': // Up
-		camera.Translate(Vector3D(0,0,1));
+		tempcamera.Translate(Vector3D(0,0,1));
 		break;
 
 	case 's': // down
-		camera.Translate(Vector3D(0,0,-1));
+		tempcamera.Translate(Vector3D(0,0,-1));
 		break;
 
 	case 'a': // left
-		camera.Translate(Vector3D(-1,0,0));
+		tempcamera.Translate(Vector3D(-1,0,0));
 		break;
 
 	case 'd': // right
-		camera.Translate(Vector3D(1,0,0));
+		tempcamera.Translate(Vector3D(1,0,0));
 		break;
 
 	case ' ': // space
-		camera.Translate(Vector3D(0,1,0));
+		tempcamera.Translate(Vector3D(0,1,0));
 		break;
 
 	case 'c': // c
-		camera.Translate(Vector3D(0,-1,0));
+		tempcamera.Translate(Vector3D(0,-1,0));
 		break;
 
     case 'p':
@@ -1219,6 +1220,9 @@ void keyboardCB(unsigned char key, int x, int y)
 	default:
 		rot = rmxyz;
 	}
+
+	// Update the player's position/heading
+	player.Eye(tempcamera);
 }
 
 void specialKeyCB(int key, int x, int y)
@@ -1255,7 +1259,7 @@ void mouseCB(int button, int state, int x, int y)
         {
             mouseLeftDown = true;
 			
-			shot.projectileInit(camera.getForward(),camera.getPosition());
+			shot.projectileInit(camera.GetForward(),camera.GetPosition());
 			objectlist.push_back(shot);
         }
         else if(state == GLUT_UP)
