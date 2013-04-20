@@ -40,8 +40,7 @@ Object::Object(Poly poly, const unsigned short* texture, const int texWid, const
 //generate() method switch statements??
 
 //Updates Temp list with any changes to the master list
-bool Object::updateList()
-{
+bool Object::updateList() {
 	clearTemp();
 
 	if(!master.empty())
@@ -64,10 +63,8 @@ bool Object::updateList()
 
 
 //Updates Temp list with any changes to the master list
-bool Object::updateList(std::list<Poly> poly)
-{
-	//if(!temp.empty() || poly.empty())
-		clearTemp();
+bool Object::updateList(std::list<Poly> poly) {
+	clearTemp();
 
 	if(!poly.empty())
 	{
@@ -87,23 +84,20 @@ bool Object::updateList(std::list<Poly> poly)
 }
 
 //Replaces Temp list with render list
-void Object::clearTemp()
-{
+void Object::clearTemp() {
 	//empties temp list
 	temp.clear();
 }
 
 //Temp List Operations
-void Object::RotateTemp(const Matrix& m)
-{
+void Object::RotateTemp(const Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->Transform(m);
 	}
 }
 
-void Object::TranslateTemp(const Vector3D& v)
-{
+void Object::TranslateTemp(const Vector3D& v) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->Translate(v);
@@ -111,15 +105,13 @@ void Object::TranslateTemp(const Vector3D& v)
 }
 
 //add polygon to lists
-void Object::add(Poly poly)
-{
+void Object::add(Poly poly) {
 	master.push_back(poly);
 	updateList();
 }
 
 //generates cube
-void Object::generateCube(float size)
-{	  
+void Object::generateCube(float size) {	  
 	master.clear();
 
 	//stores in objects master list
@@ -178,8 +170,7 @@ void Object::generateCube(float size)
 }
 
 //generates tetrahedron
-void Object::generateTetra(float size)
-{
+void Object::generateTetra(float size) {
 	Vertex p1 = Vertex(size,0,-size/sqrt(2.0)),
 			p2 = Vertex(-size,0,-size/sqrt(2.0)),
 			p3 = Vertex(0,size,size/sqrt(2.0)),
@@ -210,8 +201,7 @@ void Object::generateTetra(float size)
 }
 
 //generates cube
-void Object::generateFloor(float length, float depth)
-{
+void Object::generateFloor(float length, float depth) {
 	position = Point3D(0,depth,0);
 
 	master.clear();
@@ -228,25 +218,21 @@ void Object::generateFloor(float length, float depth)
 	updateList(); 
 }
 
-bool Object::updateTime(int time)
-{
+bool Object::updateTime(int time) {
 	return true;
 }
 
-bool Object::setVel(Vector3D vector)
-{
+bool Object::setVel(Vector3D vector) {
 	velocity = vector;
 	return true;
 }
 
-bool Object::setPosition(Point3D pos)
-{
+bool Object::setPosition(Point3D pos) {
 	position = pos;
 	return true;
 }
 
-bool Object::SetRenderType( RenderType rt )
-{
+bool Object::SetRenderType( RenderType rt ) {
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
 		it->SetRenderType(rt);
@@ -259,8 +245,7 @@ Point3D Object::getPosition(void) {
 }
 
 //assumes that only the temp list is being passed through
-void Object::Rotate(Matrix& m)
-{
+void Object::Rotate(Matrix& m) {
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
 		it->Transform(m);
@@ -268,8 +253,7 @@ void Object::Rotate(Matrix& m)
 }
 
 //assumes that only the temp list is being passed through
-void Object::Translate(Vector3D& v)
-{
+void Object::Translate(Vector3D& v) {
 	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
 	{
 		it->Translate(v.x,v.y,v.z);
@@ -277,8 +261,7 @@ void Object::Translate(Vector3D& v)
 }
 
 //returns modified polygon list
-void Object::TransformToCamera(Matrix& m)
-{
+void Object::TransformToCamera(Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->TransformToCamera(m);
@@ -286,54 +269,15 @@ void Object::TransformToCamera(Matrix& m)
 }
 
 //returns modified polygon list
-void Object::TransformToPerspective(Matrix& m)
-{
+void Object::TransformToPerspective(Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->TransformToPerspective(m);
 	}
 }
 
-////////////////////////////////////////
-/////////////////Projectile functons////
-///////////////////////////////////////
-void Object::projectileInit(Vector3D head, Vector3D pos)
-{
-	//may have to create overload this to take a vector based
-	//on where the mouse clicks
-	heading = head;
-	position = pos;
-	generateCube(1);
-	counter=1;
-}
-
-void Object::projectileMove()
-{
-	
-	position.z++; //moves cube forward
-	counter++;
-
-	if(counter >= 25)
-		kill = true;
-}
-
-bool Object::getKill()
-{
-	return kill;
-}
-
-size_t Object::getCount()
-{
-	return counter;
-}
-
-void Object::upCount()
-{
-	counter++;
-}
 //returns modified polygon list
-void Object::TransformToPixel(Matrix& m)
-{
+void Object::TransformToPixel(Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
 		it->TransformToPixel(m);
@@ -341,8 +285,7 @@ void Object::TransformToPixel(Matrix& m)
 }
 
 //returns final render list
-std::list<Poly> Object::getRenderList()
-{
+std::list<Poly> Object::getRenderList() {
 	std::list<Poly> get;
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
@@ -360,4 +303,37 @@ std::list<Poly> Object::getRenderList()
 	}
 	
 	return get;
+}
+
+////////////////////////////////////////
+/////////////////Projectile functons////
+///////////////////////////////////////
+void Object::projectileInit(Vector3D head, Vector3D pos)
+{
+	//may have to create overload this to take a vector based
+	//on where the mouse clicks
+	heading = head;
+	position = pos;
+	generateCube(1);
+	counter=1;
+}
+
+void Object::projectileMove() {
+	position = position + heading;
+	counter++;
+
+	if(counter >= 25)
+		kill = true;
+}
+
+bool Object::getKill() {
+	return kill;
+}
+
+size_t Object::getCount() {
+	return counter;
+}
+
+void Object::upCount() {
+	counter++;
 }

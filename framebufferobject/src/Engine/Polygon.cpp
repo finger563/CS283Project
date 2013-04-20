@@ -626,16 +626,16 @@ void Poly::RasterizeFast( const int y ) {
 		rightindex = 0;
 
 	if ( y < ySorted[0].y &&
-		 y > ySorted[1].y && 
+		 y >= ySorted[1].y && 
 		 (ySorted[0].y) != (ySorted[1].y) ) {			// We are between 1st and 2nd vertex
 	}
 	else if ( y < ySorted[1].y &&		// We are between 2nd and 3rd vertex
-			  y > ySorted[2].y ) {
+			  y >= ySorted[2].y ) {
 		depthindex = 1;
 	}
 	else if ( numVertices == 4 &&		// QUAD: we are between 3rd and 4th vertex
-			  y <= ySorted[2].y &&
-			  y > ySorted[3].y ) {
+			  y < ySorted[2].y &&
+			  y >= ySorted[3].y ) {
 		depthindex = 2;
 	}
 	leftindex = sides[depthindex][0],
