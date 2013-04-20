@@ -93,6 +93,17 @@ Controls for the game:
  * backspace (during chat): remove last character added
  * escape: quit program or (during chat) exit chat
  * Mouse left click: fire projectile
+ 
+FEATURES
+--------
+ * Chat over network with usernames & chat history
+ * Server selects spawn location for players
+ * Player can move about freely in virtual world and fire projectiles
+ * Server correctly tracks connected/registered players and handles terminated connections
+ * Perspective-correct texturemapping, normal interpolation, z-buffering, and color interpolation
+ * Support for different rendering types for objects
+ * Extendable messaging format
+ * Extendable rendering engine with support for advanced rendering techniques
 
 TODO
 ----
@@ -101,6 +112,6 @@ TODO
  * Collision detection
  * Physics (for jumping)
  * Build world
- * Utilize server positions (ACCEPT message) as spawn location
+ * Have server randomly choose spawn points for players.
  * Allow killing of characters and their subsequent respawn
  * Lighting system (smooth shading, shadowing, etc.)
