@@ -35,7 +35,8 @@ peer_s con_peers;
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
 	
-ACE_Time_Value period_t (1);
+ACE_Time_Value period_t (0,30000);		// update every 30,000 us = 30 ms.
+//ACE_Time_Value period_t (5,0);		// update every 30,000 us = 30 ms.
 
 // constructor (pass a pointer to the reactor). By default we assume
 // a system-wide default reactor that ACE defines
@@ -72,7 +73,7 @@ int Dummy_Data_Handler::open (void)
 	if (this->reactor ()
 		->register_handler (this,  // register ourselves with the reactor
 									// indicating it that we are interested
-									// in reading data
+									// in reading data and timout handling
 							ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
 		ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("[%P] Dummy_Data_Handler::open - "),
@@ -132,14 +133,6 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 
 	} else {
 		// some data is received.
-#if defined(DEBUG)
-		cout << "Message type: " << mymessage.Type() << endl
-			<< "Object type: " << mymessage.Object().type << endl
-			<< "Object ID: " << mymessage.Object().id << endl
-			<< "Player Name: " << mymessage.Player().name << endl
-			<< "Player ID: " << mymessage.Player().id << endl
-			<< "Message Content: " << mymessage.Content() << endl;
-#endif
 		// Now process message
 		switch (mymessage.Type())
 		{
@@ -154,10 +147,12 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myplayer.SetPos(10,0,10);
 				mymessage.Player(myplayer);
 				int numbytes = this->send(this->peer(),mymessage);
+#if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG,
 					ACE_TEXT ("Server ACCEPTed player (%s,%d).\n"),
 					myplayer.name,
 					myplayer.id));
+#endif
 				
 				peer_s *tmp = &con_peers;
 				mymessage.Type(CREATE);
@@ -171,10 +166,12 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				while (tmp->next!=NULL) {		// Let other clients know of this new client
 					tmp = tmp->next;
 					int numbytes = this->send(*(tmp->p),mymessage);
+#if defined(DEBUG)
 					ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
 						server.Player(tmp->ID),
 						tmp->ID));
+#endif
 				}
 				
 				Player_s* others = server.Players();
@@ -188,10 +185,12 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 						myobject.SetContent(others->name);
 						mymessage.Object(myobject);
 							int numbytes = this->send(this->peer(),mymessage);
+#if defined(DEBUG)
 							ACE_DEBUG ((LM_DEBUG,
 								ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
 								server.Player(tmp->ID),
 								tmp->ID));
+#endif
 					}
 					others = others->next;		
 				}
@@ -206,20 +205,23 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 					tmp = tmp->next;
 					if ( tmp->ID != myid ) {
 						int numbytes = this->send(*(tmp->p),mymessage);
+#if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Server propagated CHAT to player (%s,%d).\n"),
 							server.Player(tmp->ID),
 							tmp->ID));
+#endif
 					}
 				}
 			}
 			break;
 		case SHOOT:
 			if ( server.Player(mymessage.Player()) ) {
+#if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("%s fired a shot!\n"),
 							mymessage.Player().name));
-				
+#endif
 				peer_s *tmp = &con_peers;
 				mymessage.Type(CREATE);
 				myplayer = mymessage.Player();
@@ -228,14 +230,17 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myobject.SetHeading(myplayer.hx,myplayer.hy,myplayer.hz);
 				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
 				myobject.SetContent(myplayer.name);
+				server.Create(myobject);		// need to keep track of this object on the server
 				mymessage.Object(myobject);
 				while (tmp->next!=NULL) {
 					tmp = tmp->next;
 					int numbytes = this->send(*(tmp->p),mymessage);
+#if defined(DEBUG)
 					ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("Server sent CREATE object to player (%s,%d).\n"),
 						server.Player(tmp->ID),
 						tmp->ID));
+#endif
 				}
 			}
 			break;
@@ -272,19 +277,6 @@ int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
 	iov[0].iov_len = 8;
 	iov[1].iov_base = payload.begin()->rd_ptr();
 	iov[1].iov_len = length;
-#if defined(DEBUG)
-	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Server sent %d bytes.\n"),
-		length));
-	
-	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Client sent %d bytes of header: %s\n"),
-		length, header.begin()->rd_ptr()));
-
-	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Client sent %d bytes of message: %s\n"),
-		length, payload.begin()->rd_ptr()));
-#endif
 	return p.sendv_n (iov, 2);
 }
 
@@ -312,11 +304,6 @@ int Dummy_Data_Handler::recv_message(Message& message)
 		ACE_CDR::ULong length;
 		cdr >> length;
 
-#if defined(DEBUG)
-		ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Recieved message of length: %d\n"),
-					length));
-#endif
 		payload->size(8 + ACE_CDR::MAX_ALIGNMENT + length);
 		
 		if (peer_.recv_n (payload->wr_ptr(), length) > 0) {
@@ -345,98 +332,38 @@ int Dummy_Data_Handler::recv_message(Message& message)
 // this is the function timeout which will handle that.
 int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act)
 {	
-#if defined(DEBUG)
+	#if defined(DEBUG)
 	// for debugging
 	ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Dummy_Data_Handler::handle_timeout invoked\n")));
-#endif
+	#endif
 
 	Message mymessage;
-
-	if (mymessage.FormMessage(true))		// true because I am the server
-	{
-		if ( server.Players() == NULL)
-		{
-			ACE_DEBUG ((LM_ERROR,
-						ACE_TEXT ("Error, there are no players!\n")));
-		}	
-		else 
-		{
+	mymessage.Type(UPDATE);
+	if ( server.Players() != NULL )	{
+		if ( server.Objects() != NULL ) {
 			peer_s *tmp = &con_peers;
-			switch(mymessage.Type())
-			{
-			case ACCEPT:
-				if ( server.Create(mymessage.Object()) )
-				{
-					while (tmp->next!=NULL)
-					{
-						tmp = tmp->next;
-						int numbytes = this->send(*(tmp->p),mymessage);
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
-							numbytes,
-							server.Player(tmp->ID),
-							tmp->ID));
-					}
-				}
-				break;
-			case CHAT:
-				//if ( server.Reply(mymessage.Object()) )
-				//{
-				//	while (tmp->next!=NULL)
-				//	{
-				//		tmp = tmp->next;
-				//		int numbytes = this->send(*(tmp->p),mymessage);
-				//		ACE_DEBUG ((LM_DEBUG,
-				//			ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
-				//			numbytes,
-				//			server.Player(tmp->ID),
-				//			tmp->ID));
-				//	}
-				//}
-				break;
-			case CREATE:
-				if ( server.Create(mymessage.Object()) )
-				{
-					while (tmp->next!=NULL)
-					{
-						tmp = tmp->next;
-						int numbytes = this->send(*(tmp->p),mymessage);
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
-							numbytes,
-							server.Player(tmp->ID),
-							tmp->ID));
-					}
-				}
-				break;
-			case MOVE:
-				break;
-			case REMOVE:
-				while (tmp->next!=NULL)
-				{
-					tmp = tmp->next;
-					int numbytes = this->send(*(tmp->p),mymessage);
-					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
-						numbytes,
-						server.Player(tmp->ID),
-						tmp->ID));
-				}
-				server.Shutdown();
-				con_peers.RemoveALL();
-				break;
-			default:
-				break;
+			float time = period_t.usec()/1000000.0;
+			time += period_t.sec();
+			mymessage.Time(time);
+			while ( tmp->next != NULL ) {
+				tmp = tmp->next;
+				int numbytes = this->send(*(tmp->p),mymessage);
+				#if defined(DEBUG)
+				ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Server sent UPDATE time to player (%s,%d).\n"),
+					server.Player(tmp->ID),
+					tmp->ID));
+				#endif
 			}
 		}
 	}
 
-  this->reactor()->schedule_timer(this,
-								  0,
-								  period_t);
+	this->reactor()->schedule_timer(this,
+									0,
+									period_t);
 
-  return 0;
+	return 0;
 }
 
 // handle clean up events. The parameters are what the reactor framework

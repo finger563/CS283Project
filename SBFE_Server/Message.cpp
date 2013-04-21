@@ -1,7 +1,7 @@
 // $Id$
 //
 // Author: William Emfinger
-// Date  : Created: Feb 21, 2012
+// Date  : Created: April 15, 2013
 //
 //
 // Message implementation file.
@@ -73,6 +73,12 @@ size_t Message::Length() const {
 			// 1 -> z velocity
 		ret += strlen(object_.content_);
 		break;
+	case UPDATE:	// Server sends update time differential to all clients
+		ret += sizeof(ACE_CDR::Long);
+			// 1 -> Message type
+		ret += sizeof(ACE_CDR::Float);
+			// 1 -> time
+		break;
 	case LEAVE:		// Player sends request to leave server
 		ret += 2 * sizeof(ACE_CDR::Long);
 			// 1 -> Message type
@@ -90,8 +96,6 @@ size_t Message::Length() const {
 
 int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 	cdr << ACE_CDR::Long (m.Type());
-	//Player_s myplayer = m.Player();
-	//Object_s myobject = m.Object();
 	switch (m.Type())
 	{
 	case REGISTER:
@@ -138,6 +142,9 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		cdr << ACE_CDR::Float ( m.Object().vz );
 		cdr.write_char_array(m.Object().content_,strlen(m.Object().content_));
 		break;
+	case UPDATE:
+		cdr << ACE_CDR::Float (m.Time());
+		break;
 	case LEAVE:
 		cdr << ACE_CDR::Long ( m.Player().id );
 		break;
@@ -159,7 +166,8 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 	ACE_CDR::Long cont_len;
 	ACE_CDR::Float x,y,z,
 				   hx,hy,hz,
-				   vx,vy,vz;
+				   vx,vy,vz,
+				   time;
 	char name[MAX_NAME_LEN];
 	char cont[MAX_CONT_LEN];
 	memset(name,0,MAX_NAME_LEN);
@@ -241,6 +249,10 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		object.SetVelocity(vx,vy,vz);
 		message.Object(object);
 		message.Content(cont);
+		break;
+	case UPDATE:
+		cdr >> time;
+		message.Time(time);
 		break;
 	case LEAVE:
 		cdr >> player_id;

@@ -44,6 +44,7 @@ int parse_args (int argc, ACE_TCHAR *argv[]) {
 // thread so each thread can do its job independently of the others
 void *thread_func (void *arg)
 {
+	ACE_TCHAR **myargv = (ACE_TCHAR **)arg;
 	ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("[%t] Player : Network Thread - has started\n")));
 
@@ -60,14 +61,6 @@ void *thread_func (void *arg)
 					ACE_TEXT ("[%t] Player : Network Thread - got thread id %d\n"), my_id));
 	}  // end of scope where the lock will be magically released.
 
-	// once you know what your ID is, use it and add to 10,000 to use it
-	// as your port number. Use that info to initialize the reactor and
-	// register the event handler for "handle_input" for this thread
-	// with the reactor. The handle_input has to do 2 things:
-	// handle_input may be invoked if you are participating in the
-	// routing table computation algorithm. The other case is when you
-	// have to do forwarding of the client's packet.
-	//
 	// A singleton instance to the Reactor is obtained using the
 	// ACE_Reactor::instance () method.
 	//
@@ -83,7 +76,7 @@ void *thread_func (void *arg)
 
 	// the first step for a server is to initialize itself on the port
 	// and host network interface.
-	if (event_handler.open (ip_addr) == -1) {
+	if (event_handler.open (myargv) == -1) {
 		ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("[%t] Player : Network Thread - "),
 					ACE_TEXT ("failed to initialize client (%m)\n")));

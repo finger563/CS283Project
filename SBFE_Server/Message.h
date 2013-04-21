@@ -33,6 +33,7 @@ enum MessageType {
 	CREATE,		// Server sends CREATE message when a new object is created by a player (shot, player, etc.)
 	MOVE,		// Server sends MOVE message when a created object needs to be moved (i.e. shot update, player update, etc.)
 				//	Players send MOVE messages to the server when the player needs to move (i.e. keyboard/mouse input)
+	UPDATE,		// Server sends UPDATE periodically with a time differential so clients can synchronously update their object states
 	LEAVE,		// Player sends LEAVE message when they disconnect from the server
 	REMOVE		//	Then the server removes the player from it's list and sends REMOVE to remove the object from other players' games
 };
@@ -147,7 +148,7 @@ struct Object_s {
         // by convention, always return *this
         return *this;
 	}
-	
+
 	void SetID(ACE_CDR::Long i) {id = i;}
 	void SetType(ObjectType t) { type = t; }
 	void SetContent(const char* n) {memset(content_,0,MAX_NAME_LEN);strcpy(content_,n);}
@@ -156,6 +157,12 @@ struct Object_s {
 	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
 
 	void Link(Object_s* a){next = a;}
+	
+	void Update(const float time) {
+		x += hx * time;
+		y += hy * time;
+		z += hz * time;
+	}
 
 	bool operator==(const Object_s &b) {
 		if ( id ==b.id && type == b.type )
@@ -168,15 +175,17 @@ struct Object_s {
 class Message {
 private:
 	MessageType type_;
+	float		t_;		// time differential for update
 	Object_s	object_;
 	Player_s	player_;
 	char		content_[MAX_CONT_LEN];
 public:
 	Message() : object_(),player_() {
 		type_ = REGISTER;
+		t_ = 0;
 		memset(content_,0,MAX_CONT_LEN);
 	}
-	Message(const Message &m) : object_(m.Object()),player_(m.Player()) {
+	Message(const Message &m) : object_(m.Object()),player_(m.Player()), t_(m.Time()) {
 		this->type_ = m.Type();
 		memset(content_,0,MAX_CONT_LEN);
 		strcpy(this->content_,m.Content());
@@ -191,6 +200,7 @@ public:
 		if (this != &m) // protect against invalid self-assignment
         {
 			type_ = m.Type();
+			t_ = m.Time();
 			object_ = m.Object();
 			player_ = m.Player();
 			strcpy(content_,m.Content());
@@ -204,14 +214,17 @@ public:
 	void		Type(const MessageType type) {type_=type;}
 	MessageType Type() const {return type_;}
 
-	void			Object(const Object_s& o) {object_=o;}
-	Object_s		Object() const {return object_;}
+	void	Time(const float time) { t_ = time; }
+	float	Time() const { return t_; }
+
+	void		Object(const Object_s& o) {object_=o;}
+	Object_s	Object() const {return object_;}
 
 	void		Player(const Player_s& p) {player_=p;}
 	Player_s	Player() const {return player_;}
 
-	const char*		Content() const {return content_;}
-	void			Content(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}
+	const char*	Content() const {return content_;}
+	void		Content(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}
 
 	bool FormMessage(bool isServer);
 };

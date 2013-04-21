@@ -24,8 +24,11 @@ using namespace std;
 #include "Dummy_Event_Handler.h"
 
 Player_c player;
+extern string ip_addr;
 
-ACE_Time_Value period_t (1);
+//ACE_Time_Value period_t (0,30000);
+//ACE_Time_Value period_t (1,0);
+//ACE_Time_Value previous_time (0);
 
 
 // constructor (pass a pointer to the reactor). By default we assume
@@ -44,12 +47,14 @@ Dummy_Event_Handler::~Dummy_Event_Handler (void)
 }
 
 // initialization method that registers ourselves with the reactor. 
-int Dummy_Event_Handler::open (string server_ip)
+int Dummy_Event_Handler::open (ACE_TCHAR *argv [])
 {
-#if defined(DEBUG)
+	#if defined(DEBUG)
   // for debugging
   cout << "Dummy_Event_Handler::open invoked" << endl;
-#endif
+	#endif
+	
+	string server_ip = ip_addr;
   
 	// initialize the address data structure. 
 	if (server_addr_.set (server_ip.c_str()) == -1) {
@@ -82,7 +87,7 @@ int Dummy_Event_Handler::open (string server_ip)
 	if (this->reactor ()
 			->register_handler (this,  // register ourselves with the reactor
 										// indicating it that we are interested
-										// in reading data
+										// in reading data and timout handling
 								ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
 		ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("[%P] Dummy_Event_Handler::open - "),
@@ -92,10 +97,11 @@ int Dummy_Event_Handler::open (string server_ip)
 
 	// disable non blocking I/O
 	this->peer_.disable (ACE_NONBLOCK);
-
+	
+	ACE_Time_Value myperiod (1);
 	this->reactor()->schedule_timer(this,
 									0,
-									period_t);
+									myperiod);
 
 	// REGISTER THE PLAYER WITH THE SERVER
 	Message mymessage;
@@ -113,11 +119,11 @@ int Dummy_Event_Handler::open (string server_ip)
 // handle incoming data
 int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 {
-#if defined(DEBUG)
+	#if defined(DEBUG)
   // for debugging
   ACE_DEBUG ((LM_DEBUG,
               ACE_TEXT ("Dummy_Event_Handler::handle_input invoked\n")));
-#endif
+	#endif
   
 	Message mymessage;
 	ssize_t bytesReceived = this->recv_message(mymessage);
@@ -127,31 +133,19 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 	string chat;
 	char str[15];
 
-  // note that unless there is a well defined protocol between the two
-  // ends we never 
+	// note that unless there is a well defined protocol between the two
+	// ends we never 
 
-  if (bytesReceived == -1) { 
-    // this is an error condition
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("[%P] Dummy_Event_Handler::handle_input - "),
-                ACE_TEXT ("failed on recv (%m)\n")));
-    // we let the reactor trigger the handle close
-	return -1;
-  } 
-  else 
-  {
-#if defined(DEBUG)
-	  ACE_DEBUG ((LM_DEBUG,
-				  ACE_TEXT ("Client received %d bytes.\n"),
-				  bytesReceived));
-    // some data is received.
-		cout << "Message type: " << mymessage.Type() << endl
-			<< "Object type: " << mymessage.Object().type << endl
-			<< "Object ID: " << mymessage.Object().id << endl
-			<< "Player Name: " << mymessage.Player().name << endl
-			<< "Player ID: " << mymessage.Player().id << endl
-			<< "Message Content: " << mymessage.Content() << endl;
-#endif
+	if (bytesReceived == -1) { 
+		// this is an error condition
+		ACE_ERROR ((LM_ERROR,
+					ACE_TEXT ("[%P] Dummy_Event_Handler::handle_input - "),
+					ACE_TEXT ("failed on recv (%m)\n")));
+		// we let the reactor trigger the handle close
+		return -1;
+	} 
+	else 
+	{
 		// Now process message
 		switch (mymessage.Type())
 		{
@@ -160,16 +154,19 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 			myplayer.id = mymessage.Player().id;
 			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().z);
 			myeye.SetForward(mymessage.Player().hx,mymessage.Player().hy,mymessage.Player().hz);
-			myeye.SetUp(0,1,0);		// we will always face up
+			myeye.SetUp(0,1,0);
+			#if defined(DEBUG)
 			ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Player got position (%f,%f,%f).\n"),
 				mymessage.Player().x,
 				mymessage.Player().y,
 				mymessage.Player().z));
+			#endif
 			player.Eye(myeye);
 			player.Info(myplayer);	// update the data structure with the ID number from the server
 			break;
 		case CREATE:		// server has sent a create command for an object
+			#if defined(DEBUG)
 			switch (mymessage.Object().type)
 			{
 			case PLAYER:
@@ -185,6 +182,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 					ACE_TEXT ("Received new Object: (%s,%d)\n"),
 					str,
 					mymessage.Object().id));
+			#endif
 			myobject = mymessage.Object();
 			player.Create(myobject);
 			break;
@@ -193,6 +191,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 			player.AddChat(chat);
 			break;
 		case MOVE:
+			#if defined(DEBUG)
 			switch (mymessage.Object().type)
 			{
 			case PLAYER:
@@ -208,10 +207,21 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 					ACE_TEXT ("Moving Object: (%s,%d)\n"),
 					str,
 					mymessage.Object().id));
+			#endif
 			myobject = mymessage.Object();
 			player.Move(myobject);
 			break;
+		case UPDATE:
+			#if defined(DEBUG)
+			ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Received update with time %f\n"),
+					mymessage.Time()));
+			#endif
+			//period_t = ACE_Time_Value(floor(mymessage.Time()),(mymessage.Time()-floor(mymessage.Time()))*1000000.0);
+			player.Update(mymessage.Time());
+			break;
 		case REMOVE:
+			#if defined(DEBUG)
 			switch (mymessage.Object().type)
 			{
 			case PLAYER:
@@ -223,19 +233,20 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 			default:
 				break;
 			}
-			player.Remove(mymessage.Object().id);
 			ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Object (%s,%d) removed!\n"), str ,mymessage.Object().id));
+			#endif
+			player.Remove(mymessage.Object().id);
 			break;
 		default:
 			ACE_ERROR ((LM_ERROR,
                 ACE_TEXT ("Error: Not a valid message type!\n")));
 			break;
 		}
-  }
+	}
 
-  // success
-  return 0;
+	// success
+	return 0;
 }
 
 int Dummy_Event_Handler::send(const Message& message)
@@ -257,26 +268,13 @@ int Dummy_Event_Handler::send(const Message& message)
 	iov[0].iov_len = 8;
 	iov[1].iov_base = payload.begin()->rd_ptr();
 	iov[1].iov_len = length;
-	
-#if defined(DEBUG)
-	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Client sent %d bytes.\n"),
-		length));	
-	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Client sent %d bytes of header: %s\n"),
-		length, header.begin()->rd_ptr()));
 
-	ACE_DEBUG ((LM_DEBUG,
-		ACE_TEXT ("Client sent %d bytes of message: %s\n"),
-		length, payload.begin()->rd_ptr()));
-#endif
 	return peer_.sendv_n (iov, 2);
 }
 
-
 int Dummy_Event_Handler::recv_message(Message& message)
 {
-#define MAXHOSTNAMELEN	100
+	int MAXHOSTNAMELEN = 100;
 	ACE_INET_Addr peer_addr;
 	peer_.get_remote_addr(peer_addr);
 	ACE_Message_Block* mblk = new ACE_Message_Block (MAXHOSTNAMELEN +1);
@@ -297,12 +295,6 @@ int Dummy_Event_Handler::recv_message(Message& message)
 
 		ACE_CDR::ULong length;
 		cdr >> length;
-
-#if defined(DEBUG)
-		ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Recieved message of length: %d\n"),
-					length));
-#endif
 		payload->size(8 + ACE_CDR::MAX_ALIGNMENT + length);
 		
 		if (peer_.recv_n (payload->wr_ptr(), length) > 0) {
@@ -328,48 +320,24 @@ int Dummy_Event_Handler::recv_message(Message& message)
 // handle timeout events.
 int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act)
 {	
-#if defined(DEBUG)
-	// for debugging
+	float currenttime = current_time.usec() / 1000000.0;
+	currenttime += current_time.sec();
+	#if defined(DEBUG)
 	ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Dummy_Event_Handler::handle_timeout invoked\n")));
-#endif
+				ACE_TEXT ("Dummy_Event_Handler::handle_timeout invoked at %f\n"),
+				currenttime));
+	#endif
 	
-	Message mymessage;
-	mymessage.Player(player.Info());	// need to make sure message contains info
-
-	if (mymessage.FormMessage(false))		// false because I am a player
-	{
-		
-		switch(mymessage.Type())
-		{
-		case REGISTER:
-			if ( player.Registered() ) {
-				ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Already Registered!\n")));
-				break;
-			}
-			player.Register();
-			this->send(mymessage);
-			break;
-		case SHOOT:
-		case CHAT:
-			if ( ! player.Registered() ) {
-				ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Need to be registered first!\n")));
-				break;
-			}
-			this->send(mymessage);
-			break;
-		default:
-			break;
-		}
-	}
+	//float time = period_t.usec()/1000000.0;
+	//time += period_t.sec();
+	//player.Update(time);
 	
-  this->reactor()->schedule_timer(this,
-								  0,
-								  period_t);
+	ACE_Time_Value period_t (1);
+	this->reactor()->schedule_timer(this,
+									0,
+									period_t);
 
-  return 0;
+	return 0;
 }
 
 // handle clean up events. The parameters are what the reactor framework
@@ -383,8 +351,7 @@ int Dummy_Event_Handler::handle_close (ACE_HANDLE, ACE_Reactor_Mask mask)
   ACE_DEBUG ((LM_DEBUG,
               ACE_TEXT ("Dummy_Event_Handler::handle_close invoked\n")));
 
-  mask = ACE_Event_Handler::ALL_EVENTS_MASK |
-	  ACE_Event_Handler::DONT_CALL;
+  mask = ACE_Event_Handler::ALL_EVENTS_MASK | ACE_Event_Handler::DONT_CALL;
   this->reactor()->remove_handler(this,mask);
   
   // time for us to cleanup. First cleanup the OS socket resources

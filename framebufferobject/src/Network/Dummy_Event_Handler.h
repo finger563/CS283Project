@@ -36,7 +36,7 @@ public:
   Dummy_Event_Handler (ACE_Reactor *r = ACE_Reactor::instance ());
 
   // define an initialization method 
-  virtual int open (string server_ip);
+  virtual int open (ACE_TCHAR *argv []);
 
   /* now define the event handler's callback methods.  These are the
      methods that we will get dispatched on the events */

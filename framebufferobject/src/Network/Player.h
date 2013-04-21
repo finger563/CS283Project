@@ -11,6 +11,8 @@
 #if !defined (_CS283_PLAYER_H_)
 #define _CS283_PLAYER_H_
 
+#define DEBUG
+
 #include "..\..\..\SBFE_Server\Message.h"
 #include "..\Engine\chat.h"
 #include "..\Engine\camera.h"
@@ -69,14 +71,25 @@ public:
 	}
 
 	void Move(Object_s& a) {
-		if (objects==NULL) {
-			objects = new Object_s(a);
+		Object_s* tmp = objects;
+		Object_s* prev = tmp;
+		while ( tmp != NULL) {
+			if ( tmp->id == a.id ) {
+				tmp->SetPos(a.x,a.y,a.z);
+				tmp->SetHeading(a.hx,a.hy,a.hz);
+				tmp->SetVelocity(a.vx,a.vy,a.vz);
+				return;
+			}
+			prev = tmp;
+			tmp = tmp->next;
 		}
-		else {
-			Object_s* tmp;
-			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next);
-			Object_s* link = new Object_s(a);
-			tmp->Link(link);
+	}
+
+	void Update(const float time) {
+		Object_s* tmp = objects;
+		while ( tmp != NULL) {
+			tmp->Update(time);
+			tmp = tmp->next;
 		}
 	}
 

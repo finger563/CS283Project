@@ -18,6 +18,8 @@ using namespace std;
 
 #include <ace/SOCK_Stream.h>      // for data comm functionality
 
+#define DEBUG
+
 class Server_c {
 private:
 	Object_s	*objects;

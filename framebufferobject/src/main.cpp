@@ -54,6 +54,7 @@ Matrix worldToCamera=Matrix(),
 	   projectionToPixel=Matrix();
 
 std::list<Object> objectlist;
+std::list<Object> dynamiclist;
 std::list<Poly> renderlist;
 
 
@@ -605,18 +606,55 @@ void updatePixels(GLubyte* dst, int size)
 
 	renderlist.clear();
 
+	dynamiclist.clear();
+	Object_s* dynamic = player.Objects();
+	Object tempobj;
+	while ( dynamic != NULL ) {
+		switch ( dynamic->type ) {
+		case PLAYER:
+			tempobj = Object(box,boxtexwidth,boxtexheight);
+			tempobj.generateCube();
+			tempobj.SetRenderType(TEXTURED);
+			break;
+		case SHOT:
+			tempobj = Object();
+			tempobj.generateCube(1.0);
+			tempobj.SetRenderType(FLAT);
+			break;
+		default:
+			break;
+		}
+		tempobj.setPosition(Point3D(dynamic->x,dynamic->y,dynamic->z));
+		tempobj.setVel(Vector3D(dynamic->hx,dynamic->hy,dynamic->hz));
+		dynamiclist.push_back(tempobj);
+		dynamic = dynamic->next;
+	}
+	for (std::list<Object>::iterator it = dynamiclist.begin(); it != dynamiclist.end(); it++) {
+
+		it->updateList();
+		Vector3D tmppos = it->getPosition() - player.Eye().GetPosition();
+		it->TranslateTemp(tmppos);
+		worldToCamera.SetIdentity();
+		worldToCamera = worldToCamera*player.Eye().GetWorldToCamera();
+		it->TransformToCamera( worldToCamera );
+		it->TransformToPerspective( perspectiveProjection );
+		std::list<Poly> templist = it->getRenderList();
+		renderlist.splice(renderlist.end(), templist);
+
+	}
+
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		
 
-		//does this need to be here?
-		if(it->getCount() == 1)
-			it->upCount();
-		else if(it->getCount() > 1)
-			it->projectileMove();
+		////does this need to be here?
+		//if(it->getCount() == 1)
+		//	it->upCount();
+		//else if(it->getCount() > 1)
+		//	it->projectileMove();
 
 		it->updateList();
-		Vector3D tmp = it->getPosition() - player.Eye().GetPosition();
-		it->TranslateTemp(tmp);
+		Vector3D tmppos = it->getPosition() - player.Eye().GetPosition();
+		it->TranslateTemp(tmppos);
 		worldToCamera.SetIdentity();
 		worldToCamera = worldToCamera*player.Eye().GetWorldToCamera();
 		it->TransformToCamera( worldToCamera );
@@ -647,11 +685,11 @@ void updatePixels(GLubyte* dst, int size)
 		
 		it->Rotate(rot);	
 
-		//if shot needs to be deleted
-		if(it->getKill()) {
-			it = objectlist.erase(it);
-			--it;
-		}
+		////if shot needs to be deleted
+		//if(it->getKill()) {
+		//	it = objectlist.erase(it);
+		//	--it;
+		//}
 	}
 	
     // copy 4 bytes at once
@@ -1046,7 +1084,7 @@ void displayCB()
 	}
 	
 
-    printTransferRate();
+    //printTransferRate();
 
     glPopMatrix();
 
