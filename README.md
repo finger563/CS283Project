@@ -100,6 +100,11 @@ FEATURES
  * Server selects spawn location for players
  * Player can move about freely in virtual world and fire projectiles
  * Server correctly tracks connected/registered players and handles terminated connections
+ * Server correctly tracks dynamic objects (shots/players)
+   * Sends all currently active dynamic objects to players that join later
+   * Dynamic objects must be created by the server (including all players and shots); clients request creation
+   * Propagates player movements to other connected clients using AMI-style interface (like QUAKE)
+   * Gracefully handles players leaving (either with a LEAVE command or when they kill process with interrupt).
  * Perspective-correct texturemapping, normal interpolation, z-buffering, and color interpolation
  * Support for different rendering types for objects
  * Extendable messaging format
@@ -107,11 +112,8 @@ FEATURES
 
 TODO
 ----
- * Update server code to keep track of players & shots
-   * Send all currently active dynamic objects to players that join later
-   * Update all dynamic objects using timeout function (i.e. periodically)
  * Use mouse movement for camera rotation
- * Finish SHOOT,CREATE,MOVE,LEAVE,REMOVE server/client implementations
+ * Finish MOVE server/client implementations w.r.t player/object headings
  * Collision detection
  * Physics (for jumping)
  * Build world
