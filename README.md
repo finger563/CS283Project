@@ -59,6 +59,18 @@ Getting the project files
 Currently the code is set up as a MSVS 2010 solution containing two projects
  * SBFE_Client
  * SBFE_Server
+The solution currently has both projects (server and client) set as startup projects.
+This means that when you run/debug the solution, you get both parts of the network code 
+running at the same time and can debug both parts at the same time if you want.  Moreover,
+by right-clicking on the SBFE_Client project in the solution explorer and selecting Debug->start 
+new instance, you can spawn more clients to do more thorough network testing without the need
+for any command windows to go to the exe folder and start them.
+
+However, should you wish to run the exe's from the command window (i.e. without MSVS running),
+you can do so by opening a command window (cygwin,cmd, etc.) and cd-ing into the Release directory
+of the solution.  You need to make sure that freeglut.dll (in the SBFE_Client project folder) and 
+ACEd.dll (wherever you installed ACE) are both either in the PATH or are in the Release folder.  
+Assuming they are, you can then run the executables from the command line.
 
 Running the Server
 ------------------
@@ -114,6 +126,9 @@ TODO
 ----
  * Use mouse movement for camera rotation
  * Finish MOVE server/client implementations w.r.t player/object headings
+ * Figure out bug with client Dummy_Event_Handler timeout callback not actually being called.
+   * This would simplify the messages sent over the network
+   * And allow clients to update their own objects without interference from the server.
  * Collision detection
  * Physics (for jumping)
  * Build world
