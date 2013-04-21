@@ -174,17 +174,17 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 #endif
 				}
 				
-				Player_s* others = server.Players();
-				while ( others != NULL ) {	// Need to send CREATE messages to this client
-					if ( others->id != myid ) {
-						mymessage.Type(CREATE);
-						myobject.SetID(others->id);
-						myobject.SetType(PLAYER);
-						myobject.SetHeading(others->hx,others->hy,others->hz);
-						myobject.SetPos(others->x,others->y,others->z);
-						myobject.SetContent(others->name);
+				Player_s* otherplayers = server.Players();
+				mymessage.Type(CREATE);
+				myobject.SetType(PLAYER);
+				while ( otherplayers != NULL ) {	// Need to send CREATE messages to this client
+					if ( otherplayers->id != myid ) {
+						myobject.SetID(otherplayers->id);
+						myobject.SetHeading(otherplayers->hx,otherplayers->hy,otherplayers->hz);
+						myobject.SetPos(otherplayers->x,otherplayers->y,otherplayers->z);
+						myobject.SetContent(otherplayers->name);
 						mymessage.Object(myobject);
-							int numbytes = this->send(this->peer(),mymessage);
+						int numbytes = this->send(this->peer(),mymessage);
 #if defined(DEBUG)
 							ACE_DEBUG ((LM_DEBUG,
 								ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
@@ -192,7 +192,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 								tmp->ID));
 #endif
 					}
-					others = others->next;		
+					otherplayers = otherplayers->next;		
 				}
 				peer_s *newpeer = new peer_s(&(this->peer()),myid);	// Have finished updating all clients
 				con_peers.Push(newpeer);							// now add the new peer to our list

@@ -88,7 +88,8 @@ public:
 	void Update(const float time) {
 		Object_s* tmp = objects;
 		while ( tmp != NULL) {
-			tmp->Update(time);
+			if ( tmp->type != PLAYER )
+				tmp->Update(time);
 			tmp = tmp->next;
 		}
 	}
