@@ -59,6 +59,7 @@ Getting the project files
 Currently the code is set up as a MSVS 2010 solution containing two projects
  * SBFE_Client
  * SBFE_Server
+
 The solution currently has both projects (server and client) set as startup projects.
 This means that when you run/debug the solution, you get both parts of the network code 
 running at the same time and can debug both parts at the same time if you want.  Moreover,
