@@ -29,8 +29,7 @@ public:
 	~Player_c() {delete objects, this;}
 
 	Player_c & operator=(Player_c& s) {
-		if (this != &s) // protect against invalid self-assignment
-        {
+		if (this != &s) {
 			info = s.Info();
 			objects = s.Objects();
 			chat = s.Chat();
@@ -58,22 +57,18 @@ public:
 	bool Registered() {return registered;}
 
 	void Create(Object_s& a) {
-		char str[3];
-		switch (a.type) {
-		case PLAYER:
-			sprintf(str,"Player");
-			break;
-		case SHOT:
-			sprintf(str,"Shot");
-			break;
-		default:
-			break;
+		if (objects==NULL) {
+			objects = new Object_s(a);
 		}
-		ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Receiving Object: (%s,%d) with content: %s\n"),
-				str,
-				a.id,
-				a.content_));
+		else {
+			Object_s* tmp;
+			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next);
+			Object_s* link = new Object_s(a);
+			tmp->Link(link);
+		}
+	}
+
+	void Move(Object_s& a) {
 		if (objects==NULL) {
 			objects = new Object_s(a);
 		}
@@ -86,6 +81,22 @@ public:
 	}
 
 	void Remove(const ACE_CDR::Long _id) {
+		Object_s* tmp = objects;
+		Object_s* prev = tmp;
+		while ( tmp != NULL) {
+			if ( tmp->id == _id ) {
+				prev->next = tmp->next;
+				if ( tmp != objects )
+					delete tmp;
+				else {
+					delete tmp;
+					objects = NULL;
+				}
+				return;
+			}
+			prev = tmp;
+			tmp = tmp->next;
+		}
 	}
 };
 

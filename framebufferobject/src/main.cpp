@@ -1285,8 +1285,8 @@ void mouseCB(int button, int state, int x, int y)
         {
             mouseLeftDown = true;
 			SendShot();
-			shot.projectileInit(tempcamera.GetForward(),tempcamera.GetPosition());
-			objectlist.push_back(shot);
+			//shot.projectileInit(tempcamera.GetForward(),tempcamera.GetPosition());
+			//objectlist.push_back(shot);
         }
         else if(state == GLUT_UP)
             mouseLeftDown = false;

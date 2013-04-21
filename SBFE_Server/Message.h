@@ -67,8 +67,7 @@ struct Player_s {
 	Player_s(char* n,ACE_CDR::Long i){next=NULL;id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	
 	Player_s & operator=(const Player_s &s) {
-		if (this != &s) // protect against invalid self-assignment
-        {
+		if (this != &s) {
 			id = s.id;
 			strcpy(name,s.name);
 			x = s.x;
@@ -112,12 +111,25 @@ struct Object_s {
 	Object_s*	next;
 	
 	Object_s() {next=NULL;type=SHOT;id=0;memset(content_,0,MAX_CONT_LEN);}
-	Object_s(const Object_s &a){next=NULL;type=a.type;id=a.id;strcpy(content_,a.content_);}
+	Object_s(const Object_s &a) {
+		type = a.type;
+		id = a.id;
+		strcpy(content_,a.content_);
+		x = a.x;
+		y = a.y;
+		z = a.z;
+		hx = a.hx;
+		hy = a.hy;
+		hz = a.hz;
+		vx = a.vx;
+		vy = a.vy;
+		vz = a.vz;
+		next=NULL;
+	}
 	Object_s(ObjectType t, ACE_CDR::Long i,char* c){next=NULL;type=t;id=i;strcpy(content_,c);}
 	
 	Object_s & operator=(const Object_s &a) {
-		if (this != &a) // protect against invalid self-assignment
-        {
+		if (this != &a) {
 			type = a.type;
 			id = a.id;
 			strcpy(content_,a.content_);

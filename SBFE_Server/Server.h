@@ -48,13 +48,11 @@ public:
 	Player_s * Players() {return players;}
 
 	bool Player(Player_s& s) {
-		if (players != NULL)
-		{
+		if (players != NULL) {
 			if ( s == *players )
 				return true;
 			Player_s* tmp=Players();
-			while (tmp!=NULL)
-			{
+			while (tmp!=NULL) {
 				if ( s == *tmp ) 
 					return true;
 				tmp=tmp->next;
@@ -101,8 +99,7 @@ public:
 		}
 	}
 	
-	bool Register(Player_s& s)
-	{
+	bool Register(Player_s& s) {
 		Player_s* tmp = players;
 		Player_s* prev = tmp;
 		while ( tmp != NULL) {
@@ -129,29 +126,22 @@ public:
 		delete players,objects;
 		players=NULL;
 		objects=NULL;
-		//delete chats; chats=NULL;
 	}
 
-	bool Create(Object_s& a)
-	{
-		if ( objects==NULL)
-		{
+	bool Create(Object_s& a) {
+		if ( objects==NULL) {
 			objects=new Object_s(a);
 			return true;
 		}
-		else
-		{
-			if ( a == *objects ) 
-			{
+		else {
+			if ( a == *objects ) {
 				ACE_ERROR ((LM_ERROR,
 					ACE_TEXT ("Error, object has already been created!\n")));
 				return false;
 			}
 			Object_s* tmp;
-			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next)
-			{
-				if ( a == *tmp ) 
-				{
+			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next) {
+				if ( a == *tmp ) {
 					ACE_ERROR ((LM_ERROR,
 						ACE_TEXT ("Error, object has already been created!\n")));
 					return false;
@@ -160,6 +150,34 @@ public:
 			Object_s* link = new Object_s(a);
 			tmp->Link(link);
 			return true;
+		}
+	}
+	
+	bool Object(Object_s& s) {
+		if (players != NULL) {
+			if ( s == *objects )
+				return true;
+			Object_s* tmp=Objects();
+			while (tmp!=NULL) {
+				if ( s == *tmp ) 
+					return true;
+				tmp=tmp->next;
+			}
+		}
+		ACE_ERROR ((LM_ERROR,
+			ACE_TEXT ("Error, object has not been created!\n")));
+		return false;
+	}
+
+	void UpdateObjects(const float t) {
+		if (players != NULL) {
+			Object_s* tmp=Objects();
+			while (tmp!=NULL) {
+				tmp->x += tmp->hx * t;
+				tmp->y += tmp->hy * t;
+				tmp->z += tmp->hz * t;
+				tmp=tmp->next;
+			}
 		}
 	}
 };

@@ -185,12 +185,31 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 					ACE_TEXT ("Received new Object: (%s,%d)\n"),
 					str,
 					mymessage.Object().id));
+			myobject = mymessage.Object();
+			player.Create(myobject);
 			break;
 		case CHAT:
 			chat = string(mymessage.Content());
 			player.AddChat(chat);
 			break;
 		case MOVE:
+			switch (mymessage.Object().type)
+			{
+			case PLAYER:
+				sprintf(str,"Player");
+				break;
+			case SHOT:
+				sprintf(str,"Shot");
+				break;
+			default:
+				break;
+			}
+			ACE_DEBUG ((LM_DEBUG,
+					ACE_TEXT ("Moving Object: (%s,%d)\n"),
+					str,
+					mymessage.Object().id));
+			myobject = mymessage.Object();
+			player.Move(myobject);
 			break;
 		case REMOVE:
 			switch (mymessage.Object().type)
