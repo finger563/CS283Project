@@ -35,8 +35,8 @@ peer_s con_peers;
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
 	
-//ACE_Time_Value period_t (0,30000);		// update every 30,000 us = 30 ms.
-ACE_Time_Value period_t (2,0);		// update every 30,000 us = 30 ms.
+ACE_Time_Value period_t (1,500000);		// update every 30,000 us = 30 ms.
+//ACE_Time_Value period_t (0,50000);		// update every 30,000 us = 30 ms.
 
 // constructor (pass a pointer to the reactor). By default we assume
 // a system-wide default reactor that ACE defines
@@ -265,19 +265,28 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			break;
 		case LEAVE:
 			if ( server.Player(mymessage.Player()) ) {
-				peer_s *tmp = &con_peers;
+				//server.RemovePlayer(mymessage.Player().id);	
+				//server.RemoveObject(PLAYER,mymessage.Player().id);
+				//server.RemovePlayer(myid);
+				//server.RemoveObject(PLAYER,myid);
+				//con_peers.Remove(myid);
+				myobject = Object_s();
+				myobject.SetID(mymessage.Player().id);
+				myobject.SetType(PLAYER);
 				mymessage.Type(REMOVE);		// Send remove to players
-				server.RemovePlayer(mymessage.Player().id);	
-				myobject = Object_s(mymessage.Object());
-				while (tmp->next!=NULL) {	// and also send move to clients
+				mymessage.Object(myobject);
+				peer_s *tmp = &con_peers;
+				while (tmp->next!=NULL) {	// and also send remove to clients
 					tmp = tmp->next;
-					int numbytes = this->send(*(tmp->p),mymessage);
+					if ( tmp->ID != mymessage.Player().id ) {
+						int numbytes = this->send(*(tmp->p),mymessage);
 #if defined(DEBUG)
-					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent MOVE object to player (%s,%d).\n"),
-						server.Player(tmp->ID),
-						tmp->ID));
+						ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
+							server.Player(tmp->ID),
+							tmp->ID));
 #endif
+					}
 				}
 			}
 			break;
@@ -407,36 +416,37 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 {
 #if defined(DEBUG)
-  // for debugging
-  ACE_DEBUG ((LM_DEBUG,
-              ACE_TEXT ("Dummy_Data_Handler::handle_close invoked\n")));
+	// for debugging
+	ACE_DEBUG ((LM_DEBUG,
+				ACE_TEXT ("Dummy_Data_Handler::handle_close invoked\n")));
 #endif
-  // Stop and cancel the periodic timer associated with this reactor
-  this->reactor()->cancel_timer(this);
-  server.RemovePlayer(myid);
-  con_peers.Remove(myid);
+	// Stop and cancel the periodic timer associated with this reactor
+	this->reactor()->cancel_timer(this);
+	server.RemovePlayer(myid);
+	server.RemoveObject(PLAYER,myid);
+	con_peers.Remove(myid);
 
-  m = ACE_Event_Handler::ALL_EVENTS_MASK |
-	  ACE_Event_Handler::DONT_CALL;
-  this->reactor()->remove_handler(this,m);
+	m = ACE_Event_Handler::ALL_EVENTS_MASK |
+		ACE_Event_Handler::DONT_CALL;
+	this->reactor()->remove_handler(this,m);
 
-  // time for us to cleanup. First cleanup the OS socket resources
-  // that are held by the SOCK_Stream data member. Then follow up with
-  // deallocating the memory allocated to hold us.
-  this->peer_.close ();
+	// time for us to cleanup. First cleanup the OS socket resources
+	// that are held by the SOCK_Stream data member. Then follow up with
+	// deallocating the memory allocated to hold us.
+	this->peer_.close ();
   
-  //this->reactor()->end_reactor_event_loop();
+	//this->reactor()->end_reactor_event_loop();
 
-  // notice how we clean up the allocated memory by deallocating
-  // ourselves :-). 
-  //
-  // Deallocation is absolutely necessary since recall that we had
-  // dynamically allocated ourselves. Also note that there can never be
-  // a case where we are allocated on the stack because our destructor
-  // was declared protected.
-  delete this;
+	// notice how we clean up the allocated memory by deallocating
+	// ourselves :-). 
+	//
+	// Deallocation is absolutely necessary since recall that we had
+	// dynamically allocated ourselves. Also note that there can never be
+	// a case where we are allocated on the stack because our destructor
+	// was declared protected.
+	delete this;
 
-  return 0;
+	return 0;
 }
 
 // the following method must be defined since the reactor needs to

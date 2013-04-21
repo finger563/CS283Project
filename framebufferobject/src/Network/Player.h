@@ -98,18 +98,18 @@ public:
 		}
 	}
 
-	void Remove(const ACE_CDR::Long _id) {
+	void Remove(const ObjectType t, const ACE_CDR::Long _id) {
 		Object_s* tmp = objects;
 		Object_s* prev = tmp;
 		while ( tmp != NULL) {
-			if ( tmp->id == _id ) {
-				prev->next = tmp->next;
-				if ( tmp != objects )
-					delete tmp;
-				else {
-					delete tmp;
-					objects = NULL;
+			if ( tmp->id == _id && tmp->type == t ) {
+				if ( tmp == objects ) {
+					objects = tmp->next;
 				}
+				else {
+					prev->next = tmp->next;
+				}
+				delete tmp;
 				return;
 			}
 			prev = tmp;

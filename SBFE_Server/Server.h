@@ -50,12 +50,10 @@ public:
 	Player_s * Players() {return players;}
 
 	bool Player(Player_s& s) {
-		if (players != NULL) {
-			if ( s == *players )
-				return true;
-			Player_s* tmp=Players();
+		Player_s* tmp = players;
+		if (tmp != NULL) {
 			while (tmp!=NULL) {
-				if ( s == *tmp ) 
+				if ( s.id == tmp->id ) 
 					return true;
 				tmp=tmp->next;
 			}
@@ -84,16 +82,16 @@ public:
 		Player_s* prev = tmp;
 		while ( tmp != NULL) {
 			if ( tmp->id == id ) {
-				prev->next = tmp->next;
-				ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("%s has been removed.\n"),
-						tmp->name));
-				if ( tmp != players )
-					delete tmp;
-				else {
-					delete tmp;
-					players = NULL;
+				if ( tmp == players ) {
+					players = tmp->next;
 				}
+				else {
+					prev->next = tmp->next;
+				}
+				ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("%s has been removed from players.\n"),
+						tmp->name));
+				delete tmp;
 				return;
 			}
 			prev = tmp;
@@ -195,36 +193,57 @@ public:
 			}
 		}
 	}
+	
+	void RemoveObject( ObjectType t, ACE_CDR::Long id ) {
+		Object_s* tmp = objects;
+		Object_s* prev = tmp;
+		while ( tmp != NULL) {
+			if ( tmp->id == id && tmp->type == t ) {
+				if ( tmp == objects ) {
+					objects = tmp->next;
+				}
+				else {
+					prev->next = tmp->next;
+				}
+				ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("%s has been removed from objects.\n"),
+						tmp->content_));
+				delete tmp;
+				return;
+			}
+			prev = tmp;
+			tmp = tmp->next;
+		}
+	}
 };
 
 struct peer_s {
 	ACE_SOCK_Stream *p;
-	peer_s *next, *prev;
+	peer_s *next;
 	ACE_CDR::Long ID;
 
-	peer_s() {p=NULL;next=prev=NULL;ID=-1;}
-	peer_s(ACE_SOCK_Stream* newpeer,ACE_CDR::Long id) {next=prev=NULL;p=newpeer;ID=id;}
+	peer_s() {p=NULL;next=NULL;ID=-1;}
+	peer_s(ACE_SOCK_Stream* newpeer,ACE_CDR::Long id) {next=NULL;p=newpeer;ID=id;}
 
 	void Push(peer_s *newpeer) {
-		peer_s *tmp=this;
-		while (tmp->next!=NULL)
+		peer_s *tmp = this;
+		while (tmp->next!=NULL) {
 			tmp=tmp->next;
+		}
 		tmp->next = newpeer;
-		newpeer->prev=tmp;
 	}
 	
 	void Remove(ACE_CDR::Long id) {
 		peer_s *tmp = this;
-		peer_s* prev = this;
-		while (tmp != NULL) {
+		peer_s *prev = this;
+		while (tmp->next != NULL) {
+			prev = tmp;
+			tmp = tmp->next;
 			if ( tmp->ID == id ) {
 				prev->next = tmp->next;
-				if ( tmp->next != NULL )
-					tmp->next->prev = prev;
 				delete tmp;
 				return;
 			}
-			tmp=tmp->next;
 		}
 	}
 

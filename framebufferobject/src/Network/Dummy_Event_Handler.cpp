@@ -42,13 +42,11 @@ Dummy_Event_Handler::Dummy_Event_Handler (ACE_Reactor *r)
 
 
 // destructor (does nothing)
-Dummy_Event_Handler::~Dummy_Event_Handler (void)
-{
+Dummy_Event_Handler::~Dummy_Event_Handler (void) {
 }
 
 // initialization method that registers ourselves with the reactor. 
-int Dummy_Event_Handler::open (ACE_TCHAR *argv [])
-{
+int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 	#if defined(DEBUG)
   // for debugging
   cout << "Dummy_Event_Handler::open invoked" << endl;
@@ -117,8 +115,7 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv [])
 /* now define the event handler's callback methods  */
 
 // handle incoming data
-int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
-{
+int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 	#if defined(DEBUG)
   // for debugging
   ACE_DEBUG ((LM_DEBUG,
@@ -144,11 +141,9 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 		// we let the reactor trigger the handle close
 		return -1;
 	} 
-	else 
-	{
+	else  {
 		// Now process message
-		switch (mymessage.Type())
-		{
+		switch (mymessage.Type()) {
 		case ACCEPT:		// the server has accepted us
 			myplayer = player.Info();
 			myplayer.id = mymessage.Player().id;
@@ -236,7 +231,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 			ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Object (%s,%d) removed!\n"), str ,mymessage.Object().id));
 			#endif
-			player.Remove(mymessage.Object().id);
+			player.Remove(mymessage.Object().type,mymessage.Object().id);
 			break;
 		default:
 			ACE_ERROR ((LM_ERROR,
@@ -249,8 +244,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h)
 	return 0;
 }
 
-int Dummy_Event_Handler::send(const Message& message)
-{
+int Dummy_Event_Handler::send(const Message& message) {
 	size_t maxpayloadsize = message.Length();
 	maxpayloadsize += ACE_CDR::MAX_ALIGNMENT;
 
@@ -272,8 +266,7 @@ int Dummy_Event_Handler::send(const Message& message)
 	return peer_.sendv_n (iov, 2);
 }
 
-int Dummy_Event_Handler::recv_message(Message& message)
-{
+int Dummy_Event_Handler::recv_message(Message& message) {
 	int MAXHOSTNAMELEN = 100;
 	ACE_INET_Addr peer_addr;
 	peer_.get_remote_addr(peer_addr);
@@ -318,8 +311,7 @@ int Dummy_Event_Handler::recv_message(Message& message)
 }
 
 // handle timeout events.
-int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act)
-{	
+int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act) {	
 	float currenttime = current_time.usec() / 1000000.0;
 	currenttime += current_time.sec();
 	#if defined(DEBUG)
@@ -345,8 +337,7 @@ int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, co
 // about these parameters. But complex applications could do various
 // things such as deregistering the handler only for that mask and when
 // the mask becomes 0, then delete ourself.
-int Dummy_Event_Handler::handle_close (ACE_HANDLE, ACE_Reactor_Mask mask)
-{
+int Dummy_Event_Handler::handle_close (ACE_HANDLE, ACE_Reactor_Mask mask) {
   // for debugging
   ACE_DEBUG ((LM_DEBUG,
               ACE_TEXT ("Dummy_Event_Handler::handle_close invoked\n")));
@@ -368,8 +359,7 @@ int Dummy_Event_Handler::handle_close (ACE_HANDLE, ACE_Reactor_Mask mask)
 // keep a mapping between the underlying handle and the
 // corresponding handler.  Note that it is defined as a const method
 // since it does not modify any state.
-ACE_HANDLE Dummy_Event_Handler::get_handle (void) const
-{
+ACE_HANDLE Dummy_Event_Handler::get_handle (void) const {
   // since the ACE_SOCK_Stream class inherits from the ACE_SOCK
   // class, we simply invoke the get_handle method on the acceptor
   // data member which is the variable peer_
@@ -379,8 +369,7 @@ ACE_HANDLE Dummy_Event_Handler::get_handle (void) const
 // return a reference to the underlying peer.  This is a required method
 // used by the acceptor in its accept () method. Please see how it is
 // used in the handle_input of the Dummy_Accept_Handler.
-ACE_SOCK_Stream & Dummy_Event_Handler::peer (void)
-{
+ACE_SOCK_Stream & Dummy_Event_Handler::peer (void) {
   return this->peer_;
 }
 

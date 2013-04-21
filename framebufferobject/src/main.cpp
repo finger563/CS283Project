@@ -95,6 +95,7 @@ extern Dummy_Event_Handler event_handler;
 void SendChat(string sendstring);
 void SendShot();
 void SendMove(const Point3D& pos, const Matrix& M);
+void SendLeave();
 
 void SendChat(string sendstring) {
 	Message mymessage;
@@ -145,6 +146,13 @@ void SendMove(const Point3D& pos, const Matrix& m) {
 	myobj.hy = head.y;
 	myobj.hz = head.z;
 	mymessage.Object(myobj);
+	event_handler.send(mymessage);
+}
+
+void SendLeave() {
+	Message mymessage;
+	mymessage.Type(LEAVE);
+	mymessage.Player(player.Info());
 	event_handler.send(mymessage);
 }
 
@@ -1155,8 +1163,10 @@ void keyboardCB(unsigned char key, int x, int y)
     switch(key)
     {
     case 27: // ESCAPE
-		if(!typing)
+		if(!typing) {
+			SendLeave();	// Notify server that we are leaving
 			exit(0);
+		}
 		else {
 			typing = false;
 			playermsg.clear();
