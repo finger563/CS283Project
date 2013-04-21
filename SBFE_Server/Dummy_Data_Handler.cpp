@@ -33,6 +33,7 @@ Server_c server;
 peer_s con_peers;
 
 static ACE_CDR::Long numPlayers = 0;
+static ACE_CDR::Long numObjects = 0;
 	
 ACE_Time_Value period_t (1);
 
@@ -156,10 +157,29 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				mymessage.Player(myplayer);
 				int numbytes = this->send(this->peer(),mymessage);
 				ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
-					numbytes,
+					ACE_TEXT ("Server ACCEPTed player (%s,%d).\n"),
 					myplayer.name,
 					myplayer.id));
+				
+				peer_s *tmp = &con_peers;
+				mymessage.Type(CREATE);
+				myplayer = mymessage.Player();
+				myobject.SetID(myid);
+				myobject.SetType(PLAYER);
+				myobject.SetHeading(myplayer.hx,myplayer.hy,myplayer.hz);
+				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
+				myobject.SetContent(myplayer.name);
+				mymessage.Object(myobject);
+				while (tmp->next!=NULL) {	// don't need to alter message, it is already chat!
+					tmp = tmp->next;
+					if ( tmp->ID != myid ) {
+						int numbytes = this->send(*(tmp->p),mymessage);
+						ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
+							server.Player(tmp->ID),
+							tmp->ID));
+					}
+				}
 			}
 			break;
 		case CHAT:
@@ -170,8 +190,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 					if ( tmp->ID != myid ) {
 						int numbytes = this->send(*(tmp->p),mymessage);
 						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent %d bytes to player (%s,%d).\n"),
-							numbytes,
+							ACE_TEXT ("Server propagated CHAT to player (%s,%d).\n"),
 							server.Player(tmp->ID),
 							tmp->ID));
 					}
@@ -179,11 +198,29 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			}
 			break;
 		case SHOOT:
-			if ( server.Player(mymessage.Player()) )
+			if ( server.Player(mymessage.Player()) ) {
 				ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("%s submitted assignment with content: %s!\n"),
-							mymessage.Player().name,
-							mymessage.Content()));
+							ACE_TEXT ("%s fired a shot!\n"),
+							mymessage.Player().name));
+				
+				peer_s *tmp = &con_peers;
+				mymessage.Type(CREATE);
+				myplayer = mymessage.Player();
+				myobject.SetID(numObjects++);
+				myobject.SetType(SHOT);
+				myobject.SetHeading(myplayer.hx,myplayer.hy,myplayer.hz);
+				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
+				myobject.SetContent(myplayer.name);
+				mymessage.Object(myobject);
+				while (tmp->next!=NULL) {
+					tmp = tmp->next;
+					int numbytes = this->send(*(tmp->p),mymessage);
+					ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("Server sent CREATE object to player (%s,%d).\n"),
+						server.Player(tmp->ID),
+						tmp->ID));
+				}
+			}
 			break;
 		case MOVE:
 			break;

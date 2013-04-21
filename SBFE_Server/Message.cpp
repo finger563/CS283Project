@@ -44,6 +44,8 @@ size_t Message::Length() const {
 		ret += 2 * sizeof(ACE_CDR::Long);
 			// 1 -> Message type
 			// 1 -> Player ID		- USED FOR KNOWING WHO KILLED WHO
+			// 1 -> Player name length
+		ret += strlen(player_.name);
 		ret += 6 * sizeof(ACE_CDR::Float);
 			// 1 -> x position
 			// 1 -> y position
@@ -88,8 +90,8 @@ size_t Message::Length() const {
 
 int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 	cdr << ACE_CDR::Long (m.Type());
-	Player_s myplayer = m.Player();
-	Object_s myobject = m.Object();
+	//Player_s myplayer = m.Player();
+	//Object_s myobject = m.Object();
 	switch (m.Type())
 	{
 	case REGISTER:
@@ -98,12 +100,12 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		break;
 	case ACCEPT:
 		cdr << ACE_CDR::Long ( m.Player().id );
-		cdr << ACE_CDR::Float ( myplayer.x );
-		cdr << ACE_CDR::Float ( myplayer.y );
-		cdr << ACE_CDR::Float ( myplayer.z );
-		cdr << ACE_CDR::Float ( myplayer.hx );
-		cdr << ACE_CDR::Float ( myplayer.hy );
-		cdr << ACE_CDR::Float ( myplayer.hz );
+		cdr << ACE_CDR::Float ( m.Player().x );
+		cdr << ACE_CDR::Float ( m.Player().y );
+		cdr << ACE_CDR::Float ( m.Player().z );
+		cdr << ACE_CDR::Float ( m.Player().hx );
+		cdr << ACE_CDR::Float ( m.Player().hy );
+		cdr << ACE_CDR::Float ( m.Player().hz );
 		break;
 	case CHAT:
 		cdr << ACE_CDR::Long ( strlen(m.Content()) );
@@ -111,12 +113,14 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		break;
 	case SHOOT:
 		cdr << ACE_CDR::Long (m.Player().id);
-		cdr << ACE_CDR::Float ( myplayer.x );
-		cdr << ACE_CDR::Float ( myplayer.y );
-		cdr << ACE_CDR::Float ( myplayer.z );
-		cdr << ACE_CDR::Float ( myplayer.hx );
-		cdr << ACE_CDR::Float ( myplayer.hy );
-		cdr << ACE_CDR::Float ( myplayer.hz );
+		cdr << ACE_CDR::Long (strlen(m.Player().name));
+		cdr.write_char_array(m.Player().name,strlen(m.Player().name));
+		cdr << ACE_CDR::Float ( m.Player().x );
+		cdr << ACE_CDR::Float ( m.Player().y );
+		cdr << ACE_CDR::Float ( m.Player().z );
+		cdr << ACE_CDR::Float ( m.Player().hx );
+		cdr << ACE_CDR::Float ( m.Player().hy );
+		cdr << ACE_CDR::Float ( m.Player().hz );
 		break;
 	case CREATE:
 	case MOVE:
@@ -199,6 +203,9 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		break;
 	case SHOOT:
 		cdr >> player_id;
+		cdr >> name_len;
+		cdr.read_char_array(name,name_len);
+		name[name_len]='\0';
 		cdr >> x;
 		cdr >> y;
 		cdr >> z;
@@ -206,6 +213,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		cdr >> hy;
 		cdr >> hz;
 		player = Player_s();
+		player.SetName(name);
 		player.SetID(player_id);
 		player.SetPos(x,y,z);
 		player.SetHeading(hx,hy,hz);

@@ -90,49 +90,69 @@ void Poly::Clip( ) {
 	int lines[6] = {};
 
 	for (int i=0;i<numVertices;i++) {
-		//BC[i][0] = v[i].x;
-		//BC[i][1] = v[i].w-v[i].x;
-		//BC[i][2] = v[i].y;
-		//BC[i][3] = v[i].w-v[i].y;
-		BC[i][4] = v[i].z-.01;
-		//BC[i][5] = v[i].w-v[i].z;
+		BC[i][0] = v[i].x;
+		BC[i][1] = v[i].w-v[i].x;
+		BC[i][2] = v[i].y;
+		BC[i][3] = v[i].w-v[i].y;
+		BC[i][4] = v[i].z;
+		BC[i][5] = v[i].w-v[i].z;
 	}
+
 	for (int i=0;i<numVertices-1;i++) {
-		//line[i][0] = ((BC[i][0] > 0 && BC[i+1][0] < 0 ) ||
-		//			  (BC[i][0] < 0 && BC[i+1][0] > 0 ) ) ? 1 : 0;
-		//line[i][1] = ((BC[i][1] > 0 && BC[i+1][1] < 0 ) ||
-		//			  (BC[i][1] < 0 && BC[i+1][1] > 0 ) ) ? 1 : 0;
-		//line[i][2] = ((BC[i][2] > 0 && BC[i+1][2] < 0 ) ||
-		//			  (BC[i][2] < 0 && BC[i+1][2] > 0 ) ) ? 1 : 0;
-		//line[i][3] = ((BC[i][3] > 0 && BC[i+1][3] < 0 ) ||
-		//			  (BC[i][3] < 0 && BC[i+1][3] > 0 ) ) ? 1 : 0;
+		line[i][0] = ((BC[i][0] > 0 && BC[i+1][0] < 0 ) ||
+					  (BC[i][0] < 0 && BC[i+1][0] > 0 ) ) ? 1 : 0;
+		line[i][1] = ((BC[i][1] > 0 && BC[i+1][1] < 0 ) ||
+					  (BC[i][1] < 0 && BC[i+1][1] > 0 ) ) ? 1 : 0;
+		line[i][2] = ((BC[i][2] > 0 && BC[i+1][2] < 0 ) ||
+					  (BC[i][2] < 0 && BC[i+1][2] > 0 ) ) ? 1 : 0;
+		line[i][3] = ((BC[i][3] > 0 && BC[i+1][3] < 0 ) ||
+					  (BC[i][3] < 0 && BC[i+1][3] > 0 ) ) ? 1 : 0;
 		line[i][4] = ((BC[i][4] > 0 && BC[i+1][4] < 0 ) ||
 					  (BC[i][4] < 0 && BC[i+1][4] > 0 ) ) ? 1 : 0;
-		//line[i][5] = ((BC[i][5] > 0 && BC[i+1][5] < 0 ) ||
-		//			  (BC[i][5] < 0 && BC[i+1][5] > 0 ) ) ? 1 : 0;
+		line[i][5] = ((BC[i][5] > 0 && BC[i+1][5] < 0 ) ||
+					  (BC[i][5] < 0 && BC[i+1][5] > 0 ) ) ? 1 : 0;
 	}
-	//line[numVertices-1][0] = ((BC[numVertices-1][0] > 0 && BC[0][0] < 0 ) ||
-	//						(BC[numVertices-1][0] < 0 && BC[0][0] > 0 ) ) ? 1 : 0;
-	//line[numVertices-1][1] = ((BC[numVertices-1][1] > 0 && BC[0][1] < 0 ) ||
-	//						(BC[numVertices-1][1] < 0 && BC[0][1] > 0 ) ) ? 1 : 0;
-	//line[numVertices-1][2] = ((BC[numVertices-1][2] > 0 && BC[0][2] < 0 ) ||
-	//						(BC[numVertices-1][2] < 0 && BC[0][2] > 0 ) ) ? 1 : 0;
-	//line[numVertices-1][3] = ((BC[numVertices-1][3] > 0 && BC[0][3] < 0 ) ||
-	//						(BC[numVertices-1][3] < 0 && BC[0][3] > 0 ) ) ? 1 : 0;
+	line[numVertices-1][0] = ((BC[numVertices-1][0] > 0 && BC[0][0] < 0 ) ||
+							(BC[numVertices-1][0] < 0 && BC[0][0] > 0 ) ) ? 1 : 0;
+	line[numVertices-1][1] = ((BC[numVertices-1][1] > 0 && BC[0][1] < 0 ) ||
+							(BC[numVertices-1][1] < 0 && BC[0][1] > 0 ) ) ? 1 : 0;
+	line[numVertices-1][2] = ((BC[numVertices-1][2] > 0 && BC[0][2] < 0 ) ||
+							(BC[numVertices-1][2] < 0 && BC[0][2] > 0 ) ) ? 1 : 0;
+	line[numVertices-1][3] = ((BC[numVertices-1][3] > 0 && BC[0][3] < 0 ) ||
+							(BC[numVertices-1][3] < 0 && BC[0][3] > 0 ) ) ? 1 : 0;
 	line[numVertices-1][4] = ((BC[numVertices-1][4] > 0 && BC[0][4] < 0 ) ||
 							(BC[numVertices-1][4] < 0 && BC[0][4] > 0 ) ) ? 1 : 0;
-	//line[numVertices-1][5] = ((BC[numVertices-1][5] > 0 && BC[0][5] < 0 ) ||
-	//						(BC[numVertices-1][5] < 0 && BC[0][5] > 0 ) ) ? 1 : 0;
+	line[numVertices-1][5] = ((BC[numVertices-1][5] > 0 && BC[0][5] < 0 ) ||
+							(BC[numVertices-1][5] < 0 && BC[0][5] > 0 ) ) ? 1 : 0;
+
 	int num=1;
 	for (int i=0;i<numVertices;i++) {
-		//lines[0] += num*line[i][0];
-		//lines[1] += num*line[i][1];
-		//lines[2] += num*line[i][2];
-		//lines[3] += num*line[i][3];
+		lines[0] += num*line[i][0];
+		lines[1] += num*line[i][1];
+		lines[2] += num*line[i][2];
+		lines[3] += num*line[i][3];
 		lines[4] += num*line[i][4];
-		//lines[5] += num*line[i][5];
+		lines[5] += num*line[i][5];
 		num *= 2;
 	}
+
+	//bool test = false;
+	//int linetest = 0;
+	//for (int i=0;i<4;i++) {		// test x and y screen planes
+	//	linetest += lines[i];
+	//}
+	//if ( linetest == 0 &&		// no lines cross any boundaries
+	//	 ( v[0].x < -1 || v[0].x > 1 ||
+	//	   v[1].x < -1 || v[1].x > 1 ||
+	//	   v[2].x < -1 || v[2].x > 1 ||
+	//	   v[0].y < -1 || v[0].y > 1 ||
+	//	   v[1].y < -1 || v[1].y > 1 ||
+	//	   v[2].y < -1 || v[2].y > 1
+	//	   )
+	//	 ) {
+	//	visible = false;
+	//	return;
+	//}
 
 	Vertex sv=Vertex(),
 		   ev=Vertex();

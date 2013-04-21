@@ -22,7 +22,6 @@ class Server_c {
 private:
 	Object_s	*objects;
 	Player_s	*players;
-	//string		*chats;
 public:
 	Server_c() {
 		objects=NULL;players=NULL;
@@ -40,7 +39,6 @@ public:
         {
 			objects = t.Objects();
 			players = t.Players();
-			//chats = t.Chats();
         }
         // by convention, always return *this
         return *this;
@@ -48,7 +46,6 @@ public:
 
 	Object_s * Objects() {return objects;}
 	Player_s * Players() {return players;}
-	//string * Chats() {return chats;}
 
 	bool Player(Player_s& s) {
 		if (players != NULL)

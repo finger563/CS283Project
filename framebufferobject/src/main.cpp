@@ -91,6 +91,31 @@ void PrintChat();
 extern Player_c player;
 extern Dummy_Event_Handler event_handler;
 
+void SendChat(string sendstring);
+
+void SendChat(string sendstring) {
+	Message mymessage;
+	mymessage.Type(CHAT);
+	mymessage.Player(player.Info());
+	mymessage.Content(sendstring.c_str());
+	event_handler.send(mymessage);
+}
+
+void SendShot() {
+	Message mymessage;
+	mymessage.Type(SHOOT);
+	Player_s info = player.Info();
+	Camera eye = player.Eye();
+	info.x = eye.GetPosition().x;
+	info.y = eye.GetPosition().y;
+	info.z = eye.GetPosition().z;
+	info.hx = eye.GetForward().x;
+	info.hy = eye.GetForward().y;
+	info.hz = eye.GetForward().z;
+	mymessage.Player(info);
+	event_handler.send(mymessage);
+}
+
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
 void displayCB();
 void reshapeCB(int w, int h);
@@ -603,6 +628,10 @@ void updatePixels(GLubyte* dst, int size)
 
 	for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
 		it->Clip();
+		//if ( !it->visible ) {
+		//	it = renderlist.erase(it);
+		//	goto TEST;
+		//}
 		it->HomogeneousDivide();
 		it->TransformToPixel( projectionToPixel );
 		it->SetupRasterization( );		// for speed optimization
@@ -1068,11 +1097,7 @@ void keyboardCB(unsigned char key, int x, int y)
 			if( !playermsg.empty() ) {
 				string chatstring = userName + playermsg;
 				player.AddChat(chatstring);
-				Message mymessage;
-				mymessage.Type(CHAT);
-				mymessage.Player(player.Info());
-				mymessage.Content(chatstring.c_str());
-				event_handler.send(mymessage);
+				SendChat(chatstring);
 				playermsg.clear();
 			}
 			return;
@@ -1259,7 +1284,7 @@ void mouseCB(int button, int state, int x, int y)
         if(state == GLUT_DOWN)
         {
             mouseLeftDown = true;
-			
+			SendShot();
 			shot.projectileInit(tempcamera.GetForward(),tempcamera.GetPosition());
 			objectlist.push_back(shot);
         }

@@ -46,6 +46,9 @@ public:
 
 	Chat_c Chat() const { return chat; }
 	void Chat(const Chat_c& c) { chat = c; }
+	void AddChat(const string& str) {
+		chat.addMessage(str);
+	}
 
 	Camera Eye() const { return eye; }
 	void Eye(const Camera& e) { eye = e; }
@@ -53,10 +56,6 @@ public:
 	void Register() {registered=true;}
 	void Leave()	{registered=false;}
 	bool Registered() {return registered;}
-
-	void AddChat(const string& str) {
-		chat.addMessage(str);
-	}
 
 	void Create(Object_s& a) {
 		char str[3];

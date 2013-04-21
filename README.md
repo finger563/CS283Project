@@ -107,6 +107,9 @@ FEATURES
 
 TODO
 ----
+ * Update server code to keep track of players & shots
+   * Send all currently active dynamic objects to players that join later
+   * Update all dynamic objects using timeout function (i.e. periodically)
  * Use mouse movement for camera rotation
  * Finish SHOOT,CREATE,MOVE,LEAVE,REMOVE server/client implementations
  * Collision detection
