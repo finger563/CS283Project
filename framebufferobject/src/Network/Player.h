@@ -71,17 +71,21 @@ public:
 	}
 
 	void Move(Object_s& a) {
-		Object_s* tmp = objects;
-		Object_s* prev = tmp;
-		while ( tmp != NULL) {
-			if ( tmp->id == a.id ) {
-				tmp->SetPos(a.x,a.y,a.z);
-				tmp->SetHeading(a.hx,a.hy,a.hz);
-				tmp->SetVelocity(a.vx,a.vy,a.vz);
-				return;
+		
+		if ( a.id == info.id && a.type == PLAYER ) {
+			eye.SetPosition(a.x,a.y,a.z);
+		}
+		else {
+			Object_s* tmp = objects;
+			while ( tmp != NULL) {
+				if ( tmp->id == a.id ) {
+					tmp->SetPos(a.x,a.y,a.z);
+					tmp->SetHeading(a.hx,a.hy,a.hz);
+					tmp->SetVelocity(a.vx,a.vy,a.vz);
+					return;
+				}
+				tmp = tmp->next;
 			}
-			prev = tmp;
-			tmp = tmp->next;
 		}
 	}
 

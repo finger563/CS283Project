@@ -29,6 +29,7 @@ public:
     Matrix operator- (const Matrix& rhs) const;
     
     Vector3D operator* (const Vector3D rhs) const;
+	bool operator != (const Matrix& rhs) const;
 };
 
 #endif

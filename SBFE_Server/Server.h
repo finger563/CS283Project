@@ -155,6 +155,19 @@ public:
 		}
 	}
 	
+	void Move(Object_s& a) {
+		Object_s* tmp = objects;
+		while ( tmp != NULL) {
+			if ( tmp->id == a.id ) {
+				tmp->SetPos(a.x,a.y,a.z);
+				tmp->SetHeading(a.hx,a.hy,a.hz);
+				tmp->SetVelocity(a.vx,a.vy,a.vz);
+				return;
+			}
+			tmp = tmp->next;
+		}
+	}
+	
 	bool Object(Object_s& s) {
 		if (players != NULL) {
 			if ( s == *objects )

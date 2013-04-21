@@ -93,6 +93,8 @@ extern Player_c player;
 extern Dummy_Event_Handler event_handler;
 
 void SendChat(string sendstring);
+void SendShot();
+void SendMove(const Point3D& pos, const Matrix& M);
 
 void SendChat(string sendstring) {
 	Message mymessage;
@@ -114,6 +116,35 @@ void SendShot() {
 	info.hy = eye.GetForward().y;
 	info.hz = eye.GetForward().z;
 	mymessage.Player(info);
+	event_handler.send(mymessage);
+}
+
+void SendMove(const Point3D& pos, const Matrix& m) {
+	Message mymessage;
+	mymessage.Type(MOVE);
+	Object_s myobj = Object_s();
+	myobj.SetType(PLAYER);
+	myobj.SetID(player.Info().id);
+	myobj.SetContent(player.Info().name);
+	Camera eye = player.Eye();
+
+	Point3D trans = Point3D(eye.GetPosition().x,eye.GetPosition().y,eye.GetPosition().z);
+	Vector3D head = Vector3D(eye.GetForward().x,eye.GetForward().y,eye.GetForward().z);
+	Vector3D right = Vector3D(eye.GetRight().x,eye.GetRight().y,eye.GetRight().z);
+	Vector3D up = Vector3D(eye.GetUp().x,eye.GetUp().y,eye.GetUp().z);
+	head = m*head;
+	right = m*right;
+	up = m*up;
+	trans = trans + head*pos.z + right*pos.x + up*pos.y;
+	
+
+	myobj.x = trans.x;
+	myobj.y = trans.y;
+	myobj.z = trans.z;
+	myobj.hx = head.x;
+	myobj.hy = head.y;
+	myobj.hz = head.z;
+	mymessage.Object(myobj);
 	event_handler.send(mymessage);
 }
 
@@ -1118,6 +1149,9 @@ void idleCB()
 void keyboardCB(unsigned char key, int x, int y)
 {
 	Camera tempcamera = player.Eye();
+	Vector3D movevector = Vector3D();
+	Matrix movematrix = Matrix();
+
     switch(key)
     {
     case 27: // ESCAPE
@@ -1170,35 +1204,37 @@ void keyboardCB(unsigned char key, int x, int y)
 		break;
 
 	case 'q':	// rotate left
-		tempcamera.Rotate(neg_rmy);
+		//tempcamera.Rotate(neg_rmy);
+		movematrix = neg_rmy;
 		break;
 
 	case 'e':	// rotate right
-		tempcamera.Rotate(rmy);
+		//tempcamera.Rotate(rmy);
+		movematrix = rmy;
 		break;
 
 	case 'w': // Up
-		tempcamera.Translate(Vector3D(0,0,1));
+		movevector = (Vector3D(0,0,1));
 		break;
 
 	case 's': // down
-		tempcamera.Translate(Vector3D(0,0,-1));
+		movevector = (Vector3D(0,0,-1));
 		break;
 
 	case 'a': // left
-		tempcamera.Translate(Vector3D(-1,0,0));
+		movevector = (Vector3D(-1,0,0));
 		break;
 
 	case 'd': // right
-		tempcamera.Translate(Vector3D(1,0,0));
+		movevector = (Vector3D(1,0,0));
 		break;
 
 	case ' ': // space
-		tempcamera.Translate(Vector3D(0,1,0));
+		movevector = (Vector3D(0,1,0));
 		break;
 
 	case 'c': // c
-		tempcamera.Translate(Vector3D(0,-1,0));
+		movevector = (Vector3D(0,-1,0));
 		break;
 
     case 'p':
@@ -1282,6 +1318,10 @@ void keyboardCB(unsigned char key, int x, int y)
 		break;
 	default:
 		rot = rmxyz;
+	}
+	if ( movevector != Vector3D() ||
+		 movematrix != Matrix() ) {	// need to send movement to server
+		SendMove(movevector,movematrix);
 	}
 
 	// Update the player's position/heading

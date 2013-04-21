@@ -36,6 +36,8 @@ public:
     Point3D operator+ (const Point3D& rhs) const;
 
     Point3D operator- (const Point3D& rhs) const;
+
+	bool operator!= (const Point3D& rhs) const;
 };
 
 typedef Point3D Vector3D;

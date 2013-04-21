@@ -9,6 +9,19 @@ Point3D& Point3D::operator= (const Point3D& rhs)
     return (*this);   
 }
 
+bool Point3D::operator!= (const Point3D& rhs) const
+{
+    if ( x != rhs.x )
+		return false;
+    if ( y != rhs.y )
+		return false;
+    if ( z != rhs.z )
+		return false;
+	if ( w != rhs.w )
+		return false;
+    return true;   
+}
+
 Point3D Point3D::operator* (const float rhs) const 
 {
     return Point3D(x*rhs,y*rhs,z*rhs,w*rhs);   

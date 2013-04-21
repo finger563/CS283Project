@@ -80,6 +80,16 @@ Matrix& Matrix::operator= (const Matrix& rhs) {
     }
     return (*this);  
 }
+
+bool Matrix::operator!= (const Matrix& rhs) const {
+    for (int row=0;row<4;row++) {
+        for (int col=0;col<4;col++) {
+            if ( data[row][col] != rhs.data[row][col] )
+				return false;
+        }
+    }
+    return true;  
+}
    
 Matrix Matrix::operator* (const float rhs) const {
     Matrix m(*this);

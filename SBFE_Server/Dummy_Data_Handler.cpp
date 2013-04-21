@@ -35,8 +35,8 @@ peer_s con_peers;
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
 	
-ACE_Time_Value period_t (0,30000);		// update every 30,000 us = 30 ms.
-//ACE_Time_Value period_t (5,0);		// update every 30,000 us = 30 ms.
+//ACE_Time_Value period_t (0,30000);		// update every 30,000 us = 30 ms.
+ACE_Time_Value period_t (2,0);		// update every 30,000 us = 30 ms.
 
 // constructor (pass a pointer to the reactor). By default we assume
 // a system-wide default reactor that ACE defines
@@ -247,8 +247,39 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			}
 			break;
 		case MOVE:
+			if ( server.Object(mymessage.Object()) ) {
+				peer_s *tmp = &con_peers;
+				myobject = Object_s(mymessage.Object());
+				server.Move(myobject);		// need to update server's state
+				while (tmp->next!=NULL) {	// and also send move to clients
+					tmp = tmp->next;
+					int numbytes = this->send(*(tmp->p),mymessage);
+#if defined(DEBUG)
+					ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("Server sent MOVE object to player (%s,%d).\n"),
+						server.Player(tmp->ID),
+						tmp->ID));
+#endif
+				}
+			}
 			break;
 		case LEAVE:
+			if ( server.Player(mymessage.Player()) ) {
+				peer_s *tmp = &con_peers;
+				mymessage.Type(REMOVE);		// Send remove to players
+				server.RemovePlayer(mymessage.Player().id);	
+				myobject = Object_s(mymessage.Object());
+				while (tmp->next!=NULL) {	// and also send move to clients
+					tmp = tmp->next;
+					int numbytes = this->send(*(tmp->p),mymessage);
+#if defined(DEBUG)
+					ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("Server sent MOVE object to player (%s,%d).\n"),
+						server.Player(tmp->ID),
+						tmp->ID));
+#endif
+				}
+			}
 			break;
 		default:
 			ACE_ERROR ((LM_ERROR,
