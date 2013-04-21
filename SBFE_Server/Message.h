@@ -32,6 +32,7 @@ enum MessageType {
 	SHOOT,		// Players send SHOOT command to Server, it replies/relays CREATE message to *all* players
 	CREATE,		// Server sends CREATE message when a new object is created by a player (shot, player, etc.)
 	MOVE,		// Server sends MOVE message when a created object needs to be moved (i.e. shot update, player update, etc.)
+				//	Players send MOVE messages to the server when the player needs to move (i.e. keyboard/mouse input)
 	LEAVE,		// Player sends LEAVE message when they disconnect from the server
 	REMOVE		//	Then the server removes the player from it's list and sends REMOVE to remove the object from other players' games
 };
@@ -61,6 +62,7 @@ struct Player_s {
 		vx = s.vx;
 		vy = s.vy;
 		vz = s.vz;
+		next=NULL;
 	}
 	Player_s(char* n,ACE_CDR::Long i){next=NULL;id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	
@@ -78,6 +80,7 @@ struct Player_s {
 			vx = s.vx;
 			vy = s.vy;
 			vz = s.vz;
+			next=NULL;
         }
         // by convention, always return *this
         return *this;
@@ -127,6 +130,7 @@ struct Object_s {
 			vx = a.vx;
 			vy = a.vy;
 			vz = a.vz;
+			next=NULL;
         }
         // by convention, always return *this
         return *this;

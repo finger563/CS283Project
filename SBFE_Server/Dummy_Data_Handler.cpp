@@ -149,8 +149,6 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			myplayer.SetID(myid);
 			if ( server.Register(myplayer) )
 			{
-				peer_s *newpeer = new peer_s(&(this->peer()),myid);
-				con_peers.Push(newpeer);
 				mymessage.Type(ACCEPT);
 				myplayer.SetHeading(0,0,1);
 				myplayer.SetPos(10,0,10);
@@ -170,16 +168,35 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
 				myobject.SetContent(myplayer.name);
 				mymessage.Object(myobject);
-				while (tmp->next!=NULL) {	// don't need to alter message, it is already chat!
+				while (tmp->next!=NULL) {		// Let other clients know of this new client
 					tmp = tmp->next;
-					if ( tmp->ID != myid ) {
-						int numbytes = this->send(*(tmp->p),mymessage);
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
-							server.Player(tmp->ID),
-							tmp->ID));
-					}
+					int numbytes = this->send(*(tmp->p),mymessage);
+					ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
+						server.Player(tmp->ID),
+						tmp->ID));
 				}
+				
+				Player_s* others = server.Players();
+				while ( others != NULL ) {	// Need to send CREATE messages to this client
+					if ( others->id != myid ) {
+						mymessage.Type(CREATE);
+						myobject.SetID(others->id);
+						myobject.SetType(PLAYER);
+						myobject.SetHeading(others->hx,others->hy,others->hz);
+						myobject.SetPos(others->x,others->y,others->z);
+						myobject.SetContent(others->name);
+						mymessage.Object(myobject);
+							int numbytes = this->send(this->peer(),mymessage);
+							ACE_DEBUG ((LM_DEBUG,
+								ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
+								server.Player(tmp->ID),
+								tmp->ID));
+					}
+					others = others->next;		
+				}
+				peer_s *newpeer = new peer_s(&(this->peer()),myid);	// Have finished updating all clients
+				con_peers.Push(newpeer);							// now add the new peer to our list
 			}
 			break;
 		case CHAT:
