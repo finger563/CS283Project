@@ -48,19 +48,6 @@ void *thread_func (void *arg)
 	ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("[%t] Player : Network Thread - has started\n")));
 
-	int my_id = -1;  // I will assign myself an ID.
-
-	{
-		// notice the use of the scoped locking idiom where we create a guard
-		// variable parametrized by the lock. The constructor acquires the lock. On
-		// leaving this scope, the destructor will get invoked and the lock will be
-		// released.  Notice how I have purposefully created a dummy scope { ... }
-		// to bound the critical section.
-		ACE_GUARD_RETURN (ACE_Thread_Mutex, guard, lock, 0);
-		ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("[%t] Player : Network Thread - got thread id %d\n"), my_id));
-	}  // end of scope where the lock will be magically released.
-
 	// A singleton instance to the Reactor is obtained using the
 	// ACE_Reactor::instance () method.
 	//
