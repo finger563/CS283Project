@@ -97,6 +97,15 @@ void SendShot();
 void SendMove(const Point3D& pos, const Matrix& M);
 void SendLeave();
 
+//float rotx=0.0f, roty=0.0f;// initialization
+//
+//void rotateCamera(int x, int y) {
+//    
+//     rotx += (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2); // do an additive operation because with "=" your object view, etc... would always set to default
+//     roty += (float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2);
+//    glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
+//}
+
 void SendChat(string sendstring) {
 	Message mymessage;
 	mymessage.Type(CHAT);
@@ -449,9 +458,10 @@ int initGLUT(int argc, char **argv)
     glutKeyboardFunc(keyboardCB);
 	glutSpecialFunc(specialKeyCB);			// used for the arrow keys etc.
     glutMouseFunc(mouseCB);
-    glutMotionFunc(mouseMotionCB);
+    //glutMotionFunc(mouseMotionCB);		// used when the mouse moves and a mouse-button is held
+	glutPassiveMotionFunc(mouseMotionCB);	// used when the mouse moves and NO mouse-buttons are held
 	
-	glutSetCursor(GLUT_CURSOR_NONE);		// used to hide the cursor
+	//glutSetCursor(GLUT_CURSOR_NONE);		// used to hide the cursor
 
     return handle;
 }
@@ -1391,6 +1401,7 @@ void mouseCB(int button, int state, int x, int y)
     }
 }
 
+bool warped = false;
 
 void mouseMotionCB(int x, int y)
 {
@@ -1412,7 +1423,12 @@ void mouseMotionCB(int x, int y)
 
         //mouseY = y;
     }
-    glutWarpPointer(centerX, centerY);
+	if ( !warped ) {
+		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
+		warped = true;
+	}
+  //glutPostRedisplay();
+
 }
 
 
