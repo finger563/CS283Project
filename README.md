@@ -106,6 +106,7 @@ Controls for the game:
  * backspace (during chat): remove last character added
  * escape: quit program or (during chat) exit chat
  * Mouse left click: fire projectile
+ * Mouse movement: rotate camera
  
 FEATURES
 --------
@@ -125,11 +126,8 @@ FEATURES
 
 TODO
 ----
- * Use mouse movement for camera rotation
+ * Fix mouse camera orientation rotation control
  * Finish MOVE server/client implementations w.r.t player/object headings
- * Figure out bug with client Dummy_Event_Handler timeout callback not actually being called.
-   * This would simplify the messages sent over the network
-   * And allow clients to update their own objects without interference from the server.
  * Collision detection
  * Physics (for jumping)
  * Build world

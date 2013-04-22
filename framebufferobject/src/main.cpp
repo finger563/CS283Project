@@ -97,14 +97,26 @@ void SendShot();
 void SendMove(const Point3D& pos, const Matrix& M);
 void SendLeave();
 
-//float rotx=0.0f, roty=0.0f;// initialization
-//
-//void rotateCamera(int x, int y) {
-//    
-//     rotx += (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2); // do an additive operation because with "=" your object view, etc... would always set to default
-//     roty += (float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2);
-//    glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
-//}
+void RotateCamera(int x, int y) {
+    float anglex = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
+	float angley = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
+	Matrix rotMatrixX;
+	rotMatrixX.data[0][0] = cos(3.141*anglex);
+	rotMatrixX.data[0][2] = -sin(3.141*anglex);
+	rotMatrixX.data[2][0] = sin(3.141*anglex);
+	rotMatrixX.data[2][2] = cos(3.141*anglex);
+	Matrix rotMatrixY;
+    rotMatrixY.data[1][1] = cos(3.141*angley);
+    rotMatrixY.data[1][2] = -sin(3.141*angley);
+    rotMatrixY.data[2][1] = sin(3.141*angley);
+    rotMatrixY.data[2][2] = cos(3.141*angley);
+
+	Camera tempcamera = player.Eye();
+	tempcamera.Rotate(rotMatrixX);
+	tempcamera.Rotate(rotMatrixY);
+	player.Eye(tempcamera);
+    glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
+}
 
 void SendChat(string sendstring) {
 	Message mymessage;
@@ -1425,8 +1437,11 @@ void mouseMotionCB(int x, int y)
     }
 	if ( !warped ) {
 		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
+		RotateCamera(x,y);
 		warped = true;
 	}
+	else
+		warped = false;
   //glutPostRedisplay();
 
 }

@@ -57,6 +57,8 @@ void *thread_func (void *arg)
 	*/
 	ACE_Reactor *reactor = ACE_Reactor::instance ();  // static class method (returns the same instance every time - singleton pattern)
 
+	reactor->owner (ACE_OS::thr_self ());		// need to tell the reactor that we own it in order for the timeout to work
+
 	event_handler = Dummy_Event_Handler(reactor);
 	
 	cout << "Connecting to server on: " << ip_addr << endl;

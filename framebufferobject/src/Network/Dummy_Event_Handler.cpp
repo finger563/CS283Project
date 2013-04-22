@@ -96,10 +96,10 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 	// disable non blocking I/O
 	this->peer_.disable (ACE_NONBLOCK);
 	
-	ACE_Time_Value myperiod (1);
-	this->reactor()->schedule_timer(this,
-									0,
-									myperiod);
+	//ACE_Time_Value myperiod (1);
+	//this->reactor()->schedule_timer(this,
+	//								0,
+	//								myperiod);
 
 	// REGISTER THE PLAYER WITH THE SERVER
 	Message mymessage;
