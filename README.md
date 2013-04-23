@@ -125,7 +125,7 @@ FEATURES
 
 TODO
 ----
- * Finish MOVE server/client implementations w.r.t player/object headings
+ * Utilize key buffering for player input
  * Collision detection
  * Physics (for jumping)
  * Build world
