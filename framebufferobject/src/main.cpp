@@ -466,46 +466,39 @@ void updatePixels(GLubyte* dst, int size) {
 }
 
 void KeyOperations() {
+	if ( !typing ) {
+		Vector3D movevector = Vector3D();
 
-	//Vector3D movevector = Vector3D();
-	//switch (0) {
-	//case 't': //chat function
-	//	typing = true;
-	//	//print = true;
-	//	break;
+		if (keyStates['w']) { // Up
+			movevector = movevector + (Vector3D(0,0,1));
+		}
 
-	//case 'w': // Up
-	//	movevector = (Vector3D(0,0,1));
-	//	break;
+		if (keyStates['s']) { // down
+			movevector = movevector + (Vector3D(0,0,-1));
+		}
 
-	//case 's': // down
-	//	movevector = (Vector3D(0,0,-1));
-	//	break;
+		if (keyStates['a']) { // left
+			movevector = movevector + (Vector3D(-1,0,0));
+		}
 
-	//case 'a': // left
-	//	movevector = (Vector3D(-1,0,0));
-	//	break;
+		if (keyStates['d']) { // right
+			movevector = movevector + (Vector3D(1,0,0));
+		}
 
-	//case 'd': // right
-	//	movevector = (Vector3D(1,0,0));
-	//	break;
+		if (keyStates[' ']) { // space
+			movevector = movevector + (Vector3D(0,1,0));
+		}
 
-	//case ' ': // space
-	//	movevector = (Vector3D(0,1,0));
-	//	break;
+		if (keyStates['c']) {
+			movevector = movevector + (Vector3D(0,-1,0));
+		}
 
-	//case 'c': // c
-	//	movevector = (Vector3D(0,-1,0));
-	//	break;
-
- //   case 'p':
- //       if(pboSupported)
- //           pboMode = ++pboMode % 3;
- //       cout << "PBO mode: " << pboMode << endl;
- //        break;
-	//}
-	////SendMove(movevector);
-	//tempeye.Translate(movevector);
+		if (keyStates['b'] || keyStates['B']) {
+			display_z_buffer = !display_z_buffer;
+		}
+	
+		tempeye.Translate(movevector);
+	}
 }
 
 // displays chat history (everyone who is on server)
@@ -727,6 +720,8 @@ void reshapeCB(int width, int height) {
 
 void timerCB(int millisec) {
     glutTimerFunc(millisec, timerCB, millisec);
+	KeyOperations();
+	SendMove();
     glutPostRedisplay();
 }
 
@@ -781,51 +776,51 @@ void keyboardCB(unsigned char key, int x, int y) {
 		return;
 	}
 
-	if (keyStates['w']) { // Up
-		movevector = movevector + (Vector3D(0,0,1));
-	}
+	//if (keyStates['w']) { // Up
+	//	movevector = movevector + (Vector3D(0,0,1));
+	//}
 
-	if (keyStates['s']) { // down
-		movevector = movevector + (Vector3D(0,0,-1));
-	}
+	//if (keyStates['s']) { // down
+	//	movevector = movevector + (Vector3D(0,0,-1));
+	//}
 
-	if (keyStates['a']) { // left
-		movevector = movevector + (Vector3D(-1,0,0));
-	}
+	//if (keyStates['a']) { // left
+	//	movevector = movevector + (Vector3D(-1,0,0));
+	//}
 
-	if (keyStates['d']) { // right
-		movevector = movevector + (Vector3D(1,0,0));
-	}
+	//if (keyStates['d']) { // right
+	//	movevector = movevector + (Vector3D(1,0,0));
+	//}
 
-	if (keyStates[' ']) { // space
-		movevector = movevector + (Vector3D(0,1,0));
-	}
+	//if (keyStates[' ']) { // space
+	//	movevector = movevector + (Vector3D(0,1,0));
+	//}
 
-	if (keyStates['c']) {
-		movevector = movevector + (Vector3D(0,-1,0));
-	}
+	//if (keyStates['c']) {
+	//	movevector = movevector + (Vector3D(0,-1,0));
+	//}
 
-	if (keyStates['b'] || keyStates['B']) {
-		display_z_buffer = !display_z_buffer;
-	}
+	//if (keyStates['b'] || keyStates['B']) {
+	//	display_z_buffer = !display_z_buffer;
+	//}
 
-	//case 'x':
-	//case 'X':
-	//	rotx = !rotx;
-	//	break;
+	////case 'x':
+	////case 'X':
+	////	rotx = !rotx;
+	////	break;
 
-	//case 'y':
-	//case 'Y':
-	//	roty = !roty;
-	//	break;
+	////case 'y':
+	////case 'Y':
+	////	roty = !roty;
+	////	break;
 
-	//case 'z':
-	//case 'Z':
-	//	rotz = !rotz;
-	//	break;
-	
-	tempeye.Translate(movevector);
-	SendMove();
+	////case 'z':
+	////case 'Z':
+	////	rotz = !rotz;
+	////	break;
+	//
+	//tempeye.Translate(movevector);
+	//SendMove();
 }
 
 void specialKeyCB(int key, int x, int y) {
@@ -885,7 +880,7 @@ void mousePassiveMotionCB(int x, int y) {
 		}
 		//RotateCamera(x,y);
 		tempeye.Rotate(theta,phi);
-		SendMove();
+		//SendMove();
 		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
 		warped = true;
 	}

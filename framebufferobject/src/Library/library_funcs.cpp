@@ -50,7 +50,7 @@ int initGLUT(int argc, char **argv) {
 
     // register GLUT callback functions
     glutDisplayFunc(displayCB);
-    //glutTimerFunc(33, timerCB, 33);             // redraw only every given millisec
+    glutTimerFunc(20, timerCB, 20);             // set up timer callback for updating input state
     glutIdleFunc(idleCB);                       // redraw only every given millisec
     glutReshapeFunc(reshapeCB);
     glutKeyboardFunc(keyboardCB);
