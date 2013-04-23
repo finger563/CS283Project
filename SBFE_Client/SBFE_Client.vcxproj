@@ -98,6 +98,7 @@
     <ClCompile Include="..\Engine\point.cpp" />
     <ClCompile Include="..\Engine\Polygon.cpp" />
     <ClCompile Include="..\Engine\Vertex.cpp" />
+    <ClCompile Include="..\Engine\world.cpp" />
     <ClCompile Include="..\Network\Dummy_Event_Handler.cpp" />
     <ClCompile Include="..\Network\helper_funcs.cpp" />
     <ClCompile Include="..\Network\Message.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="..\Engine\Polygon.h" />
     <ClInclude Include="..\Engine\Textures.h" />
     <ClInclude Include="..\Engine\Vertex.h" />
+    <ClInclude Include="..\Engine\world.h" />
     <ClInclude Include="..\Network\Dummy_Event_Handler.h" />
     <ClInclude Include="..\Network\helper_funcs.h" />
     <ClInclude Include="..\Network\Message.h" />

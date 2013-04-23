@@ -43,6 +43,9 @@
     <ClCompile Include="main.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\world.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -116,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="Library\Timer.h">
       <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\world.h">
+      <Filter>headers\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
