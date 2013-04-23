@@ -35,11 +35,11 @@ void Camera::SetAngles( const float _t, const float _p ) {
 		theta = theta + 2.0*3.141592;
 	}
 	phi = _p;
-	if ( phi > 2.0*3.141592 ) {
-		phi = phi - 2.0*3.141592;
+	if ( phi > 3.141592/2.0 ) {
+		phi = phi - 3.141592/2.0;
 	}
-	else if ( theta < -2.0*3.141592 ) {
-		phi = phi + 2.0*3.141592;
+	else if ( theta < -3.141592/2.0 ) {
+		phi = phi + 3.141592/2.0;
 	}
 	ComputeAxes();
 }
@@ -53,10 +53,10 @@ void Camera::Rotate ( const float _t, const float _p ) {
 		theta = theta + 2.0*3.141592;
 	}
 	phi += _p;
-	if ( phi > 2.0*3.141592 ) {
+	if ( phi > 3.141592/2.0 ) {
 		phi = phi - 2.0*3.141592;
 	}
-	else if ( theta < -2.0*3.141592 ) {
+	else if ( theta < -3.141592/2.0 ) {
 		phi = phi + 2.0*3.141592;
 	}
 	ComputeAxes();

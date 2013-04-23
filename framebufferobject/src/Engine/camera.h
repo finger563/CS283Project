@@ -27,6 +27,8 @@ public:
 
 	Matrix GetWorldToCamera();
 
+	float GetPhi() const { return phi; }
+	float GetTheta() const { return theta; }
 	void SetAngles( const float _t, const float _p );
 
 	Point3D GetPosition();

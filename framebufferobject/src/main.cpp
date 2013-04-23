@@ -94,7 +94,7 @@ extern Dummy_Event_Handler event_handler;
 
 void SendChat(string sendstring);
 void SendShot();
-void SendMove(const Point3D& pos, const Matrix& M);
+void SendMove(const Point3D& pos);
 void SendLeave();
 
 void RotateCamera(int x, int y) {
@@ -103,8 +103,26 @@ void RotateCamera(int x, int y) {
 
 	Camera tempcamera = player.Eye();
 	tempcamera.Rotate(theta,phi);
-	player.Eye(tempcamera);
     glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
+#ifdef SERVER_CONTROLS_HEADING
+	Message mymessage;
+	mymessage.Type(MOVE);
+	Object_s myobj = Object_s();
+	myobj.SetType(PLAYER);
+	myobj.SetID(player.Info().id);
+	myobj.SetContent(player.Info().name);	
+
+	myobj.x = tempcamera.GetPosition().x;
+	myobj.y = tempcamera.GetPosition().y;
+	myobj.z = tempcamera.GetPosition().z;
+	myobj.hx = tempcamera.GetTheta();		// theta
+	myobj.hy = tempcamera.GetPhi();		// phi
+	myobj.hz = 0;		// not used
+	mymessage.Object(myobj);
+	event_handler.send(mymessage);
+#else
+	player.Eye(tempcamera);
+#endif
 }
 
 void SendChat(string sendstring) {
@@ -130,7 +148,7 @@ void SendShot() {
 	event_handler.send(mymessage);
 }
 
-void SendMove(const Point3D& pos, const Matrix& m) {
+void SendMove(const Point3D& pos) {
 	Message mymessage;
 	mymessage.Type(MOVE);
 	Object_s myobj = Object_s();
@@ -139,22 +157,17 @@ void SendMove(const Point3D& pos, const Matrix& m) {
 	myobj.SetContent(player.Info().name);
 	Camera eye = player.Eye();
 
-	Point3D trans = Point3D(eye.GetPosition().x,eye.GetPosition().y,eye.GetPosition().z);
-	Vector3D head = Vector3D(eye.GetForward().x,eye.GetForward().y,eye.GetForward().z);
-	Vector3D right = Vector3D(eye.GetRight().x,eye.GetRight().y,eye.GetRight().z);
-	Vector3D up = Vector3D(eye.GetUp().x,eye.GetUp().y,eye.GetUp().z);
-	head = m*head;
-	right = m*right;
-	up = m*up;
-	trans = trans + head*pos.z + right*pos.x + up*pos.y;
+	Vector3D head = eye.GetForward();
+	Vector3D right = eye.GetRight();
+	Vector3D up = eye.GetUp();
+	Vector3D trans = player.Eye().GetPosition() + head*pos.z + right*pos.x + up*pos.y;
 	
-
 	myobj.x = trans.x;
 	myobj.y = trans.y;
 	myobj.z = trans.z;
-	myobj.hx = head.x;
-	myobj.hy = head.y;
-	myobj.hz = head.z;
+	myobj.hx = eye.GetTheta();		// theta
+	myobj.hy = eye.GetPhi();		// phi
+	myobj.hz = 0;		// not used
 	mymessage.Object(myobj);
 	event_handler.send(mymessage);
 }
@@ -235,8 +248,7 @@ PFNGLUNMAPBUFFERARBPROC pglUnmapBufferARB = 0;                   // unmap VBO pr
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
-{    
+int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {    
 	// parse the arguments
 	ACE_DEBUG ((LM_DEBUG,
 				"Player: parse the args\n"));
@@ -364,8 +376,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
 #ifdef _WIN32
     // check PBO is supported by your video card
-    if(glInfo.isExtensionSupported("GL_ARB_pixel_buffer_object"))
-    {
+    if(glInfo.isExtensionSupported("GL_ARB_pixel_buffer_object")) {
         // get pointers to GL functions
         glGenBuffersARB = (PFNGLGENBUFFERSARBPROC)wglGetProcAddress("glGenBuffersARB");
         glBindBufferARB = (PFNGLBINDBUFFERARBPROC)wglGetProcAddress("glBindBufferARB");
@@ -378,14 +389,12 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 
         // check once again PBO extension
         if(glGenBuffersARB && glBindBufferARB && glBufferDataARB && glBufferSubDataARB &&
-           glMapBufferARB && glUnmapBufferARB && glDeleteBuffersARB && glGetBufferParameterivARB)
-        {
+           glMapBufferARB && glUnmapBufferARB && glDeleteBuffersARB && glGetBufferParameterivARB) {
             pboSupported = true;
             pboMode = 1;    // using 1 PBO
             cout << "Video card supports GL_ARB_pixel_buffer_object." << endl;
         }
-        else
-        {
+        else {
             pboSupported = false;
             pboMode = 0;    // without PBO
             cout << "Video card does NOT support GL_ARB_pixel_buffer_object." << endl;
@@ -393,22 +402,19 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
     }
 
 #else // for linux, do not need to get function pointers, it is up-to-date
-    if(glInfo.isExtensionSupported("GL_ARB_pixel_buffer_object"))
-    {
+    if(glInfo.isExtensionSupported("GL_ARB_pixel_buffer_object")) {
         pboSupported = true;
         pboMode = 1;
         cout << "Video card supports GL_ARB_pixel_buffer_object." << endl;
     }
-    else
-    {
+    else {
         pboSupported = false;
         pboMode = 0;
         cout << "Video card does NOT support GL_ARB_pixel_buffer_object." << endl;
     }
 #endif
 
-    if(pboSupported)
-    {
+    if(pboSupported) {
         // create 2 pixel buffer objects, you need to delete them when program exits.
         // glBufferDataARB with NULL pointer reserves only memory space.
         glGenBuffersARB(2, pboIds);
@@ -433,8 +439,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[])
 ///////////////////////////////////////////////////////////////////////////////
 // initialize GLUT for windowing
 ///////////////////////////////////////////////////////////////////////////////
-int initGLUT(int argc, char **argv)
-{
+int initGLUT(int argc, char **argv) {
     // GLUT stuff for windowing
     // initialization openGL window.
     // it is called before any other GLUT routine
@@ -473,8 +478,7 @@ int initGLUT(int argc, char **argv)
 // initialize OpenGL
 // disable unused features
 ///////////////////////////////////////////////////////////////////////////////
-void initGL()
-{
+void initGL() {
     //@glShadeModel(GL_SMOOTH);                    // shading mathod: GL_SMOOTH or GL_FLAT
     glShadeModel(GL_FLAT);                      // shading mathod: GL_SMOOTH or GL_FLAT
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);      // 4-byte pixel alignment
@@ -507,8 +511,7 @@ void initGL()
 // write 2d text using GLUT
 // The projection matrix must be set to orthogonal before call this function.
 ///////////////////////////////////////////////////////////////////////////////
-void drawString(const char *str, int x, int y, float color[4], void *font)
-{
+void drawString(const char *str, int x, int y, float color[4], void *font) {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT); // lighting and color mask
     glDisable(GL_LIGHTING);     // need to disable lighting for proper text color
     glDisable(GL_TEXTURE_2D);
@@ -517,8 +520,7 @@ void drawString(const char *str, int x, int y, float color[4], void *font)
     glRasterPos2i(x, y);        // place text position
 
     // loop all characters in the string
-    while(*str)
-    {
+    while(*str) {
         glutBitmapCharacter(font, *str);
         ++str;
     }
@@ -533,8 +535,7 @@ void drawString(const char *str, int x, int y, float color[4], void *font)
 ///////////////////////////////////////////////////////////////////////////////
 // draw a string in 3D space
 ///////////////////////////////////////////////////////////////////////////////
-void drawString3D(const char *str, float pos[3], float color[4], void *font)
-{
+void drawString3D(const char *str, float pos[3], float color[4], void *font) {
     glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT); // lighting and color mask
     glDisable(GL_LIGHTING);     // need to disable lighting for proper text color
     glDisable(GL_TEXTURE_2D);
@@ -543,8 +544,7 @@ void drawString3D(const char *str, float pos[3], float color[4], void *font)
     glRasterPos3fv(pos);        // place text position
 
     // loop all characters in the string
-    while(*str)
-    {
+    while(*str) {
         glutBitmapCharacter(font, *str);
         ++str;
     }
@@ -559,8 +559,7 @@ void drawString3D(const char *str, float pos[3], float color[4], void *font)
 ///////////////////////////////////////////////////////////////////////////////
 // initialize global variables
 ///////////////////////////////////////////////////////////////////////////////
-bool initSharedMem()
-{
+bool initSharedMem() {
     screenWidth = SCREEN_WIDTH;
     screenHeight = SCREEN_HEIGHT;
 
@@ -627,11 +626,10 @@ void initLights()
 ///////////////////////////////////////////////////////////////////////////////
 // set camera position and lookat direction
 ///////////////////////////////////////////////////////////////////////////////
-void setCamera(float posX, float posY, float posZ, float targetX, float targetY, float targetZ)
-{
+void setCamera(float posX, float posY, float posZ, float targetX, float targetY, float targetZ) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(posX, posY, posZ, targetX, targetY, targetZ, 0, 1, 0); // eye(x,y,z), focal(x,y,z), up(x,y,z)
+    gluLookAt(posX, posY, posZ, targetX, targetY, targetZ, 0, 1, 0);
 }
 
 
@@ -639,8 +637,7 @@ void setCamera(float posX, float posY, float posZ, float targetX, float targetY,
 ///////////////////////////////////////////////////////////////////////////////
 // copy an image data to texture buffer
 /////////////////////////////////////////////////////////////////////////////// actual rendering
-void updatePixels(GLubyte* dst, int size)
-{
+void updatePixels(GLubyte* dst, int size) {
     static int color = 0;
 
     if(!dst)
@@ -680,7 +677,6 @@ void updatePixels(GLubyte* dst, int size)
 		dynamic = dynamic->next;
 	}
 	for (std::list<Object>::iterator it = dynamiclist.begin(); it != dynamiclist.end(); it++) {
-
 		it->updateList();
 		Vector3D tmppos = it->getPosition() - player.Eye().GetPosition();
 		it->TranslateTemp(tmppos);
@@ -690,18 +686,9 @@ void updatePixels(GLubyte* dst, int size)
 		it->TransformToPerspective( perspectiveProjection );
 		std::list<Poly> templist = it->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
-
 	}
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
-		
-
-		////does this need to be here?
-		//if(it->getCount() == 1)
-		//	it->upCount();
-		//else if(it->getCount() > 1)
-		//	it->projectileMove();
-
 		it->updateList();
 		Vector3D tmppos = it->getPosition() - player.Eye().GetPosition();
 		it->TranslateTemp(tmppos);
@@ -711,7 +698,6 @@ void updatePixels(GLubyte* dst, int size)
 		it->TransformToPerspective( perspectiveProjection );
 		std::list<Poly> templist = it->getRenderList();
 		renderlist.splice(renderlist.end(), templist);
-
 	}
 
 	for (std::list<Poly>::iterator it = renderlist.begin(); it != renderlist.end(); it++) {
@@ -732,21 +718,12 @@ void updatePixels(GLubyte* dst, int size)
 	}
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); ++it) {
-		
-		it->Rotate(rot);	
-
-		////if shot needs to be deleted
-		//if(it->getKill()) {
-		//	it = objectlist.erase(it);
-		//	--it;
-		//}
+		it->Rotate(rot);	// purely for debugging fun
 	}
 	
     // copy 4 bytes at once
-    for(int i = 0; i < IMAGE_HEIGHT; ++i)
-    {
-        for(int j = 0; j < IMAGE_WIDTH; ++j)
-        {	// 0xAARRGGBB
+    for(int i = 0; i < IMAGE_HEIGHT; ++i) {
+        for(int j = 0; j < IMAGE_WIDTH; ++j) {	// 0xAARRGGBB
 			if (display_z_buffer) {
 				*ptr = ((int)(z_buffer[j+i*SIZE_X]) << 16) 
 					+ ((int)(z_buffer[j+i*SIZE_X]) << 8)
@@ -767,8 +744,7 @@ void updatePixels(GLubyte* dst, int size)
 ///////////////////////////////////////////////////////////////////////////////
 // display info messages
 ///////////////////////////////////////////////////////////////////////////////
-void showInfo()
-{
+void showInfo() {
     // backup current model-view matrix
     glPushMatrix();                     // save current modelview matrix
     glLoadIdentity();                   // reset modelview matrix
@@ -802,16 +778,8 @@ void showInfo()
     drawString(ss.str().c_str(), 1, screenHeight-(3*TEXT_HEIGHT), color, font);
     ss.str("");
 
-	//if(type == true)
-	//{
-		//PrintChat();
-		//type = false;
-	//}
-	//else
-	//{
-		ss << "Press SPACE key to toggle PBO on/off." << ends;
-		drawString(ss.str().c_str(), 1, 1, color, font);
-	//}
+	ss << "Press SPACE key to toggle PBO on/off." << ends;
+	drawString(ss.str().c_str(), 1, 1, color, font);
 
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
@@ -827,8 +795,7 @@ void showInfo()
 ///////////////////////////////////////////////////////////////////////////////
 // display chat messages
 ///////////////////////////////////////////////////////////////////////////////
-void PrintChat()
-{
+void PrintChat() {
     // backup current model-view matrix
     glPushMatrix();                     // save current modelview matrix
     glLoadIdentity();                   // reset modelview matrix
@@ -864,7 +831,7 @@ void PrintChat()
 			ss << userName << ends;
 			drawString(ss.str().c_str(), 1, 1, color, font); //positions at the bottom
 		}
-		}
+	}
 	ss.str("");
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
@@ -880,8 +847,7 @@ void PrintChat()
 ///////////////////////////////////////////////////////////////////////////////
 // display transfer rates
 ///////////////////////////////////////////////////////////////////////////////
-void showTransferRate()
-{
+void showTransferRate() {
     static Timer timer;
     static int count = 0;
     static stringstream ss;
@@ -902,12 +868,10 @@ void showTransferRate()
 
     // update fps every second
     elapsedTime = timer.getElapsedTime();
-    if(elapsedTime < 1.0)
-    {
+    if(elapsedTime < 1.0) {
         ++count;
     }
-    else
-    {
+    else {
         ss.str("");
         ss << std::fixed << std::setprecision(1);
         ss << "Transfer Rate: " << (count / elapsedTime) * DATA_SIZE / (1024 * 1024) << " MB" << ends; // update fps string
@@ -930,8 +894,7 @@ void showTransferRate()
 ///////////////////////////////////////////////////////////////////////////////
 // print transfer rates
 ///////////////////////////////////////////////////////////////////////////////
-void printTransferRate()
-{
+void printTransferRate() {
     const double INV_MEGA = 1.0 / (1024 * 1024);
     static Timer timer;
     static int count = 0;
@@ -959,8 +922,7 @@ void printTransferRate()
 ///////////////////////////////////////////////////////////////////////////////
 // set projection matrix as orthogonal
 ///////////////////////////////////////////////////////////////////////////////
-void toOrtho()
-{
+void toOrtho() {
     // set viewport to be the entire window
     glViewport(0, 0, (GLsizei)screenWidth, (GLsizei)screenHeight);
 
@@ -979,8 +941,7 @@ void toOrtho()
 ///////////////////////////////////////////////////////////////////////////////
 // set the projection matrix as perspective
 ///////////////////////////////////////////////////////////////////////////////
-void toPerspective()
-{
+void toPerspective() {
     // set viewport to be the entire window
     glViewport(0, 0, (GLsizei)screenWidth, (GLsizei)screenHeight);
 
@@ -996,29 +957,22 @@ void toPerspective()
 
 
 
-
-
-
 //=============================================================================
 // CALLBACKS
 //=============================================================================
 
-void displayCB()
-{
+void displayCB() {
     static int index = 0;
     int nextIndex = 0;                  // pbo index used for next frame
 
-    if(pboMode > 0)
-    {
+    if(pboMode > 0) {
         // "index" is used to copy pixels from a PBO to a texture object
         // "nextIndex" is used to update pixels in a PBO
-        if(pboMode == 1)
-        {
+        if(pboMode == 1) {
             // In single PBO mode, the index and nextIndex are set to 0
             index = nextIndex = 0;
         }
-        else if(pboMode == 2)
-        {
+        else if(pboMode == 2) {
             // In dual PBO mode, increment current index first then get the next index
             index = (index + 1) % 2;
             nextIndex = (index + 1) % 2;
@@ -1057,8 +1011,7 @@ void displayCB()
         // even if GPU is still working with the previous data.
         glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, DATA_SIZE, 0, GL_STREAM_DRAW_ARB);
         GLubyte* ptr = (GLubyte*)glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
-        if(ptr)
-        {
+        if(ptr) {
             // update data directly on the mapped buffer
             updatePixels(ptr, DATA_SIZE);
             glUnmapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB); // release pointer to mapping buffer
@@ -1073,8 +1026,7 @@ void displayCB()
         // Once bound with 0, all pixel operations behave normal ways.
         glBindBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
     }
-    else
-    {
+    else {
         ///////////////////////////////////////////////////
         // start to copy pixels from system memory to textrure object
         t1.start();
@@ -1121,58 +1073,42 @@ void displayCB()
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	if(print)
-	{
+	if(print) {
 		PrintChat();
-		
 	}
-	else
-	{
-		// draw info messages
+	else {		// draw info messages
 		showInfo();
 		//showTransferRate();
 	}
 	
-
     //printTransferRate();
-
     glPopMatrix();
-
     glutSwapBuffers();
-
-	//type = false;
 }
 
 
-void reshapeCB(int width, int height)
-{
+void reshapeCB(int width, int height) {
     screenWidth = width;
     screenHeight = height;
     toPerspective();
 }
 
 
-void timerCB(int millisec)
-{
+void timerCB(int millisec) {
     glutTimerFunc(millisec, timerCB, millisec);
     glutPostRedisplay();
 }
 
 
-void idleCB()
-{
+void idleCB() {
     glutPostRedisplay();
 }
 
 
-void keyboardCB(unsigned char key, int x, int y)
-{
-	Camera tempcamera = player.Eye();
+void keyboardCB(unsigned char key, int x, int y) {
 	Vector3D movevector = Vector3D();
-	Matrix movematrix = Matrix();
 
-    switch(key)
-    {
+    switch(key) {
     case 27: // ESCAPE
 		if(!typing) {
 			SendLeave();	// Notify server that we are leaving
@@ -1185,8 +1121,7 @@ void keyboardCB(unsigned char key, int x, int y)
         break;
 
 	case 13: //ENTER
-		if(typing)
-		{
+		if(typing) {
 			if( !playermsg.empty() ) {
 				string chatstring = userName + playermsg;
 				player.AddChat(chatstring);
@@ -1197,41 +1132,23 @@ void keyboardCB(unsigned char key, int x, int y)
 		}
 		break;
 	case 8: //BACKSPACE
-		if(typing)
-		{
+		if(typing) {
 			if ( playermsg.size() > 0 )
 				playermsg.erase(playermsg.size()-1);
 			return;
 		}
-		//else
-			//send string array
-			//to be named later to stack
         break;
 	}
 
-	if(typing)
-	{
-		//append character to string
-		//being typed
+	if(typing) {
 		playermsg += key;
 		return;
 	}
 
-	switch(key)
-	{
+	switch(key) {
 	case 't': //chat function
 		typing = true;
 		//print = true;
-		break;
-
-	case 'q':	// rotate left
-		//tempcamera.Rotate(neg_rmy);
-		movematrix = neg_rmy;
-		break;
-
-	case 'e':	// rotate right
-		//tempcamera.Rotate(rmy);
-		movematrix = rmy;
 		break;
 
 	case 'w': // Up
@@ -1311,8 +1228,7 @@ void keyboardCB(unsigned char key, int x, int y)
         ;
     }
 
-	switch ( rotx + roty*2 + rotz*4 )
-	{
+	switch ( rotx + roty*2 + rotz*4 ) {
 	case 0:
 		rot.SetIdentity();
 		break;
@@ -1340,61 +1256,43 @@ void keyboardCB(unsigned char key, int x, int y)
 	default:
 		rot = rmxyz;
 	}
-	if ( movevector != Vector3D() ||
-		 movematrix != Matrix() ) {	// need to send movement to server
-		SendMove(movevector,movematrix);
-	}
-
-	// Update the player's position/heading
-	player.Eye(tempcamera);
+	
+	SendMove(movevector);
 }
 
-void specialKeyCB(int key, int x, int y)
-{
-    switch(key)
-    {
-	case GLUT_KEY_UP: // Up
-		//CameraPos = CameraPos + Vector3D(0,0,-1);
+void specialKeyCB(int key, int x, int y) {
+    switch(key) {
+	case GLUT_KEY_UP:
 		break;
 
-	case GLUT_KEY_DOWN: // down
-		//CameraPos = CameraPos + Vector3D(0,0,1);
+	case GLUT_KEY_DOWN:
 		break;
 
-	case GLUT_KEY_LEFT: // left
-		//CameraPos = CameraPos + Vector3D(1,0,0);
+	case GLUT_KEY_LEFT:
 		break;
 
-	case GLUT_KEY_RIGHT: // right
-		//CameraPos = CameraPos + Vector3D(-1,0,0);
+	case GLUT_KEY_RIGHT:
 		break;
 	}
 }
 
 
-void mouseCB(int button, int state, int x, int y)
-{
+void mouseCB(int button, int state, int x, int y) {
     mouseX = x;
     mouseY = y;
 	Camera tempcamera = player.Eye();
 
-    if(button == GLUT_LEFT_BUTTON)
-    {
-        if(state == GLUT_DOWN)
-        {
+    if(button == GLUT_LEFT_BUTTON) {
+        if(state == GLUT_DOWN) {
             mouseLeftDown = true;
 			SendShot();
-			//shot.projectileInit(tempcamera.GetForward(),tempcamera.GetPosition());
-			//objectlist.push_back(shot);
         }
         else if(state == GLUT_UP)
             mouseLeftDown = false;
     }
 
-    else if(button == GLUT_RIGHT_BUTTON)
-    {
-        if(state == GLUT_DOWN)
-        {
+    else if(button == GLUT_RIGHT_BUTTON) {
+        if(state == GLUT_DOWN) {
             mouseRightDown = true;
         }
         else if(state == GLUT_UP)
@@ -1404,25 +1302,10 @@ void mouseCB(int button, int state, int x, int y)
 
 bool warped = false;
 
-void mouseMotionCB(int x, int y)
-{
-    static int centerX = glutGet(SCREEN_WIDTH) / 2;
-    static int centerY = glutGet(SCREEN_HEIGHT) / 2;
-
-    if(mouseLeftDown)
-    {
-        //cameraAngleY += (x - mouseX);
-        //cameraAngleX += (y - mouseY);
-        //mouseX = x;
-        //mouseY = y;
+void mouseMotionCB(int x, int y) {
+    if(mouseLeftDown) {
     }
-    if(mouseRightDown)
-    {
-        //cameraDistance += (y - mouseY) * 0.2f;
-        //if(cameraDistance < 2.0f)
-        //    cameraDistance = 2.0f;
-
-        //mouseY = y;
+    if(mouseRightDown) {
     }
 	if ( !warped ) {
 		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
@@ -1431,13 +1314,10 @@ void mouseMotionCB(int x, int y)
 	}
 	else
 		warped = false;
-  //glutPostRedisplay();
-
 }
 
 
 
-void exitCB()
-{
+void exitCB() {
     clearSharedMem();
 }

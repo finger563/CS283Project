@@ -74,6 +74,9 @@ public:
 		
 		if ( a.id == info.id && a.type == PLAYER ) {
 			eye.SetPosition(a.x,a.y,a.z);
+#ifdef SERVER_CONTROLS_HEADING
+			eye.SetAngles(a.hx,a.hy);
+#endif
 		}
 		else {
 			Object_s* tmp = objects;
