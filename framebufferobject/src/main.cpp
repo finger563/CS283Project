@@ -483,11 +483,15 @@ void KeyOperations() {
 		}
 
 		if (keyStates[' ']) { // space
-			movevector = movevector + (Vector3D(0,1,0));
+			tempeye.SetPosition(tempeye.GetPosition().x,
+				                tempeye.GetPosition().y + 1,
+								tempeye.GetPosition().z);
 		}
 
 		if (keyStates['c']) {
-			movevector = movevector + (Vector3D(0,-1,0));
+			tempeye.SetPosition(tempeye.GetPosition().x,
+				                tempeye.GetPosition().y - 1,
+								tempeye.GetPosition().z);
 		}
 
 		if (keyStates['b'] || keyStates['B']) {
