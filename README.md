@@ -125,10 +125,11 @@ FEATURES
 
 TODO
 ----
- * Finish MOVE server/client implementations w.r.t player/object headings
+ * Utilize key buffering for player input
  * Collision detection
  * Physics (for jumping)
  * Build world
  * Have server randomly choose spawn points for players.
  * Allow killing of characters and their subsequent respawn
  * Lighting system (smooth shading, shadowing, etc.)
+ * Sprite system for particles/explosions/HUD
