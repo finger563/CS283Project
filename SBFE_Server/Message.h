@@ -175,7 +175,8 @@ struct Object_s {
 		x += tx * vz * time;
 		y += ty * vz * time;
 		z += tz * vz * time;
-		life = life - time;		// overload hz as timetolive
+		if ( type != PLAYER )
+			life = life - time;		// overload hz as timetolive
 		return (life > 0);
 	}
 
