@@ -7,9 +7,11 @@ This project is written by William Emfinger and Paul Mcneil for Vanderbilt's
 spring 2013 CS283 Computer Networks class.
 
 The program is a networked 3D first person game in which the player can use the 
-mouse and keyboard to move and look in a 3D virtual environment.  The player can
-connect to a server, and will be able to chat with, see, and interact with other
-players on that server.  
+mouse and keyboard to move and look and shoot in a 3D virtual environment.  The player can
+connect to a server, and can chat with, see, and interact with other
+players on that server.  The server determines the world which the players load, and runs
+the collision detection on the dynamic objects (players and shots), maintaining the 
+state for all dynamic objects in the game.  
 
 The rendering code for this projet is written from scratch, and only uses a small
 subset of OpenGL in order to have access to a pixel buffer.  The vector/matrix 
