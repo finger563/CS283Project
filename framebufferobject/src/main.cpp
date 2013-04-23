@@ -58,15 +58,12 @@ Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
 std::string userName = "";
 std::string playermsg = "";
 bool print = true;
-bool typing = false;	//hopefully a trigger to create chat window
+bool typing = false;
 
 void PrintChat();
 
 // INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
 #include "Network\helper_funcs.h"
-
-extern Player_c player;
-extern Dummy_Event_Handler event_handler;
 
 void SendChat(string sendstring);
 void SendShot();
@@ -154,7 +151,6 @@ void SendLeave() {
 	mymessage.Player(player.Info());
 	event_handler.send(mymessage);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {    
@@ -345,11 +341,9 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
     return 0;
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// copy an image data to texture buffer
-/////////////////////////////////////////////////////////////////////////////// actual rendering
+// copy an image data to texture buffer, this updates what is rendered
+///////////////////////////////////////////////////////////////////////////////
 void updatePixels(GLubyte* dst, int size) {
     static int color = 0;
 
@@ -452,8 +446,6 @@ void updatePixels(GLubyte* dst, int size) {
     }
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // display chat messages
 ///////////////////////////////////////////////////////////////////////////////
@@ -505,8 +497,6 @@ void PrintChat() {
     glMatrixMode(GL_MODELVIEW);      // switch to modelview matrix
     glPopMatrix();                   // restore to previous modelview matrix
 }
-
-
 
 //=============================================================================
 // CALLBACKS
@@ -637,24 +627,20 @@ void displayCB() {
     glutSwapBuffers();
 }
 
-
 void reshapeCB(int width, int height) {
     screenWidth = width;
     screenHeight = height;
     toPerspective();
 }
 
-
 void timerCB(int millisec) {
     glutTimerFunc(millisec, timerCB, millisec);
     glutPostRedisplay();
 }
 
-
 void idleCB() {
     glutPostRedisplay();
 }
-
 
 void keyboardCB(unsigned char key, int x, int y) {
 	Vector3D movevector = Vector3D();
@@ -827,7 +813,6 @@ void specialKeyCB(int key, int x, int y) {
 	}
 }
 
-
 void mouseCB(int button, int state, int x, int y) {
     mouseX = x;
     mouseY = y;
@@ -866,8 +851,6 @@ void mouseMotionCB(int x, int y) {
 	else
 		warped = false;
 }
-
-
 
 void exitCB() {
     clearSharedMem();

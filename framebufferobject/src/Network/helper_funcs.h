@@ -42,4 +42,7 @@ int parse_args (int argc, ACE_TCHAR *argv[]);
 // signature of our thread entry point
 void *thread_func (void *arg);
 
+
+extern Dummy_Event_Handler event_handler;
+
 #endif /* _CS283_HELPER_FUNCS_H */

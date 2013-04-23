@@ -25,6 +25,8 @@ using namespace std;
 
 #include "Player.h"
 
+extern Player_c player;
+
 // our data communication handler inherits from ACE_Event_Handler so
 // that it can be registered with the Reactor.  We also maintain a
 // SOCK_Stream object (Bridge design pattern).
