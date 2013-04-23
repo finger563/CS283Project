@@ -14,6 +14,7 @@
 #include <string>
 
 #include <iostream>
+#include <list>
 using namespace std;
 
 #include <ace/SOCK_Stream.h>      // for data comm functionality
@@ -170,7 +171,7 @@ public:
 		}
 	}
 	
-	bool Object(Object_s& s) {
+	bool ObjectExists(Object_s& s) {
 		if (players != NULL) {
 			if ( s == *objects )
 				return true;
@@ -186,15 +187,7 @@ public:
 		return false;
 	}
 
-	void UpdateObjects(const float t) {
-		if (players != NULL) {
-			Object_s* tmp=Objects();
-			while (tmp!=NULL) {
-				tmp->Update(t);
-				tmp=tmp->next;
-			}
-		}
-	}
+	bool DetectCollide(Object_s& s);	// collision detection code
 	
 	void RemoveObject( ObjectType t, ACE_CDR::Long id ) {
 		Object_s* tmp = objects;

@@ -50,15 +50,15 @@ void SendLeave();
 
 void SendChat(string sendstring) {
 	Message mymessage;
-	mymessage.Type(CHAT);
-	mymessage.Player(player.Info());
-	mymessage.Content(sendstring.c_str());
+	mymessage.SetType(CHAT);
+	mymessage.SetPlayer(player.Info());
+	mymessage.SetContent(sendstring.c_str());
 	event_handler.send(mymessage);
 }
 
 void SendShot() {
 	Message mymessage;
-	mymessage.Type(SHOOT);
+	mymessage.SetType(SHOOT);
 	Player_s info = player.Info();
 	Camera eye = player.Eye();
 	info.x = eye.GetPosition().x;
@@ -66,13 +66,13 @@ void SendShot() {
 	info.z = eye.GetPosition().z;
 	info.theta = eye.GetTheta();
 	info.phi = eye.GetPhi();
-	mymessage.Player(info);
+	mymessage.SetPlayer(info);
 	event_handler.send(mymessage);
 }
 
 void SendMove() {
 	Message mymessage;
-	mymessage.Type(MOVE);
+	mymessage.SetType(MOVE);
 	Object_s myobj = Object_s();
 	myobj.SetType(PLAYER);
 	myobj.SetID(player.Info().id);
@@ -83,7 +83,7 @@ void SendMove() {
 	myobj.z = tempeye.GetPosition().z;
 	myobj.theta = tempeye.GetTheta();		// theta
 	myobj.phi = tempeye.GetPhi();		// phi
-	mymessage.Object(myobj);
+	mymessage.SetObject(myobj);
 	event_handler.send(mymessage);
 	
 	theta = 0;		// zero the delta's for the angles
@@ -92,8 +92,8 @@ void SendMove() {
 
 void SendLeave() {
 	Message mymessage;
-	mymessage.Type(LEAVE);
-	mymessage.Player(player.Info());
+	mymessage.SetType(LEAVE);
+	mymessage.SetPlayer(player.Info());
 	event_handler.send(mymessage);
 }
 

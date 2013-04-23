@@ -202,10 +202,10 @@ public:
 		t_ = 0;
 		memset(content_,0,MAX_CONT_LEN);
 	}
-	Message(const Message &m) : object_(m.Object()),player_(m.Player()), t_(m.Time()) {
-		this->type_ = m.Type();
+	Message(const Message &m) : object_(m.GetObject()),player_(m.GetPlayer()), t_(m.GetTime()) {
+		this->type_ = m.GetType();
 		memset(content_,0,MAX_CONT_LEN);
-		strcpy(this->content_,m.Content());
+		strcpy(this->content_,m.GetContent());
 	}
 	Message(MessageType t,Object_s &o,Player_s &p, char* c) : object_(o),player_(p) {
 		this->type_ = t;
@@ -215,34 +215,34 @@ public:
 	~Message(){}
 	Message & operator=(const Message & m) {
 		if (this != &m)  {
-			type_ = m.Type();
-			t_ = m.Time();
-			object_ = m.Object();
-			player_ = m.Player();
-			strcpy(content_,m.Content());
+			type_ = m.GetType();
+			t_ = m.GetTime();
+			object_ = m.GetObject();
+			player_ = m.GetPlayer();
+			strcpy(content_,m.GetContent());
         } 
         return *this;
 	}
 
 	size_t Length() const;
 
-	void		Type(const MessageType type) {type_=type;}
-	MessageType Type() const {return type_;}
+	void		SetType(const MessageType type) {type_=type;}
+	MessageType GetType() const {return type_;}
 
-	void	World(const long w) { world_ = w; }
-	long	World() const { return world_; }
+	void	SetWorld(const long w) { world_ = w; }
+	long	GetWorld() const { return world_; }
 
-	void	Time(const float time) { t_ = time; }
-	float	Time() const { return t_; }
+	void	SetTime(const float time) { t_ = time; }
+	float	GetTime() const { return t_; }
 
-	void		Object(const Object_s& o) {object_=o;}
-	Object_s	Object() const {return object_;}
+	void		SetObject(const Object_s& o) {object_=o;}
+	Object_s	GetObject() const {return object_;}
 
-	void		Player(const Player_s& p) {player_=p;}
-	Player_s	Player() const {return player_;}
+	void		SetPlayer(const Player_s& p) {player_=p;}
+	Player_s	GetPlayer() const {return player_;}
 
-	const char*	Content() const {return content_;}
-	void		Content(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}
+	const char*	GetContent() const {return content_;}
+	void		SetContent(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}
 
 	bool FormMessage(bool isServer);
 };

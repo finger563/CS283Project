@@ -91,7 +91,8 @@
     <ClCompile Include="..\Network\Dummy_Accept_Handler.cpp" />
     <ClCompile Include="..\Network\Dummy_Data_Handler.cpp" />
     <ClCompile Include="..\Network\Message.cpp" />
-    <ClCompile Include="server.cpp" />
+    <ClCompile Include="..\Network\Server.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\camera.h" />

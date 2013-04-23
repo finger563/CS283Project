@@ -96,63 +96,63 @@ size_t Message::Length() const {
 }
 
 int operator<< (ACE_OutputCDR &cdr, const Message &m) {
-	cdr << ACE_CDR::Long (m.Type());
-	switch (m.Type())
+	cdr << ACE_CDR::Long (m.GetType());
+	switch (m.GetType())
 	{
 	case REGISTER:
-		cdr << ACE_CDR::Long (strlen(m.Player().name));
-		cdr.write_char_array(m.Player().name,strlen(m.Player().name));
+		cdr << ACE_CDR::Long (strlen(m.GetPlayer().name));
+		cdr.write_char_array(m.GetPlayer().name,strlen(m.GetPlayer().name));
 		break;
 	case ACCEPT:
-		cdr << ACE_CDR::Long ( m.World() );
-		cdr << ACE_CDR::Long ( m.Player().id );
-		cdr << ACE_CDR::Float ( m.Player().x );
-		cdr << ACE_CDR::Float ( m.Player().y );
-		cdr << ACE_CDR::Float ( m.Player().z );
-		cdr << ACE_CDR::Float ( m.Player().theta );
-		cdr << ACE_CDR::Float ( m.Player().phi );
-		cdr << ACE_CDR::Float ( m.Player().life );
+		cdr << ACE_CDR::Long ( m.GetWorld() );
+		cdr << ACE_CDR::Long ( m.GetPlayer().id );
+		cdr << ACE_CDR::Float ( m.GetPlayer().x );
+		cdr << ACE_CDR::Float ( m.GetPlayer().y );
+		cdr << ACE_CDR::Float ( m.GetPlayer().z );
+		cdr << ACE_CDR::Float ( m.GetPlayer().theta );
+		cdr << ACE_CDR::Float ( m.GetPlayer().phi );
+		cdr << ACE_CDR::Float ( m.GetPlayer().life );
 		break;
 	case CHAT:
-		cdr << ACE_CDR::Long ( strlen(m.Content()) );
-		cdr.write_char_array(m.Content(),strlen(m.Content()));
+		cdr << ACE_CDR::Long ( strlen(m.GetContent()) );
+		cdr.write_char_array(m.GetContent(),strlen(m.GetContent()));
 		break;
 	case SHOOT:
-		cdr << ACE_CDR::Long (m.Player().id);
-		cdr << ACE_CDR::Long (strlen(m.Player().name));
-		cdr.write_char_array(m.Player().name,strlen(m.Player().name));
-		cdr << ACE_CDR::Float ( m.Player().x );
-		cdr << ACE_CDR::Float ( m.Player().y );
-		cdr << ACE_CDR::Float ( m.Player().z );
-		cdr << ACE_CDR::Float ( m.Player().theta );
-		cdr << ACE_CDR::Float ( m.Player().phi );
-		cdr << ACE_CDR::Float ( m.Player().life );
+		cdr << ACE_CDR::Long (m.GetPlayer().id);
+		cdr << ACE_CDR::Long (strlen(m.GetPlayer().name));
+		cdr.write_char_array(m.GetPlayer().name,strlen(m.GetPlayer().name));
+		cdr << ACE_CDR::Float ( m.GetPlayer().x );
+		cdr << ACE_CDR::Float ( m.GetPlayer().y );
+		cdr << ACE_CDR::Float ( m.GetPlayer().z );
+		cdr << ACE_CDR::Float ( m.GetPlayer().theta );
+		cdr << ACE_CDR::Float ( m.GetPlayer().phi );
+		cdr << ACE_CDR::Float ( m.GetPlayer().life );
 		break;
 	case CREATE:
 	case MOVE:
-		cdr << ACE_CDR::Long (m.Object().type);
-		cdr << ACE_CDR::Long (m.Object().id);
-		cdr << ACE_CDR::Long (strlen(m.Object().content_));
-		cdr << ACE_CDR::Float ( m.Object().x );
-		cdr << ACE_CDR::Float ( m.Object().y );
-		cdr << ACE_CDR::Float ( m.Object().z );
-		cdr << ACE_CDR::Float ( m.Object().theta );
-		cdr << ACE_CDR::Float ( m.Object().phi );
-		cdr << ACE_CDR::Float ( m.Object().life );
-		cdr << ACE_CDR::Float ( m.Object().vx );
-		cdr << ACE_CDR::Float ( m.Object().vy );
-		cdr << ACE_CDR::Float ( m.Object().vz );
-		cdr.write_char_array(m.Object().content_,strlen(m.Object().content_));
+		cdr << ACE_CDR::Long (m.GetObject().type);
+		cdr << ACE_CDR::Long (m.GetObject().id);
+		cdr << ACE_CDR::Long (strlen(m.GetObject().content_));
+		cdr << ACE_CDR::Float ( m.GetObject().x );
+		cdr << ACE_CDR::Float ( m.GetObject().y );
+		cdr << ACE_CDR::Float ( m.GetObject().z );
+		cdr << ACE_CDR::Float ( m.GetObject().theta );
+		cdr << ACE_CDR::Float ( m.GetObject().phi );
+		cdr << ACE_CDR::Float ( m.GetObject().life );
+		cdr << ACE_CDR::Float ( m.GetObject().vx );
+		cdr << ACE_CDR::Float ( m.GetObject().vy );
+		cdr << ACE_CDR::Float ( m.GetObject().vz );
+		cdr.write_char_array(m.GetObject().content_,strlen(m.GetObject().content_));
 		break;
 	case UPDATE:
-		cdr << ACE_CDR::Float (m.Time());
+		cdr << ACE_CDR::Float (m.GetTime());
 		break;
 	case LEAVE:
-		cdr << ACE_CDR::Long ( m.Player().id );
+		cdr << ACE_CDR::Long ( m.GetPlayer().id );
 		break;
 	case REMOVE:
-		cdr << ACE_CDR::Long (m.Object().type);
-		cdr << ACE_CDR::Long (m.Object().id);
+		cdr << ACE_CDR::Long (m.GetObject().type);
+		cdr << ACE_CDR::Long (m.GetObject().id);
 		break;
 	}
 
@@ -181,7 +181,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 	Object_s object;
 
 	cdr >> type;
-	message.Type((MessageType)type);
+	message.SetType((MessageType)type);
 
 	switch (type)
 	{
@@ -191,7 +191,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		name[name_len]='\0';
 		player = Player_s();
 		player.SetName(name);
-		message.Player(player);
+		message.SetPlayer(player);
 		break;
 	case ACCEPT:
 		cdr >> world;
@@ -207,14 +207,14 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		player.SetPos(x,y,z);
 		player.SetHeading(theta,phi);
 		player.SetLife(life);
-		message.Player(player);
-		message.World(world);
+		message.SetPlayer(player);
+		message.SetWorld(world);
 		break;
 	case CHAT:
 		cdr >> cont_len;
 		cdr.read_char_array(cont,cont_len);
 		cont[cont_len]='\0';
-		message.Content(cont);
+		message.SetContent(cont);
 		break;
 	case SHOOT:
 		cdr >> player_id;
@@ -233,7 +233,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		player.SetPos(x,y,z);
 		player.SetHeading(theta,phi);
 		player.SetLife(life);
-		message.Player(player);
+		message.SetPlayer(player);
 		break;
 	case CREATE:
 	case MOVE:
@@ -256,18 +256,18 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		object.SetHeading(theta,phi);
 		object.SetLife(life);
 		object.SetVelocity(vx,vy,vz);
-		message.Object(object);
-		message.Content(cont);
+		message.SetObject(object);
+		message.SetContent(cont);
 		break;
 	case UPDATE:
 		cdr >> time;
-		message.Time(time);
+		message.SetTime(time);
 		break;
 	case LEAVE:
 		cdr >> player_id;
 		player = Player_s();
 		player.SetID(player_id);
-		message.Player(player);
+		message.SetPlayer(player);
 		break;
 	case REMOVE:
 		cdr >> object_type;
@@ -275,7 +275,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		object = Object_s();
 		object.SetType((ObjectType)object_type);
 		object.SetID(object_id);
-		message.Object(object);
+		message.SetObject(object);
 		break;
 	}
 

@@ -102,8 +102,8 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 
 	// REGISTER THE PLAYER WITH THE SERVER
 	Message mymessage;
-	mymessage.Type(REGISTER);
-	mymessage.Player(player.Info());
+	mymessage.SetType(REGISTER);
+	mymessage.SetPlayer(player.Info());
 	player.Register();
 	this->send(mymessage);
 
@@ -142,21 +142,21 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 	} 
 	else  {
 		// Now process message
-		switch (mymessage.Type()) {
+		switch (mymessage.GetType()) {
 		case ACCEPT:		// the server has accepted us
-			player.Level(mymessage.World());
+			player.Level(mymessage.GetWorld());
 			myplayer = player.Info();
-			myplayer.id = mymessage.Player().id;
-			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().z);
-			myeye.SetAngles(mymessage.Player().theta,mymessage.Player().phi);
+			myplayer.id = mymessage.GetPlayer().id;
+			myeye.SetPosition(mymessage.GetPlayer().x,mymessage.GetPlayer().y,mymessage.GetPlayer().z);
+			myeye.SetAngles(mymessage.GetPlayer().theta,mymessage.GetPlayer().phi);
 			myeye.ComputeAxes();
-			myplayer.SetLife(mymessage.Player().life);
+			myplayer.SetLife(mymessage.GetPlayer().life);
 			#if defined(DEBUG)
 			ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Player got position (%f,%f,%f).\n"),
-				mymessage.Player().x,
-				mymessage.Player().y,
-				mymessage.Player().z));
+				mymessage.GetPlayer().x,
+				mymessage.GetPlayer().y,
+				mymessage.GetPlayer().z));
 			#endif
 			player.Eye(myeye);
 			player.Info(myplayer);	// update the data structure with the ID number from the server
@@ -164,7 +164,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 			break;
 		case CREATE:		// server has sent a create command for an object
 			#if defined(DEBUG)
-			switch (mymessage.Object().type)
+			switch (mymessage.GetObject().type)
 			{
 			case PLAYER:
 				sprintf(str,"Player");
@@ -178,18 +178,18 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 			ACE_DEBUG ((LM_DEBUG,
 					ACE_TEXT ("Received new Object: (%s,%d)\n"),
 					str,
-					mymessage.Object().id));
+					mymessage.GetObject().id));
 			#endif
-			myobject = mymessage.Object();
+			myobject = mymessage.GetObject();
 			player.Create(myobject);
 			break;
 		case CHAT:
-			chat = string(mymessage.Content());
+			chat = string(mymessage.GetContent());
 			player.AddChat(chat);
 			break;
 		case MOVE:
 			#if defined(DEBUG)
-			switch (mymessage.Object().type)
+			switch (mymessage.GetObject().type)
 			{
 			case PLAYER:
 				sprintf(str,"Player");
@@ -203,9 +203,9 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 			ACE_DEBUG ((LM_DEBUG,
 					ACE_TEXT ("Moving Object: (%s,%d)\n"),
 					str,
-					mymessage.Object().id));
+					mymessage.GetObject().id));
 			#endif
-			myobject = mymessage.Object();
+			myobject = mymessage.GetObject();
 			player.Move(myobject);
 			break;
 		case UPDATE:
@@ -215,11 +215,11 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 					mymessage.Time()));
 			#endif
 			//period_t = ACE_Time_Value(floor(mymessage.Time()),(mymessage.Time()-floor(mymessage.Time()))*1000000.0);
-			player.Update(mymessage.Time());
+			player.Update(mymessage.GetTime());
 			break;
 		case REMOVE:
 			#if defined(DEBUG)
-			switch (mymessage.Object().type)
+			switch (mymessage.GetObject().type)
 			{
 			case PLAYER:
 				sprintf(str,"Player");
@@ -231,9 +231,9 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 				break;
 			}
 			ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Object (%s,%d) removed!\n"), str ,mymessage.Object().id));
+				ACE_TEXT ("Object (%s,%d) removed!\n"), str ,mymessage.GetObject().id));
 			#endif
-			player.Remove(mymessage.Object().type,mymessage.Object().id);
+			player.Remove(mymessage.GetObject().type,mymessage.GetObject().id);
 			break;
 		default:
 			ACE_ERROR ((LM_ERROR,

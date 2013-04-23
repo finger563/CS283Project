@@ -95,8 +95,7 @@ int Dummy_Data_Handler::open (void)
 /* now define the event handler's callback methods  */
 
 // handle incoming data
-int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
-{
+int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 #if defined(DEBUG)
 	// for debugging
 	ACE_DEBUG ((LM_DEBUG,
@@ -137,20 +136,20 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 	} else {
 		// some data is received.
 		// Now process message
-		switch (mymessage.Type())
+		switch (mymessage.GetType())
 		{
 		case REGISTER:
 			myid = numPlayers++;
-			myplayer = mymessage.Player();
+			myplayer = mymessage.GetPlayer();
 			myplayer.SetID(myid);
 			if ( server.Register(myplayer) )
 			{
-				mymessage.Type(ACCEPT);
-				mymessage.World(server.Level());	// let player know which world to load
+				mymessage.SetType(ACCEPT);
+				mymessage.SetWorld(server.Level());	// let player know which world to load
 				myplayer.SetHeading(0,0);
 				myplayer.SetLife(PLAYERLIFE);
 				myplayer.SetPos(10,0,10);
-				mymessage.Player(myplayer);
+				mymessage.SetPlayer(myplayer);
 				int numbytes = this->send(this->peer(),mymessage);
 				#if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG,
@@ -160,8 +159,8 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				#endif
 				
 				peer_s *tmp = &con_peers;
-				mymessage.Type(CREATE);
-				myplayer = mymessage.Player();
+				mymessage.SetType(CREATE);
+				myplayer = mymessage.GetPlayer();
 				myobject.SetID(myid);
 				myobject.SetType(PLAYER);
 				myobject.SetHeading(myplayer.theta,myplayer.phi);
@@ -169,7 +168,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
 				myobject.SetContent(myplayer.name);
 				server.Create(myobject);		// need to keep track of this object on the server
-				mymessage.Object(myobject);
+				mymessage.SetObject(myobject);
 				while (tmp->next!=NULL) {		// Let other clients know of this new client
 					tmp = tmp->next;
 					int numbytes = this->send(*(tmp->p),mymessage);
@@ -182,7 +181,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				}
 				
 				Object_s* myobjects = server.Objects();
-				mymessage.Type(CREATE);
+				mymessage.SetType(CREATE);
 				while ( myobjects != NULL ) {	// Need to send CREATE messages to this client for all objects
 					if ( myobjects->id != myid ||
 						 myobjects->type != PLAYER ) {
@@ -192,7 +191,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 						myobject.SetLife(myobjects->life);
 						myobject.SetPos(myobjects->x,myobjects->y,myobjects->z);
 						myobject.SetContent(myobjects->content_);
-						mymessage.Object(myobject);
+						mymessage.SetObject(myobject);
 						int numbytes = this->send(this->peer(),mymessage);
 						#if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
@@ -225,15 +224,15 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			}
 			break;
 		case SHOOT:
-			if ( server.Player(mymessage.Player()) ) {
+			if ( server.Player(mymessage.GetPlayer()) ) {
 #if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("%s fired a shot!\n"),
 							mymessage.Player().name));
 #endif
 				peer_s *tmp = &con_peers;
-				mymessage.Type(CREATE);
-				myplayer = mymessage.Player();
+				mymessage.SetType(CREATE);
+				myplayer = mymessage.GetPlayer();
 				myobject.SetID(numObjects++);
 				myobject.SetType(SHOT);
 				myobject.SetHeading(myplayer.theta,myplayer.phi);
@@ -242,7 +241,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
 				myobject.SetContent(myplayer.name);
 				server.Create(myobject);		// need to keep track of this object on the server
-				mymessage.Object(myobject);
+				mymessage.SetObject(myobject);
 				while (tmp->next!=NULL) {
 					tmp = tmp->next;
 					int numbytes = this->send(*(tmp->p),mymessage);
@@ -256,9 +255,9 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			}
 			break;
 		case MOVE:
-			if ( server.Object(mymessage.Object()) ) {
+			if ( server.ObjectExists(mymessage.GetObject()) ) {
 				peer_s *tmp = &con_peers;
-				myobject = Object_s(mymessage.Object());
+				myobject = Object_s(mymessage.GetObject());
 				server.Move(myobject);		// need to update server's state
 				while (tmp->next!=NULL) {	// and also send move to clients
 					tmp = tmp->next;
@@ -273,21 +272,21 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			}
 			break;
 		case LEAVE:
-			if ( server.Player(mymessage.Player()) ) {
+			if ( server.Player(mymessage.GetPlayer()) ) {
 				//server.RemovePlayer(mymessage.Player().id);	
 				//server.RemoveObject(PLAYER,mymessage.Player().id);
 				//server.RemovePlayer(myid);
 				//server.RemoveObject(PLAYER,myid);
 				//con_peers.Remove(myid);
 				myobject = Object_s();
-				myobject.SetID(mymessage.Player().id);
+				myobject.SetID(mymessage.GetPlayer().id);
 				myobject.SetType(PLAYER);
-				mymessage.Type(REMOVE);		// Send remove to players
-				mymessage.Object(myobject);
+				mymessage.SetType(REMOVE);		// Send remove to players
+				mymessage.SetObject(myobject);
 				peer_s *tmp = &con_peers;
 				while (tmp->next!=NULL) {	// and also send remove to clients
 					tmp = tmp->next;
-					if ( tmp->ID != mymessage.Player().id ) {
+					if ( tmp->ID != mymessage.GetPlayer().id ) {
 						int numbytes = this->send(*(tmp->p),mymessage);
 #if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
@@ -309,8 +308,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 	return 0;
 }
 
-int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
-{
+int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message) {
 	size_t maxpayloadsize = message.Length();
 	maxpayloadsize += ACE_CDR::MAX_ALIGNMENT;
 
@@ -331,8 +329,7 @@ int Dummy_Data_Handler::send(ACE_SOCK_Stream &p,const Message& message)
 	return p.sendv_n (iov, 2);
 }
 
-int Dummy_Data_Handler::recv_message(Message& message)
-{
+int Dummy_Data_Handler::recv_message(Message& message) {
 #define MAXHOSTNAMELEN	100
 	ACE_INET_Addr peer_addr;
 	peer_.get_remote_addr(peer_addr);
@@ -381,8 +378,7 @@ int Dummy_Data_Handler::recv_message(Message& message)
 // THIS IS WHERE THE STATE UPDATE & TRANSMISSION OCCURS
 // When the server needs to update each player with new object positions, etc.
 // this is the function timeout which will handle that.
-int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act)
-{	
+int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act) {	
 	#if defined(DEBUG)
 	// for debugging
 	ACE_DEBUG ((LM_DEBUG,
@@ -396,12 +392,13 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 			time += period_t.sec();
 			Object_s* myobjects = server.Objects();
 			while ( myobjects != NULL ) {
-				if ( !myobjects->Update(time) ) {	// object is no longer alive, need to remove
+				if ( !myobjects->Update(time) ||
+					 server.DetectCollide(*myobjects) ) {	// object is no longer alive, need to remove
 					peer_s *tmp = &con_peers;
 					while (tmp->next != NULL) {
 						tmp = tmp->next;
-						mymessage.Type(REMOVE);
-						mymessage.Object(*myobjects);
+						mymessage.SetType(REMOVE);
+						mymessage.SetObject(*myobjects);
 						int numbytes = this->send(*(tmp->p),mymessage);
 #if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
