@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 // the following is used for logging of messages
 #include "ace/Log_Msg.h"
 
@@ -159,9 +160,17 @@ struct Object_s {
 	void Link(Object_s* a){next = a;}
 	
 	void Update(const float time) {
-		x += hx * time;
-		y += hy * time;
-		z += hz * time;
+		float tr = cos(hy);
+		float tx = tr*sin(hx),
+			  ty = sin(hy),
+			  tz = tr*cos(hx);
+		float mag = sqrt(tx*tx + ty*ty + tz*tz);
+		tx = tx/mag;
+		ty = ty/mag;
+		tz = tz/mag;
+		x += tx * vz * time;
+		y += ty * vz * time;
+		z += tz * vz * time;
 	}
 
 	bool operator==(const Object_s &b) {

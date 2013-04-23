@@ -4,7 +4,6 @@
 #include "Library\library_funcs.h"		// GL and GLUT functions needed for code
 
 #include "Engine\Object.h"
-#include "Engine\camera.h"
 
 short display_buffer[SIZE_X*SIZE_Y];
 float z_buffer[SIZE_X*SIZE_Y];
@@ -29,11 +28,12 @@ Matrix worldToCamera=Matrix(),
 	   perspectiveProjection=Matrix(),
 	   projectionToPixel=Matrix();
 
-std::list<Object> objectlist;
-std::list<Object> dynamiclist;
-std::list<Poly> renderlist;
+std::list<Object> objectlist;		// used for the static world objects
+std::list<Object> dynamiclist;		// used for dynamic objects received from server
+std::list<Poly> renderlist;			// aggregate polygon list to be rendered
 
 
+Matrix rot;		// debug/testing for rotating objects
 Matrix rmz = Matrix(), 
         rmy = Matrix(),
 		neg_rmy = Matrix(),
@@ -44,13 +44,19 @@ Matrix rmz = Matrix(),
         rmxyz = Matrix();
 
 float rot_angle = 3.141/60;
-		
-Matrix rot;		// debug/testing for rotating objects
-
-Camera camera;
 
 //shoot will be the projectile
 Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
+
+// INPUT HANDLING CODE ////////////////////////////////////////////////////////
+bool keyStates[256] = {};				// for regular keyboard keys
+bool keySpecialStates[256] = {};		// for "special" keyboard keys, i.e. arrow keys
+bool mouseLeftClick = false;
+bool mouseRightClick = false;
+float mouseX,mouseY;
+float theta = 0,
+	  phi = 0;
+void KeyOperations();
 
 // EVERYTHING FOR CHAT CODE ///////////////////////////////////////////////////
 #include "Engine\chat.h"
@@ -65,18 +71,19 @@ void PrintChat();
 // INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
 #include "Network\helper_funcs.h"
 
+Camera tempeye;
+
 void SendChat(string sendstring);
 void SendShot();
-void SendMove(const Point3D& pos);
+void SendMove();
 void SendLeave();
 
 void RotateCamera(int x, int y) {
-    float theta = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
-	float phi = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
+    float theta_ = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
+	float phi_ = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
 
 	Camera tempcamera = player.Eye();
-	tempcamera.Rotate(theta,phi);
-    glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
+	tempcamera.Rotate(theta_,phi_);
 #ifdef SERVER_CONTROLS_HEADING
 	Message mymessage;
 	mymessage.Type(MOVE);
@@ -114,35 +121,32 @@ void SendShot() {
 	info.x = eye.GetPosition().x;
 	info.y = eye.GetPosition().y;
 	info.z = eye.GetPosition().z;
-	info.hx = eye.GetForward().x;
-	info.hy = eye.GetForward().y;
-	info.hz = eye.GetForward().z;
+	info.hx = eye.GetTheta();
+	info.hy = eye.GetPhi();
+	info.hz = 0;
 	mymessage.Player(info);
 	event_handler.send(mymessage);
 }
 
-void SendMove(const Point3D& pos) {
+void SendMove() {
 	Message mymessage;
 	mymessage.Type(MOVE);
 	Object_s myobj = Object_s();
 	myobj.SetType(PLAYER);
 	myobj.SetID(player.Info().id);
 	myobj.SetContent(player.Info().name);
-	Camera eye = player.Eye();
-
-	Vector3D head = eye.GetForward();
-	Vector3D right = eye.GetRight();
-	Vector3D up = eye.GetUp();
-	Vector3D trans = player.Eye().GetPosition() + head*pos.z + right*pos.x + up*pos.y;
 	
-	myobj.x = trans.x;
-	myobj.y = trans.y;
-	myobj.z = trans.z;
-	myobj.hx = eye.GetTheta();		// theta
-	myobj.hy = eye.GetPhi();		// phi
+	myobj.x = tempeye.GetPosition().x;
+	myobj.y = tempeye.GetPosition().y;
+	myobj.z = tempeye.GetPosition().z;
+	myobj.hx = tempeye.GetTheta();		// theta
+	myobj.hy = tempeye.GetPhi();		// phi
 	myobj.hz = 0;		// not used
 	mymessage.Object(myobj);
 	event_handler.send(mymessage);
+	
+	theta = 0;		// zero the delta's for the angles
+	phi = 0;
 }
 
 void SendLeave() {
@@ -245,9 +249,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 
 	testobj3.generateFloor(75,-10);
 
-	//projectile code
-	shot.projectileInit(camera.GetForward());
-
 	objectlist.push_back(testobj);
 	objectlist.push_back(testobj2);	
 	objectlist.push_back(testobj3);
@@ -341,9 +342,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
     return 0;
 }
 
-///////////////////////////////////////////////////////////////////////////////
 // copy an image data to texture buffer, this updates what is rendered
-///////////////////////////////////////////////////////////////////////////////
 void updatePixels(GLubyte* dst, int size) {
     static int color = 0;
 
@@ -379,7 +378,27 @@ void updatePixels(GLubyte* dst, int size) {
 			break;
 		}
 		tempobj.setPosition(Point3D(dynamic->x,dynamic->y,dynamic->z));
-		tempobj.setVel(Vector3D(dynamic->hx,dynamic->hy,dynamic->hz));
+		
+		float r = cos(dynamic->hy);
+		float x = r*sin(dynamic->hx),
+			  y = sin(dynamic->hy),
+			  z = r*cos(dynamic->hx);
+		Vector3D forward = normalize(Vector3D(x,y,z));
+		Vector3D up = normalize(Vector3D(0,1,0));
+		Vector3D right = normalize(Cross(up,forward));
+		up = normalize(Cross(forward,right));
+		Matrix m = Matrix();
+		m.data[0][0] = right.x;
+		m.data[0][1] = right.y;
+		m.data[0][2] = right.z;
+		m.data[1][0] = up.x;
+		m.data[1][1] = up.y;
+		m.data[1][2] = up.z;
+		m.data[2][0] = forward.x;
+		m.data[2][1] = forward.y;
+		m.data[2][2] = forward.z;
+		tempobj.Rotate(m);
+		tempobj.setVel(Vector3D(dynamic->vx,dynamic->vy,dynamic->vz));
 		dynamiclist.push_back(tempobj);
 		dynamic = dynamic->next;
 	}
@@ -446,9 +465,50 @@ void updatePixels(GLubyte* dst, int size) {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// display chat messages
-///////////////////////////////////////////////////////////////////////////////
+void KeyOperations() {
+
+	//Vector3D movevector = Vector3D();
+	//switch (0) {
+	//case 't': //chat function
+	//	typing = true;
+	//	//print = true;
+	//	break;
+
+	//case 'w': // Up
+	//	movevector = (Vector3D(0,0,1));
+	//	break;
+
+	//case 's': // down
+	//	movevector = (Vector3D(0,0,-1));
+	//	break;
+
+	//case 'a': // left
+	//	movevector = (Vector3D(-1,0,0));
+	//	break;
+
+	//case 'd': // right
+	//	movevector = (Vector3D(1,0,0));
+	//	break;
+
+	//case ' ': // space
+	//	movevector = (Vector3D(0,1,0));
+	//	break;
+
+	//case 'c': // c
+	//	movevector = (Vector3D(0,-1,0));
+	//	break;
+
+ //   case 'p':
+ //       if(pboSupported)
+ //           pboMode = ++pboMode % 3;
+ //       cout << "PBO mode: " << pboMode << endl;
+ //        break;
+	//}
+	////SendMove(movevector);
+	//tempeye.Translate(movevector);
+}
+
+// displays chat history (everyone who is on server)
 void PrintChat() {
     // backup current model-view matrix
     glPushMatrix();                     // save current modelview matrix
@@ -505,6 +565,38 @@ void PrintChat() {
 void displayCB() {
     static int index = 0;
     int nextIndex = 0;                  // pbo index used for next frame
+	
+	//KeyOperations();
+	//SendMove();
+
+	switch ( rotx + roty*2 + rotz*4 ) {
+	case 0:
+		rot.SetIdentity();
+		break;
+	case 1:
+		rot = rmx;
+		break;
+	case 2:
+		rot = rmy;
+		break;
+	case 3:
+		rot = rmxy;
+		break;
+	case 4:
+		rot = rmz;
+		break;
+	case 5:
+		rot = rmxz;
+		break;
+	case 6:
+		rot = rmyz;
+		break;
+	case 7:
+		rot = rmxyz;
+		break;
+	default:
+		rot = rmxyz;
+	}
 
     if(pboMode > 0) {
         // "index" is used to copy pixels from a PBO to a texture object
@@ -643,6 +735,8 @@ void idleCB() {
 }
 
 void keyboardCB(unsigned char key, int x, int y) {
+	keyStates[key] = true;
+
 	Vector3D movevector = Vector3D();
 
     switch(key) {
@@ -682,170 +776,117 @@ void keyboardCB(unsigned char key, int x, int y) {
 		return;
 	}
 
-	switch(key) {
-	case 't': //chat function
+	if (keyStates['t']) { //chat function
 		typing = true;
-		//print = true;
-		break;
-
-	case 'w': // Up
-		movevector = (Vector3D(0,0,1));
-		break;
-
-	case 's': // down
-		movevector = (Vector3D(0,0,-1));
-		break;
-
-	case 'a': // left
-		movevector = (Vector3D(-1,0,0));
-		break;
-
-	case 'd': // right
-		movevector = (Vector3D(1,0,0));
-		break;
-
-	case ' ': // space
-		movevector = (Vector3D(0,1,0));
-		break;
-
-	case 'c': // c
-		movevector = (Vector3D(0,-1,0));
-		break;
-
-    case 'p':
-        if(pboSupported)
-            pboMode = ++pboMode % 3;
-        cout << "PBO mode: " << pboMode << endl;
-         break;
-	
-	case 'b':
-	case 'B':
-		display_z_buffer = !display_z_buffer;
-		break;
-
-	case 'x':
-	case 'X':
-		rotx = !rotx;
-		break;
-
-	case 'y':
-	case 'Y':
-		roty = !roty;
-		break;
-
-	case 'z':
-	case 'Z':
-		rotz = !rotz;
-		break;
-
-    case 'm': // switch rendering modes (fill -> wire -> point)
-    case 'M':
-        drawMode = ++drawMode % 3;
-        if(drawMode == 0)        // fill mode
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glEnable(GL_DEPTH_TEST);
-            glEnable(GL_CULL_FACE);
-        }
-        else if(drawMode == 1)  // wireframe mode
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_CULL_FACE);
-        }
-        else                    // point mode
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_CULL_FACE);
-        }
-        break;
-
-    default:
-        ;
-    }
-
-	switch ( rotx + roty*2 + rotz*4 ) {
-	case 0:
-		rot.SetIdentity();
-		break;
-	case 1:
-		rot = rmx;
-		break;
-	case 2:
-		rot = rmy;
-		break;
-	case 3:
-		rot = rmxy;
-		break;
-	case 4:
-		rot = rmz;
-		break;
-	case 5:
-		rot = rmxz;
-		break;
-	case 6:
-		rot = rmyz;
-		break;
-	case 7:
-		rot = rmxyz;
-		break;
-	default:
-		rot = rmxyz;
+		return;
 	}
+
+	if (keyStates['w']) { // Up
+		movevector = movevector + (Vector3D(0,0,1));
+	}
+
+	if (keyStates['s']) { // down
+		movevector = movevector + (Vector3D(0,0,-1));
+	}
+
+	if (keyStates['a']) { // left
+		movevector = movevector + (Vector3D(-1,0,0));
+	}
+
+	if (keyStates['d']) { // right
+		movevector = movevector + (Vector3D(1,0,0));
+	}
+
+	if (keyStates[' ']) { // space
+		movevector = movevector + (Vector3D(0,1,0));
+	}
+
+	if (keyStates['c']) {
+		movevector = movevector + (Vector3D(0,-1,0));
+	}
+
+	if (keyStates['b'] || keyStates['B']) {
+		display_z_buffer = !display_z_buffer;
+	}
+
+	//case 'x':
+	//case 'X':
+	//	rotx = !rotx;
+	//	break;
+
+	//case 'y':
+	//case 'Y':
+	//	roty = !roty;
+	//	break;
+
+	//case 'z':
+	//case 'Z':
+	//	rotz = !rotz;
+	//	break;
 	
-	SendMove(movevector);
+	tempeye.Translate(movevector);
+	SendMove();
 }
 
 void specialKeyCB(int key, int x, int y) {
-    switch(key) {
-	case GLUT_KEY_UP:
-		break;
+	keySpecialStates[key] = true;
+}
 
-	case GLUT_KEY_DOWN:
-		break;
+void keyboardUpCB(unsigned char key, int x, int y) {
+	keyStates[key] = false;
+}
 
-	case GLUT_KEY_LEFT:
-		break;
-
-	case GLUT_KEY_RIGHT:
-		break;
-	}
+void specialKeyUpCB(int key, int x, int y) {
+	keySpecialStates[key] = false;
 }
 
 void mouseCB(int button, int state, int x, int y) {
     mouseX = x;
     mouseY = y;
-	Camera tempcamera = player.Eye();
 
     if(button == GLUT_LEFT_BUTTON) {
         if(state == GLUT_DOWN) {
-            mouseLeftDown = true;
+            mouseLeftClick = true;
 			SendShot();
         }
         else if(state == GLUT_UP)
-            mouseLeftDown = false;
+            mouseLeftClick = false;
     }
 
     else if(button == GLUT_RIGHT_BUTTON) {
         if(state == GLUT_DOWN) {
-            mouseRightDown = true;
+            mouseRightClick = true;
         }
         else if(state == GLUT_UP)
-            mouseRightDown = false;
+            mouseRightClick = false;
     }
 }
 
-bool warped = false;
+bool warped = false;		// without this, the mouse warp (capture) generates endless loop
 
 void mouseMotionCB(int x, int y) {
-    if(mouseLeftDown) {
-    }
-    if(mouseRightDown) {
-    }
+}
+
+void mousePassiveMotionCB(int x, int y) {
 	if ( !warped ) {
+		theta += (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
+		phi += -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
+		if ( theta > 2.0*3.141592 ) {
+			theta = theta - 2.0*3.141592;
+		}
+		else if ( theta < -2.0*3.141592 ) {
+			theta = theta + 2.0*3.141592;
+		}
+		if ( phi > 3.141592/2.0 ) {
+			phi = 3.141592/2.0;
+		}
+		else if ( phi < -3.141592/2.0 ) {
+			phi = -3.141592/2.0;
+		}
+		//RotateCamera(x,y);
+		tempeye.Rotate(theta,phi);
+		SendMove();
 		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
-		RotateCamera(x,y);
 		warped = true;
 	}
 	else

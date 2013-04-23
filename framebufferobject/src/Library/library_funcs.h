@@ -39,9 +39,12 @@ void reshapeCB(int w, int h);
 void timerCB(int millisec);
 void idleCB();
 void keyboardCB(unsigned char key, int x, int y);
+void keyboardUpCB(unsigned char key, int x, int y);
 void specialKeyCB(int key, int x, int y);
+void specialKeyUpCB(int key, int x, int y);
 void mouseCB(int button, int stat, int x, int y);
 void mouseMotionCB(int x, int y);
+void mousePassiveMotionCB(int x, int y);
 
 // CALLBACK function when exit() called ///////////////////////////////////////
 void exitCB();
@@ -89,9 +92,6 @@ extern GLuint textureId;                   // ID of texture
 extern GLubyte* imageData;             // pointer to texture buffer
 extern int screenWidth;
 extern int screenHeight;
-extern bool mouseLeftDown;
-extern bool mouseRightDown;
-extern float mouseX, mouseY;
 extern float cameraAngleX;
 extern float cameraAngleY;
 extern float cameraDistance;

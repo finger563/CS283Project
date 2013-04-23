@@ -26,8 +26,8 @@ using namespace std;
 Player_c player;
 extern string ip_addr;
 
-//ACE_Time_Value period_t (0,30000);
-ACE_Time_Value period_t (1,0);
+ACE_Time_Value period_t (0,50000);
+//ACE_Time_Value period_t (1,0);
 //ACE_Time_Value previous_time (0);
 
 
@@ -319,9 +319,11 @@ int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, co
 				currenttime));
 	#endif
 	
-	float time = period_t.usec()/1000000.0;
-	time += period_t.sec();
-	player.Update(time);
+	if ( player.Objects() != NULL ) {
+		float time = period_t.usec()/1000000.0;
+		time += period_t.sec();
+		player.Update(time);
+	}
 	
 	this->reactor()->schedule_timer(this,
 									0,

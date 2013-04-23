@@ -34,6 +34,7 @@ peer_s con_peers;
 
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
+const int SHOTSPEED = 5;
 	
 ACE_Time_Value period_t (1,500000);		// update every 30,000 us = 30 ms.
 //ACE_Time_Value period_t (0,50000);		// update every 30,000 us = 30 ms.
@@ -230,6 +231,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myobject.SetID(numObjects++);
 				myobject.SetType(SHOT);
 				myobject.SetHeading(myplayer.hx,myplayer.hy,myplayer.hz);
+				myobject.SetVelocity(0,0,SHOTSPEED);		// velocity w.r.t. object's u/v/n axes
 				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
 				myobject.SetContent(myplayer.name);
 				server.Create(myobject);		// need to keep track of this object on the server

@@ -18,9 +18,6 @@ GLuint textureId;                   // ID of texture
 GLubyte* imageData = 0;             // pointer to texture buffer
 int screenWidth;
 int screenHeight;
-bool mouseLeftDown;
-bool mouseRightDown;
-float mouseX, mouseY;
 float cameraAngleX;
 float cameraAngleY;
 float cameraDistance;
@@ -57,10 +54,12 @@ int initGLUT(int argc, char **argv) {
     glutIdleFunc(idleCB);                       // redraw only every given millisec
     glutReshapeFunc(reshapeCB);
     glutKeyboardFunc(keyboardCB);
+	glutKeyboardUpFunc(keyboardUpCB);
 	glutSpecialFunc(specialKeyCB);			// used for the arrow keys etc.
+	glutSpecialUpFunc(specialKeyUpCB);
     glutMouseFunc(mouseCB);
-    //glutMotionFunc(mouseMotionCB);		// used when the mouse moves and a mouse-button is held
-	glutPassiveMotionFunc(mouseMotionCB);	// used when the mouse moves and NO mouse-buttons are held
+    glutMotionFunc(mouseMotionCB);		// used when the mouse moves and a mouse-button is held
+	glutPassiveMotionFunc(mousePassiveMotionCB);	// used when the mouse moves and NO mouse-buttons are held
 	
 	//glutSetCursor(GLUT_CURSOR_NONE);		// used to hide the cursor
 
@@ -158,9 +157,6 @@ void drawString3D(const char *str, float pos[3], float color[4], void *font) {
 bool initSharedMem() {
     screenWidth = SCREEN_WIDTH;
     screenHeight = SCREEN_HEIGHT;
-
-    mouseLeftDown = mouseRightDown = false;
-    mouseX = mouseY = 0;
 
     cameraAngleX = cameraAngleY = 0;
     cameraDistance = CAMERA_DISTANCE;

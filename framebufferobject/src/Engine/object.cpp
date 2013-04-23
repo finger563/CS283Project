@@ -308,8 +308,7 @@ std::list<Poly> Object::getRenderList() {
 ////////////////////////////////////////
 /////////////////Projectile functons////
 ///////////////////////////////////////
-void Object::projectileInit(Vector3D head, Vector3D pos)
-{
+void Object::projectileInit(Vector3D head, Vector3D pos) {
 	//may have to create overload this to take a vector based
 	//on where the mouse clicks
 	heading = head;

@@ -27,22 +27,18 @@ private:
 public:
 	Server_c() {
 		objects=NULL;players=NULL;
-		//chats=NULL;
 	}
 	Server_c(Server_c& t) {*this=t;}
 	~Server_c() {
 		delete objects,players,this;
-		//delete chats;
 	}
 
 	Server_c & operator=(Server_c& t)
 	{
-		if (this != &t) // protect against invalid self-assignment
-        {
+		if (this != &t) {
 			objects = t.Objects();
 			players = t.Players();
         }
-        // by convention, always return *this
         return *this;
 	}
 

@@ -17,6 +17,8 @@
 #include "..\Engine\chat.h"
 #include "..\Engine\camera.h"
 
+extern Camera tempeye;
+
 class Player_c {
 private:
 	bool registered;
@@ -77,6 +79,7 @@ public:
 #ifdef SERVER_CONTROLS_HEADING
 			eye.SetAngles(a.hx,a.hy);
 #endif
+			tempeye = eye;
 		}
 		else {
 			Object_s* tmp = objects;
