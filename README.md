@@ -132,3 +132,4 @@ TODO
  * Have server randomly choose spawn points for players.
  * Allow killing of characters and their subsequent respawn
  * Lighting system (smooth shading, shadowing, etc.)
+ * Sprite system for particles/explosions/HUD
