@@ -11,7 +11,7 @@
 #if !defined (_CS283_PLAYER_H_)
 #define _CS283_PLAYER_H_
 
-#define DEBUG
+//#define DEBUG
 
 #include "Message.h"
 #include "..\Engine\chat.h"

@@ -18,7 +18,9 @@ using namespace std;
 
 #include <ace/SOCK_Stream.h>      // for data comm functionality
 
-#define DEBUG
+#include "..\Engine\Object.h"
+
+//#define DEBUG
 
 class Server_c {
 private:
