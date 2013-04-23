@@ -60,6 +60,9 @@
     <ClCompile Include="..\Engine\Vertex.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\world.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Network\Dummy_Accept_Handler.h">
@@ -99,6 +102,9 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\Vertex.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\world.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
