@@ -30,9 +30,10 @@ private:
 	Player_s	*players;
 	long		 worldID;	// which world is the server running?
 	World		level;		// actual level which is loaded (for collision detection)
+	std::list<Object> staticlist;
 public:
 	Server_c() {
-		objects=NULL;players=NULL;worldID=0;
+		objects=NULL;players=NULL;worldID=0;level=World(worldID);staticlist=level.getRenderList();
 	}
 	Server_c(Server_c& t) {*this=t;}
 	~Server_c() {
@@ -44,6 +45,8 @@ public:
 			objects = t.Objects();
 			players = t.Players();
 			worldID = t.worldID;
+			level = World(t.Level());
+			staticlist = level.getRenderList();
         }
         return *this;
 	}
@@ -51,7 +54,7 @@ public:
 	Object_s * Objects() {return objects;}
 	Player_s * Players() {return players;}
 	long Level() { return worldID; }
-	void Level(const long w) { worldID = w; level = World(w); }
+	void Level(const long w) { worldID = w; level = World(w); staticlist = level.getRenderList(); }
 
 	bool Player(Player_s& s) {
 		Player_s* tmp = players;

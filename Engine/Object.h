@@ -97,6 +97,7 @@ private:
 	std::list<Poly> master;
 	std::list<Poly> temp;
 	Vector3D heading, velocity; 
+	float theta,phi;
 	Point3D position;
 	const unsigned short* tex;
 	int texWidth;

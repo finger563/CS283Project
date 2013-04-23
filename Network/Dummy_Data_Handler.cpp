@@ -375,9 +375,6 @@ int Dummy_Data_Handler::recv_message(Message& message) {
 }
 
 // handle timeout events.
-// THIS IS WHERE THE STATE UPDATE & TRANSMISSION OCCURS
-// When the server needs to update each player with new object positions, etc.
-// this is the function timeout which will handle that.
 int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act) {	
 	#if defined(DEBUG)
 	// for debugging
