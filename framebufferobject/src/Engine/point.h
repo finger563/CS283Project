@@ -42,6 +42,12 @@ public:
 
 typedef Point3D Vector3D;
 
+inline static Vector3D Cross(const Vector3D& a, const Vector3D& b) {
+	return Vector3D( a.y*b.z - a.z*b.y,
+					 a.z*b.x - a.x*b.z,
+					 a.x*b.y - a.y*b.x);
+}
+
 inline static Vector3D normalize(const Vector3D rhs)
 {
   float mag = sqrt(rhs.x*rhs.x + rhs.y*rhs.y + rhs.z*rhs.z);

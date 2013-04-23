@@ -98,22 +98,11 @@ void SendMove(const Point3D& pos, const Matrix& M);
 void SendLeave();
 
 void RotateCamera(int x, int y) {
-    float anglex = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
-	float angley = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
-	Matrix rotMatrixX;
-	rotMatrixX.data[0][0] = cos(3.141*anglex);
-	rotMatrixX.data[0][2] = -sin(3.141*anglex);
-	rotMatrixX.data[2][0] = sin(3.141*anglex);
-	rotMatrixX.data[2][2] = cos(3.141*anglex);
-	Matrix rotMatrixY;
-    rotMatrixY.data[1][1] = cos(3.141*angley);
-    rotMatrixY.data[1][2] = -sin(3.141*angley);
-    rotMatrixY.data[2][1] = sin(3.141*angley);
-    rotMatrixY.data[2][2] = cos(3.141*angley);
+    float theta = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
+	float phi = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
 
 	Camera tempcamera = player.Eye();
-	tempcamera.Rotate(rotMatrixX);
-	tempcamera.Rotate(rotMatrixY);
+	tempcamera.Rotate(theta,phi);
 	player.Eye(tempcamera);
     glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
 }

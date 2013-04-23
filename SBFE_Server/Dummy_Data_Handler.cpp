@@ -81,9 +81,9 @@ int Dummy_Data_Handler::open (void)
 		return -1;
 	}
   
-	this->reactor()->schedule_timer(this,
-									0,
-									period_t);
+	//this->reactor()->schedule_timer(this,
+	//								0,
+	//								period_t);
 
 	// everything went well. Return success
 	return 0;

@@ -7,30 +7,27 @@
 class Camera{
 
 private:
+	float theta,phi;
 	Vector3D forward;
 	Vector3D up;
 	Vector3D right; 
-	Vector3D position;
 
-	Matrix rotation; 
+	Vector3D position;
 
 public:
 	Camera();
 
 	void Normalize();
 
+	void ComputeAxes();
+
 	void Translate(const Vector3D& v);
 
-	void Rotate (const Matrix& m);
-
-	void Rotate (const float x, const float y, const float z);
-
-	void Rotate (const float x, const Vector3D& v);
+	void Rotate( const float _t, const float _p );
 
 	Matrix GetWorldToCamera();
 
-	Matrix GetRotation();
-	void SetRotation (const Matrix& m);
+	void SetAngles( const float _t, const float _p );
 
 	Point3D GetPosition();
 	void SetPosition(const float x, const float y, const float z);

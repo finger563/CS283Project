@@ -98,21 +98,20 @@ to TestUser. Also, if you want to show the command line options, just run
 
 Controls for the game:
  * w/a,s/d: move forward/backward, strafe left/right
+ * Mouse movement: rotate camera
+ * Mouse left click: fire projectile
  * space: move camera up
  * c: move camera down
- * q/e: rotate camera left/right
  * t: initiate chat (during chat, keyboard commands are disabled)
  * enter (during chat): send message
  * backspace (during chat): remove last character added
  * escape: quit program or (during chat) exit chat
- * Mouse left click: fire projectile
- * Mouse movement: rotate camera
  
 FEATURES
 --------
  * Chat over network with usernames & chat history
  * Server selects spawn location for players
- * Player can move about freely in virtual world and fire projectiles
+ * Player can move about freely in virtual world and fire projectiles using mouse and keyboard
  * Server correctly tracks connected/registered players and handles terminated connections
  * Server correctly tracks dynamic objects (shots/players)
    * Sends all currently active dynamic objects to players that join later
@@ -126,7 +125,6 @@ FEATURES
 
 TODO
 ----
- * Fix mouse camera orientation rotation control
  * Finish MOVE server/client implementations w.r.t player/object headings
  * Collision detection
  * Physics (for jumping)

@@ -1,7 +1,7 @@
 #include "camera.h"
 #include <math.h>
 
-Camera::Camera():up(0, 1, 0), forward(0, 0, 1), right(1, 0, 0), position(0, 0, 0){
+Camera::Camera():up(0, 1, 0), forward(0, 0, 1), right(1, 0, 0), position(0, 0, 0), theta(0), phi(0) {
 
 }
 
@@ -15,47 +15,65 @@ void Camera::Translate( const Vector3D& v) {
 	position = right*(v.x) + up*(v.y) + forward*(v.z) + position; 
 }
 
-void Camera::Rotate (const Matrix& m) {
-	 rotation = rotation*m;
-	 
-	 up = m * up;
-	 forward = m * forward;
-	 right = m * right;
-	 Normalize();
+void Camera::ComputeAxes() {
+	float r = cos(phi);
+	float x = r*sin(theta),
+		  y = sin(phi),
+		  z = r*cos(theta);
+	forward = normalize(Vector3D(x,y,z));
+	up = normalize(Vector3D(0,1,0));
+	right = normalize(Cross(up,forward));
+	up = normalize(Cross(forward,right));
 }
 
-void Camera::Rotate (const float x, const float y, const float z) {
-	 Matrix m;
-	 m.SetRotation(x, y, z);
-	 rotation = m*rotation;
-
-	 up = m * up;
-	 forward = m * forward;
-	 right = m * right;
-	 Normalize();
+void Camera::SetAngles( const float _t, const float _p ) {
+	theta = _t;
+	if ( theta > 2.0*3.141592 ) {
+		theta = theta - 2.0*3.141592;
+	}
+	else if ( theta < -2.0*3.141592 ) {
+		theta = theta + 2.0*3.141592;
+	}
+	phi = _p;
+	if ( phi > 2.0*3.141592 ) {
+		phi = phi - 2.0*3.141592;
+	}
+	else if ( theta < -2.0*3.141592 ) {
+		phi = phi + 2.0*3.141592;
+	}
+	ComputeAxes();
 }
 
-void Camera::Rotate (const float x, const Vector3D& v) {
-	 Matrix m;
-	 m.SetRotation(x,v);
-	 rotation = m*rotation;
-
-	 up = m * up;
-	 forward = m * forward;
-	 right = m * right;
-	 Normalize();
+void Camera::Rotate ( const float _t, const float _p ) {
+	theta += _t;
+	if ( theta > 2.0*3.141592 ) {
+		theta = theta - 2.0*3.141592;
+	}
+	else if ( theta < -2.0*3.141592 ) {
+		theta = theta + 2.0*3.141592;
+	}
+	phi += _p;
+	if ( phi > 2.0*3.141592 ) {
+		phi = phi - 2.0*3.141592;
+	}
+	else if ( theta < -2.0*3.141592 ) {
+		phi = phi + 2.0*3.141592;
+	}
+	ComputeAxes();
 }
 
 Matrix Camera::GetWorldToCamera() {
-	return rotation.Transpose();
-}
-
-Matrix Camera::GetRotation() {
-	return rotation;
-}
-
-void Camera::SetRotation(const Matrix& m) {
-	 rotation = m;
+	Matrix m;
+	m.data[0][0] = right.x;
+	m.data[1][0] = right.y;
+	m.data[2][0] = right.z;
+	m.data[0][1] = up.x;
+	m.data[1][1] = up.y;
+	m.data[2][1] = up.z;
+	m.data[0][2] = forward.x;
+	m.data[1][2] = forward.y;
+	m.data[2][2] = forward.z;
+	return m;
 }
 
 Point3D Camera::GetPosition() {
