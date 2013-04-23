@@ -40,7 +40,7 @@ int parse_args (int argc, ACE_TCHAR *argv[]) {
 			ip_addr = get_opt.opt_arg ();
 			break;
 		case 'l':
-			server.World(atoi(get_opt.opt_arg()));
+			server.Level(atoi(get_opt.opt_arg()));
 			break;
 		case '?':
 		default:

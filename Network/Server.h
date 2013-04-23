@@ -49,8 +49,8 @@ public:
 
 	Object_s * Objects() {return objects;}
 	Player_s * Players() {return players;}
-	long World() { return worldID; }
-	void World(const long w) { worldID = w; }
+	long Level() { return worldID; }
+	void Level(const long w) { worldID = w; level = World(w); }
 
 	bool Player(Player_s& s) {
 		Player_s* tmp = players;
