@@ -5,40 +5,56 @@
 
 #include "viewplane.h"
 #include "color.h"
-#include "geometricobject.h"
+#include "Object.h"
 #include "tracer.h"
 
 using namespace std;
 
 class World
 {
-public:
-	ViewPlane					vp;
-	Color						background_color;
-	vector<GeometricObject>		*objects;
-	Tracer						*tracer_ptr;
 
+private: 
+	std::list<Object> master;
+	std::list<Object> temp;
+	long id;
+
+public:
+
+	//constructor
 	World();
+
+	//alternate constructor
+	World(long worldID);
+
+	//destructor
 	~World();
 
-	void Build(void);
+	//allows world change
+	void changeWorld(long worldID);
 
-	void AddObject(const GeometricObject &object_ptr);
+	//clear Master
+	void masterClear();
 
-	Record Hit_bare_bones_objects(const Ray& ray) const;
+	//clear Temp
+	void tempClear();
 
-	void RenderScene(void);
+	//adds correct world to temp list
+	void library(long worldID);
 
-	void OpenWindow(const int hres, const int vres) const;
+	//Updates Temp list with any changes to the master list
+	bool updateList();
 
-	void DisplayPixel(const int row,
-		const int column,
-		const Color& pixel_color) const;
+	//returns renderList
+	std::list<Object> getRenderList();
+
+	///////////////////////////////////////////////////////
+	///////////////// Custom Worlds///////////////////////
+	//////////////////////////////////////////////////////
+
+	//basic layout
+	void basicWorld();
 };
 
-inline void
-	World::AddObject(const GeometricObject &object_ptr) {
-		objects->push_back(object_ptr);
-}
+
 
 #endif
