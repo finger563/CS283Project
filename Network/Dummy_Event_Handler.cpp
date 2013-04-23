@@ -144,6 +144,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 		// Now process message
 		switch (mymessage.Type()) {
 		case ACCEPT:		// the server has accepted us
+			player.Level(mymessage.World());
 			myplayer = player.Info();
 			myplayer.id = mymessage.Player().id;
 			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().z);
@@ -159,6 +160,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 			#endif
 			player.Eye(myeye);
 			player.Info(myplayer);	// update the data structure with the ID number from the server
+			player.Register();
 			break;
 		case CREATE:		// server has sent a create command for an object
 			#if defined(DEBUG)

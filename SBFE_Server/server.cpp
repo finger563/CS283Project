@@ -21,8 +21,11 @@
 
 #include "ace/Select_Reactor.h"  // we use the Select_Reactor
 #include "..\Network\Dummy_Accept_Handler.h"  // this is the event handler we need
+#include "..\Network\Server.h"
 
 using namespace std;
+
+extern Server_c server;
 
 ACE_INET_Addr   server_addr;			// server address
 string ip_addr = "127.0.0.1:9999";		// IP address from command line
@@ -30,17 +33,21 @@ string ip_addr = "127.0.0.1:9999";		// IP address from command line
 // command line parsing
 int parse_args (int argc, ACE_TCHAR *argv[]) {
 	int c;
-	ACE_Get_Opt get_opt (argc, argv, "i:");
+	ACE_Get_Opt get_opt (argc, argv, "i:l:");
 	while ((c = get_opt ()) != -1) {
 		switch (c) {
 		case 'i':
 			ip_addr = get_opt.opt_arg ();
+			break;
+		case 'l':
+			server.World(atoi(get_opt.opt_arg()));
 			break;
 		case '?':
 		default:
 			ACE_ERROR_RETURN ((LM_ERROR,
 								"usage:  %s "
 								"-i <IP address>:<port number> "
+								"-l <Level ID number> "
 								"\n",
 								argv [0]),
 								-1);

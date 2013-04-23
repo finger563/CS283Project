@@ -16,8 +16,10 @@
 #include "Message.h"
 #include "..\Engine\chat.h"
 #include "..\Engine\camera.h"
+#include "..\Engine\world.h"
 
-extern Camera tempeye;
+extern Camera tempeye;					// for update from server and input handling
+extern std::list<Object> objectlist;	// for update from server
 
 class Player_c {
 private:
@@ -26,6 +28,7 @@ private:
 	Object_s*	objects;
 	Chat_c		chat;
 	Camera		eye;
+	World		level;
 public:
 	Player_c() : info(), chat(), eye() {objects=NULL;registered=false;}
 	Player_c(const Player_s& s): info(s), chat(), eye() {objects=NULL;registered=false;}
@@ -56,6 +59,10 @@ public:
 	Camera Eye() const { return eye; }
 	void Eye(const Camera& e) { eye = e; }
 
+	World Level() const { return level; }
+	void Level(const World& l) { level = l; objectlist = level.getRenderList(); }
+	void Level(const long id) { level = World(id); objectlist = level.getRenderList(); }
+
 	void Register() {registered=true;}
 	void Leave()	{registered=false;}
 	bool Registered() {return registered;}
@@ -76,9 +83,7 @@ public:
 		
 		if ( a.id == info.id && a.type == PLAYER ) {
 			eye.SetPosition(a.x,a.y,a.z);
-#ifdef SERVER_CONTROLS_HEADING
 			eye.SetAngles(a.theta,a.phi);
-#endif
 			tempeye = eye;
 		}
 		else {

@@ -19,6 +19,7 @@ using namespace std;
 #include <ace/SOCK_Stream.h>      // for data comm functionality
 
 #include "..\Engine\Object.h"
+#include "..\Engine\world.h"
 
 //#define DEBUG
 
@@ -26,26 +27,30 @@ class Server_c {
 private:
 	Object_s	*objects;
 	Player_s	*players;
+	long		 worldID;	// which world is the server running?
+	World		level;		// actual level which is loaded (for collision detection)
 public:
 	Server_c() {
-		objects=NULL;players=NULL;
+		objects=NULL;players=NULL;worldID=0;
 	}
 	Server_c(Server_c& t) {*this=t;}
 	~Server_c() {
 		delete objects,players,this;
 	}
 
-	Server_c & operator=(Server_c& t)
-	{
+	Server_c & operator=(Server_c& t) {
 		if (this != &t) {
 			objects = t.Objects();
 			players = t.Players();
+			worldID = t.worldID;
         }
         return *this;
 	}
 
 	Object_s * Objects() {return objects;}
 	Player_s * Players() {return players;}
+	long World() { return worldID; }
+	void World(const long w) { worldID = w; }
 
 	bool Player(Player_s& s) {
 		Player_s* tmp = players;

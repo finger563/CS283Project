@@ -146,6 +146,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			if ( server.Register(myplayer) )
 			{
 				mymessage.Type(ACCEPT);
+				mymessage.World(server.World());	// let player know which world to load
 				myplayer.SetHeading(0,0);
 				myplayer.SetLife(PLAYERLIFE);
 				myplayer.SetPos(10,0,10);

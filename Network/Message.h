@@ -191,7 +191,8 @@ struct Object_s {
 class Message {
 private:
 	MessageType type_;
-	float		t_;		// time differential for update
+	float		t_;				// time differential for update
+	ACE_CDR::Long	world_;		// which world is the server running?
 	Object_s	object_;
 	Player_s	player_;
 	char		content_[MAX_CONT_LEN];
@@ -227,6 +228,9 @@ public:
 
 	void		Type(const MessageType type) {type_=type;}
 	MessageType Type() const {return type_;}
+
+	void	World(const long w) { world_ = w; }
+	long	World() const { return world_; }
 
 	void	Time(const float time) { t_ = time; }
 	float	Time() const { return t_; }

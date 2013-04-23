@@ -25,6 +25,7 @@ size_t Message::Length() const {
 	case ACCEPT:	// Server returns player ID number and starting position/heading
 		ret += 2 * sizeof(ACE_CDR::Long);
 			// 1 -> Message type
+			// 1 -> World ID
 			// 1 -> Player ID
 		ret += 6 * sizeof(ACE_CDR::Float);
 			// 1 -> x position
@@ -103,6 +104,7 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		cdr.write_char_array(m.Player().name,strlen(m.Player().name));
 		break;
 	case ACCEPT:
+		cdr << ACE_CDR::Long ( m.World() );
 		cdr << ACE_CDR::Long ( m.Player().id );
 		cdr << ACE_CDR::Float ( m.Player().x );
 		cdr << ACE_CDR::Float ( m.Player().y );
@@ -159,6 +161,7 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 
 int operator>> (ACE_InputCDR &cdr, Message &message) {
 	ACE_CDR::Long type;
+	ACE_CDR::Long world;
 	ACE_CDR::Long object_type;
 	ACE_CDR::Long object_id;
 	ACE_CDR::Long player_id;
@@ -191,6 +194,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		message.Player(player);
 		break;
 	case ACCEPT:
+		cdr >> world;
 		cdr >> player_id;
 		cdr >> x;
 		cdr >> y;
@@ -204,6 +208,7 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		player.SetHeading(theta,phi);
 		player.SetLife(life);
 		message.Player(player);
+		message.World(world);
 		break;
 	case CHAT:
 		cdr >> cont_len;

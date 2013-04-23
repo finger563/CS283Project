@@ -1,32 +1,11 @@
 
-#include "..\Engine\main.h"
-
 #include "Library\library_funcs.h"		// GL and GLUT functions needed for code
 
+#include "..\Engine\main.h"
 #include "..\Engine\Object.h"
-
 #include "..\Engine\world.h"
 
-// These are all values toggled by user input
-int  rotx = 0,		// rotation about x axis, toggled by 'x'
-	 roty = 0,		// rotation about y axis, toggled by 'y'
-	 rotz = 0,		// rotation about z axis, toggled by 'z'
-	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
-
-/*Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
-					 Vertex(13.333,6.666,0,1,1,0),
-					 Vertex(-6.666,-13.333,0,1,0,1),
-					 Vertex(),3,Vector3D(0,0,-1),TEXTURED);
-
-Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
-Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
-Object testobj3 = Object(floorlarge,floorlargewidth,floorlargeheight);
-Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
-*/
-
-//test world
-
-World testWorld(0);
+int  display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
 Matrix worldToCamera=Matrix(),
 	   perspectiveProjection=Matrix(),
@@ -35,19 +14,6 @@ Matrix worldToCamera=Matrix(),
 std::list<Object> objectlist;		// used for the static world objects
 std::list<Object> dynamiclist;		// used for dynamic objects received from server
 std::list<Poly> renderlist;			// aggregate polygon list to be rendered
-
-
-Matrix rot;		// debug/testing for rotating objects
-Matrix rmz = Matrix(), 
-        rmy = Matrix(),
-		neg_rmy = Matrix(),
-        rmx = Matrix(),
-        rmxy = Matrix(),
-		rmxz = Matrix(),
-		rmyz = Matrix(),
-        rmxyz = Matrix();
-
-float rot_angle = 3.141/60;
 
 //shoot will be the projectile
 Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
@@ -81,32 +47,6 @@ void SendChat(string sendstring);
 void SendShot();
 void SendMove();
 void SendLeave();
-
-void RotateCamera(int x, int y) {
-    float theta_ = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
-	float phi_ = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
-
-	Camera tempcamera = player.Eye();
-	tempcamera.Rotate(theta_,phi_);
-#ifdef SERVER_CONTROLS_HEADING
-	Message mymessage;
-	mymessage.Type(MOVE);
-	Object_s myobj = Object_s();
-	myobj.SetType(PLAYER);
-	myobj.SetID(player.Info().id);
-	myobj.SetContent(player.Info().name);	
-
-	myobj.x = tempcamera.GetPosition().x;
-	myobj.y = tempcamera.GetPosition().y;
-	myobj.z = tempcamera.GetPosition().z;
-	myobj.theta = tempcamera.GetTheta();		// theta
-	myobj.phi = tempcamera.GetPhi();		// phi
-	mymessage.Object(myobj);
-	event_handler.send(mymessage);
-#else
-	player.Eye(tempcamera);
-#endif
-}
 
 void SendChat(string sendstring) {
 	Message mymessage;
@@ -157,7 +97,7 @@ void SendLeave() {
 	event_handler.send(mymessage);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+// MAIN FUNCTION ///////////////////////////////////////////////////////////////
 int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {    
 	// parse the arguments
 	ACE_DEBUG ((LM_DEBUG,
@@ -196,31 +136,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 		return -1;
 	}
 
-    rmz.data[0][0] = cos(rot_angle);
-    rmz.data[0][1] = -sin(rot_angle);
-    rmz.data[1][0] = sin(rot_angle);
-    rmz.data[1][1] = cos(rot_angle);
-    
-    rmy.data[0][0] = cos(rot_angle);
-    rmy.data[0][2] = -sin(rot_angle);
-    rmy.data[2][0] = sin(rot_angle);
-    rmy.data[2][2] = cos(rot_angle);
-
-    neg_rmy.data[0][0] = cos(-rot_angle);
-    neg_rmy.data[0][2] = -sin(-rot_angle);
-    neg_rmy.data[2][0] = sin(-rot_angle);
-    neg_rmy.data[2][2] = cos(-rot_angle);
-    
-    rmx.data[1][1] = cos(rot_angle);
-    rmx.data[1][2] = -sin(rot_angle);
-    rmx.data[2][1] = sin(rot_angle);
-    rmx.data[2][2] = cos(rot_angle);
-    
-    rmxy = rmx*rmy;
-	rmxz = rmx*rmz;
-	rmyz = rmy*rmz;
-    rmxyz = rmz*rmxy;
-
 	// Structure of a transformation matrix:
 	// ( r=rotation, p=projection, t=translation )
 	// [ x y z w ]	| r r r p | = [ x' y' z' w']
@@ -242,20 +157,6 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 	projectionToPixel.data[3][1] = (float)SIZE_Y*0.5;	// translate y
 	projectionToPixel.data[0][0] = (float)SIZE_X*0.5;	// scale x
 	projectionToPixel.data[1][1] = (float)SIZE_Y*0.5;	// scale y
-
-	/* testobj.generateCube();
-
-	testobj2.generateCube();
-	testobj2.SetRenderType(COLORED);
-
-	testobj3.generateFloor(75,-10);
-
-	objectlist.push_back(testobj);
-	objectlist.push_back(testobj2);	
-	objectlist.push_back(testobj3);
-	objectlist.push_back(testobj4);
-	*/
-	objectlist.splice(objectlist.end(), testWorld.getRenderList());
 
 	userName = string(player.Info().name) + ":";
 
@@ -445,10 +346,6 @@ void updatePixels(GLubyte* dst, int size) {
 			it->RasterizeFast(y);
 		}
 	}
-
-	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); ++it) {
-		it->Rotate(rot);	// purely for debugging fun
-	}
 	
     // copy 4 bytes at once
     for(int i = 0; i < IMAGE_HEIGHT; ++i) {
@@ -472,19 +369,19 @@ void KeyOperations() {
 	if ( !typing ) {
 		Vector3D movevector = Vector3D();
 
-		if (keyStates['w']) { // Up
+		if (keyStates['w'] || keyStates['W']) { // Up
 			movevector = movevector + (Vector3D(0,0,1));
 		}
 
-		if (keyStates['s']) { // down
+		if (keyStates['s'] || keyStates['S']) { // down
 			movevector = movevector + (Vector3D(0,0,-1));
 		}
 
-		if (keyStates['a']) { // left
+		if (keyStates['a'] || keyStates['A']) { // left
 			movevector = movevector + (Vector3D(-1,0,0));
 		}
 
-		if (keyStates['d']) { // right
+		if (keyStates['d'] || keyStates['D']) { // right
 			movevector = movevector + (Vector3D(1,0,0));
 		}
 
@@ -494,7 +391,7 @@ void KeyOperations() {
 								tempeye.GetPosition().z);
 		}
 
-		if (keyStates['c']) {
+		if (keyStates['c'] || keyStates['C']) {
 			tempeye.SetPosition(tempeye.GetPosition().x,
 				                tempeye.GetPosition().y - 1,
 								tempeye.GetPosition().z);
@@ -505,35 +402,6 @@ void KeyOperations() {
 		}
 	
 		tempeye.Translate(movevector);
-	}
-	
-	switch ( rotx + roty*2 + rotz*4 ) {
-	case 0:
-		rot.SetIdentity();
-		break;
-	case 1:
-		rot = rmx;
-		break;
-	case 2:
-		rot = rmy;
-		break;
-	case 3:
-		rot = rmxy;
-		break;
-	case 4:
-		rot = rmz;
-		break;
-	case 5:
-		rot = rmxz;
-		break;
-	case 6:
-		rot = rmyz;
-		break;
-	case 7:
-		rot = rmxyz;
-		break;
-	default:
-		rot = rmxyz;
 	}
 }
 
@@ -732,13 +600,12 @@ void idleCB() {
 
 void keyboardCB(unsigned char key, int x, int y) {
 	keyStates[key] = true;
-
 	Vector3D movevector = Vector3D();
-
     switch(key) {
     case 27: // ESCAPE
 		if(!typing) {
 			SendLeave();	// Notify server that we are leaving
+			player.Leave();
 			exit(0);
 		}
 		else {
@@ -776,52 +643,6 @@ void keyboardCB(unsigned char key, int x, int y) {
 		typing = true;
 		return;
 	}
-
-	//if (keyStates['w']) { // Up
-	//	movevector = movevector + (Vector3D(0,0,1));
-	//}
-
-	//if (keyStates['s']) { // down
-	//	movevector = movevector + (Vector3D(0,0,-1));
-	//}
-
-	//if (keyStates['a']) { // left
-	//	movevector = movevector + (Vector3D(-1,0,0));
-	//}
-
-	//if (keyStates['d']) { // right
-	//	movevector = movevector + (Vector3D(1,0,0));
-	//}
-
-	//if (keyStates[' ']) { // space
-	//	movevector = movevector + (Vector3D(0,1,0));
-	//}
-
-	//if (keyStates['c']) {
-	//	movevector = movevector + (Vector3D(0,-1,0));
-	//}
-
-	//if (keyStates['b'] || keyStates['B']) {
-	//	display_z_buffer = !display_z_buffer;
-	//}
-
-	////case 'x':
-	////case 'X':
-	////	rotx = !rotx;
-	////	break;
-
-	////case 'y':
-	////case 'Y':
-	////	roty = !roty;
-	////	break;
-
-	////case 'z':
-	////case 'Z':
-	////	rotz = !rotz;
-	////	break;
-	//
-	//tempeye.Translate(movevector);
-	//SendMove();
 }
 
 void specialKeyCB(int key, int x, int y) {
@@ -865,8 +686,8 @@ void mouseMotionCB(int x, int y) {
 
 void mousePassiveMotionCB(int x, int y) {
 	if ( !warped ) {
-		theta += (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH/2.0);
-		phi += -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT/2.0);
+		theta += (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH);
+		phi += -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT);
 		if ( theta > 2.0*3.141592 ) {
 			theta = theta - 2.0*3.141592;
 		}
@@ -879,9 +700,7 @@ void mousePassiveMotionCB(int x, int y) {
 		else if ( phi < -3.141592/2.0 ) {
 			phi = -3.141592/2.0;
 		}
-		//RotateCamera(x,y);
 		tempeye.Rotate(theta,phi);
-		//SendMove();
 		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
 		warped = true;
 	}
