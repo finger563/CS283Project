@@ -125,7 +125,6 @@ FEATURES
 
 TODO
 ----
- * Utilize key buffering for player input
  * Collision detection
  * Physics (for jumping)
  * Build world
