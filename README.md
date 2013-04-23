@@ -79,9 +79,14 @@ Running the Server
 ------------------
 To run the server, simply run 
 	
-	SBFE_Server -i <ip address>:<port number>
+	SBFE_Server -i <ip address>:<port number> - l <Level ID number>
 
-If you do not provide the -i argument, the server will default to 127.0.0.1:9999.
+If you do not provide the -i argument, the server will default to 127.0.0.1:9999. The Level ID
+defaults to 0, which is a test world.  Worlds available are:
+ * 0 = Test world
+ * 1 = Room with crates
+ * 2 = Series of rooms
+
 Also, if you want to show the command line options, just run
 
 	SBFE_Server -?
