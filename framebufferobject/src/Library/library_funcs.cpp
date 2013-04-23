@@ -238,28 +238,28 @@ void showInfo() {
     float color[4] = {1, 1, 1, 1};
 
     stringstream ss;
-    ss << "PBO: ";
-    if(pboMode == 0)
-        ss << "off" << ends;
-    else if(pboMode == 1)
-        ss << "1 PBO" << ends;
-    else if(pboMode == 2)
-        ss << "2 PBOs" << ends;
+    //ss << "PBO: ";
+    //if(pboMode == 0)
+    //    ss << "off" << ends;
+    //else if(pboMode == 1)
+    //    ss << "1 PBO" << ends;
+    //else if(pboMode == 2)
+    //    ss << "2 PBOs" << ends;
 
-    drawString(ss.str().c_str(), 1, screenHeight-TEXT_HEIGHT, color, font);
-    ss.str(""); // clear buffer
+    //drawString(ss.str().c_str(), 1, screenHeight-TEXT_HEIGHT, color, font);
+    //ss.str(""); // clear buffer
 
     ss << std::fixed << std::setprecision(3);
     ss << "Updating Time: " << updateTime << " ms" << ends;
     drawString(ss.str().c_str(), 1, screenHeight-(2*TEXT_HEIGHT), color, font);
     ss.str("");
 
-    ss << "Copying Time: " << copyTime << " ms" << ends;
-    drawString(ss.str().c_str(), 1, screenHeight-(3*TEXT_HEIGHT), color, font);
-    ss.str("");
+ //   ss << "Copying Time: " << copyTime << " ms" << ends;
+ //   drawString(ss.str().c_str(), 1, screenHeight-(3*TEXT_HEIGHT), color, font);
+ //   ss.str("");
 
-	ss << "Press SPACE key to toggle PBO on/off." << ends;
-	drawString(ss.str().c_str(), 1, 1, color, font);
+	//ss << "Press SPACE key to toggle PBO on/off." << ends;
+	//drawString(ss.str().c_str(), 1, 1, color, font);
 
     // unset floating format
     ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);

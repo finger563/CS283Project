@@ -47,7 +47,8 @@ struct Player_s {
 	char			name[MAX_NAME_LEN];
 	ACE_CDR::Long	id;
 	float x,y,z,		// position vector
-		  hx,hy,hz,		// heading vector
+		  theta, phi,	// heading vector
+		  life,			// time to live
 		  vx,vy,vz;		// velocity vector
 	Player_s*		next;
 	
@@ -58,9 +59,9 @@ struct Player_s {
 		x = s.x;
 		y = s.y;
 		z = s.z;
-		hx = s.hx;
-		hy = s.hy;
-		hz = s.hz;
+		theta = s.theta;
+		phi = s.phi;
+		life = s.life;
 		vx = s.vx;
 		vy = s.vy;
 		vz = s.vz;
@@ -75,9 +76,9 @@ struct Player_s {
 			x = s.x;
 			y = s.y;
 			z = s.z;
-			hx = s.hx;
-			hy = s.hy;
-			hz = s.hz;
+			theta = s.theta;
+			phi = s.phi;
+			life = s.life;
 			vx = s.vx;
 			vy = s.vy;
 			vz = s.vz;
@@ -90,7 +91,8 @@ struct Player_s {
 	void SetName(const char* n) {memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	void SetID(ACE_CDR::Long i) {id = i;}
 	void SetPos(const float _x, const float _y, const float _z) { x=_x;y=_y;z=_z;}
-	void SetHeading(const float _x, const float _y, const float _z) { hx=_x;hy=_y;hz=_z;}
+	void SetHeading(const float _t, const float _p) { theta = _t; phi = _p; }
+	void SetLife(const float _l) { life = _l; }
 	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
 	
 	void Link(Player_s* s){next = s;}
@@ -107,7 +109,8 @@ struct Object_s {
 	ObjectType		type;
 	ACE_CDR::Long	id;
 	float x,y,z,		// position vector
-		  hx,hy,hz,		// heading vector
+		  theta,phi,	// heading vector
+		  life,			// time to live
 		  vx,vy,vz;		// velocity vector
 	char			content_[MAX_CONT_LEN];
 	Object_s*	next;
@@ -120,9 +123,9 @@ struct Object_s {
 		x = a.x;
 		y = a.y;
 		z = a.z;
-		hx = a.hx;
-		hy = a.hy;
-		hz = a.hz;
+		theta = a.theta;
+		phi = a.phi;
+		life = a.life;
 		vx = a.vx;
 		vy = a.vy;
 		vz = a.vz;
@@ -138,9 +141,9 @@ struct Object_s {
 			x = a.x;
 			y = a.y;
 			z = a.z;
-			hx = a.hx;
-			hy = a.hy;
-			hz = a.hz;
+			theta = a.theta;
+			phi = a.phi;
+			life = a.life;
 			vx = a.vx;
 			vy = a.vy;
 			vz = a.vz;
@@ -154,16 +157,17 @@ struct Object_s {
 	void SetType(ObjectType t) { type = t; }
 	void SetContent(const char* n) {memset(content_,0,MAX_NAME_LEN);strcpy(content_,n);}
 	void SetPos(const float _x, const float _y, const float _z) { x=_x;y=_y;z=_z;}
-	void SetHeading(const float _x, const float _y, const float _z) { hx=_x;hy=_y;hz=_z;}
+	void SetHeading(const float _t, const float _p) { theta = _t; phi = _p; }
+	void SetLife(const float _l) { life = _l; }
 	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
 
 	void Link(Object_s* a){next = a;}
 	
-	void Update(const float time) {
-		float tr = cos(hy);
-		float tx = tr*sin(hx),
-			  ty = sin(hy),
-			  tz = tr*cos(hx);
+	bool Update(const float time) {
+		float tr = cos(phi);
+		float tx = tr*sin(theta),
+			  ty = sin(phi),
+			  tz = tr*cos(theta);
 		float mag = sqrt(tx*tx + ty*ty + tz*tz);
 		tx = tx/mag;
 		ty = ty/mag;
@@ -171,6 +175,8 @@ struct Object_s {
 		x += tx * vz * time;
 		y += ty * vz * time;
 		z += tz * vz * time;
+		life = life - time;		// overload hz as timetolive
+		return (life > 0);
 	}
 
 	bool operator==(const Object_s &b) {

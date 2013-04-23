@@ -154,7 +154,8 @@ public:
 		while ( tmp != NULL) {
 			if ( tmp->id == a.id ) {
 				tmp->SetPos(a.x,a.y,a.z);
-				tmp->SetHeading(a.hx,a.hy,a.hz);
+				tmp->SetHeading(a.theta,a.phi);
+				// DO NOT UPDATE LIFE HERE, SERVER CONTROLS LIFE
 				tmp->SetVelocity(a.vx,a.vy,a.vz);
 				return;
 			}
@@ -182,9 +183,7 @@ public:
 		if (players != NULL) {
 			Object_s* tmp=Objects();
 			while (tmp!=NULL) {
-				tmp->x += tmp->hx * t;
-				tmp->y += tmp->hy * t;
-				tmp->z += tmp->hz * t;
+				tmp->Update(t);
 				tmp=tmp->next;
 			}
 		}

@@ -34,10 +34,12 @@ peer_s con_peers;
 
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
-const int SHOTSPEED = 5;
+const int SHOTSPEED = 15;
+const float SHOTLIFE = 5.0;	// measured in seconds
+const float PLAYERLIFE = 100.0;		// measured in HP
 	
-ACE_Time_Value period_t (1,500000);		// update every 30,000 us = 30 ms.
-//ACE_Time_Value period_t (0,50000);		// update every 30,000 us = 30 ms.
+//ACE_Time_Value period_t (1,500000);		// update every 30,000 us = 30 ms.
+ACE_Time_Value period_t (0,50000);		// update every 30,000 us = 30 ms.
 
 // constructor (pass a pointer to the reactor). By default we assume
 // a system-wide default reactor that ACE defines
@@ -82,9 +84,9 @@ int Dummy_Data_Handler::open (void)
 		return -1;
 	}
   
-	//this->reactor()->schedule_timer(this,
-	//								0,
-	//								period_t);
+	this->reactor()->schedule_timer(this,
+									0,
+									period_t);
 
 	// everything went well. Return success
 	return 0;
@@ -144,7 +146,8 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 			if ( server.Register(myplayer) )
 			{
 				mymessage.Type(ACCEPT);
-				myplayer.SetHeading(0,0,1);
+				myplayer.SetHeading(0,0);
+				myplayer.SetLife(PLAYERLIFE);
 				myplayer.SetPos(10,0,10);
 				mymessage.Player(myplayer);
 				int numbytes = this->send(this->peer(),mymessage);
@@ -160,7 +163,8 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myplayer = mymessage.Player();
 				myobject.SetID(myid);
 				myobject.SetType(PLAYER);
-				myobject.SetHeading(myplayer.hx,myplayer.hy,myplayer.hz);
+				myobject.SetHeading(myplayer.theta,myplayer.phi);
+				myobject.SetLife(PLAYERLIFE);
 				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
 				myobject.SetContent(myplayer.name);
 				server.Create(myobject);		// need to keep track of this object on the server
@@ -183,14 +187,15 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 						 myobjects->type != PLAYER ) {
 						myobject.SetType(myobjects->type);
 						myobject.SetID(myobjects->id);
-						myobject.SetHeading(myobjects->hx,myobjects->hy,myobjects->hz);
+						myobject.SetHeading(myobjects->theta,myobjects->phi);
+						myobject.SetLife(myobjects->life);
 						myobject.SetPos(myobjects->x,myobjects->y,myobjects->z);
 						myobject.SetContent(myobjects->content_);
 						mymessage.Object(myobject);
 						int numbytes = this->send(this->peer(),mymessage);
 						#if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
+							ACE_TEXT ("Server sent CREATE to player (%s,%d).\n"),
 							server.Player(tmp->ID),
 							tmp->ID));
 						#endif
@@ -230,7 +235,8 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h)
 				myplayer = mymessage.Player();
 				myobject.SetID(numObjects++);
 				myobject.SetType(SHOT);
-				myobject.SetHeading(myplayer.hx,myplayer.hy,myplayer.hz);
+				myobject.SetHeading(myplayer.theta,myplayer.phi);
+				myobject.SetLife(SHOTLIFE);
 				myobject.SetVelocity(0,0,SHOTSPEED);		// velocity w.r.t. object's u/v/n axes
 				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
 				myobject.SetContent(myplayer.name);
@@ -383,22 +389,28 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 	#endif
 
 	Message mymessage;
-	mymessage.Type(UPDATE);
 	if ( server.Players() != NULL )	{
 		if ( server.Objects() != NULL ) {
-			peer_s *tmp = &con_peers;
 			float time = period_t.usec()/1000000.0;
 			time += period_t.sec();
-			mymessage.Time(time);
-			while ( tmp->next != NULL ) {
-				tmp = tmp->next;
-				int numbytes = this->send(*(tmp->p),mymessage);
-				#if defined(DEBUG)
-				ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Server sent UPDATE time to player (%s,%d).\n"),
-					server.Player(tmp->ID),
-					tmp->ID));
-				#endif
+			Object_s* myobjects = server.Objects();
+			while ( myobjects != NULL ) {
+				if ( !myobjects->Update(time) ) {	// object is no longer alive, need to remove
+					peer_s *tmp = &con_peers;
+					while (tmp->next != NULL) {
+						tmp = tmp->next;
+						mymessage.Type(REMOVE);
+						mymessage.Object(*myobjects);
+						int numbytes = this->send(*(tmp->p),mymessage);
+#if defined(DEBUG)
+						ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
+							server.Player(tmp->ID),
+							tmp->ID));
+#endif
+					}
+				}
+				myobjects = myobjects->next;
 			}
 		}
 	}

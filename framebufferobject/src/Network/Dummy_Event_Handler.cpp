@@ -147,8 +147,9 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 			myplayer = player.Info();
 			myplayer.id = mymessage.Player().id;
 			myeye.SetPosition(mymessage.Player().x,mymessage.Player().y,mymessage.Player().z);
-			myeye.SetForward(mymessage.Player().hx,mymessage.Player().hy,mymessage.Player().hz);
-			myeye.SetUp(0,1,0);
+			myeye.SetAngles(mymessage.Player().theta,mymessage.Player().phi);
+			myeye.ComputeAxes();
+			myplayer.SetLife(mymessage.Player().life);
 			#if defined(DEBUG)
 			ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Player got position (%f,%f,%f).\n"),

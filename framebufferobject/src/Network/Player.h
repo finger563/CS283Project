@@ -77,7 +77,7 @@ public:
 		if ( a.id == info.id && a.type == PLAYER ) {
 			eye.SetPosition(a.x,a.y,a.z);
 #ifdef SERVER_CONTROLS_HEADING
-			eye.SetAngles(a.hx,a.hy);
+			eye.SetAngles(a.theta,a.phi);
 #endif
 			tempeye = eye;
 		}
@@ -86,7 +86,8 @@ public:
 			while ( tmp != NULL) {
 				if ( tmp->id == a.id ) {
 					tmp->SetPos(a.x,a.y,a.z);
-					tmp->SetHeading(a.hx,a.hy,a.hz);
+					tmp->SetHeading(a.theta,a.phi);
+					tmp->SetLife(a.life);
 					tmp->SetVelocity(a.vx,a.vy,a.vz);
 					return;
 				}

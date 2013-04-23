@@ -30,9 +30,9 @@ size_t Message::Length() const {
 			// 1 -> x position
 			// 1 -> y position
 			// 1 -> z position
-			// 1 -> x heading
-			// 1 -> y heading
-			// 1 -> z heading
+			// 1 -> theta
+			// 1 -> phi
+			// 1 -> life
 		break;
 	case CHAT:		// Player sends to server & server propagates to other Players
 		ret += 2 * sizeof(ACE_CDR::Long);
@@ -50,9 +50,9 @@ size_t Message::Length() const {
 			// 1 -> x position
 			// 1 -> y position
 			// 1 -> z position
-			// 1 -> x heading
-			// 1 -> y heading
-			// 1 -> z heading
+			// 1 -> theta
+			// 1 -> phi
+			// 1 -> life
 		break;
 	case CREATE:	// Server sends create message to players to create a dynamic object
 	case MOVE:		// create and move send same data
@@ -65,9 +65,9 @@ size_t Message::Length() const {
 			// 1 -> x position
 			// 1 -> y position
 			// 1 -> z position
-			// 1 -> x heading
-			// 1 -> y heading
-			// 1 -> z heading
+			// 1 -> theta
+			// 1 -> phi
+			// 1 -> life
 			// 1 -> x velocity
 			// 1 -> y velocity
 			// 1 -> z velocity
@@ -107,9 +107,9 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		cdr << ACE_CDR::Float ( m.Player().x );
 		cdr << ACE_CDR::Float ( m.Player().y );
 		cdr << ACE_CDR::Float ( m.Player().z );
-		cdr << ACE_CDR::Float ( m.Player().hx );
-		cdr << ACE_CDR::Float ( m.Player().hy );
-		cdr << ACE_CDR::Float ( m.Player().hz );
+		cdr << ACE_CDR::Float ( m.Player().theta );
+		cdr << ACE_CDR::Float ( m.Player().phi );
+		cdr << ACE_CDR::Float ( m.Player().life );
 		break;
 	case CHAT:
 		cdr << ACE_CDR::Long ( strlen(m.Content()) );
@@ -122,9 +122,9 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		cdr << ACE_CDR::Float ( m.Player().x );
 		cdr << ACE_CDR::Float ( m.Player().y );
 		cdr << ACE_CDR::Float ( m.Player().z );
-		cdr << ACE_CDR::Float ( m.Player().hx );
-		cdr << ACE_CDR::Float ( m.Player().hy );
-		cdr << ACE_CDR::Float ( m.Player().hz );
+		cdr << ACE_CDR::Float ( m.Player().theta );
+		cdr << ACE_CDR::Float ( m.Player().phi );
+		cdr << ACE_CDR::Float ( m.Player().life );
 		break;
 	case CREATE:
 	case MOVE:
@@ -134,9 +134,9 @@ int operator<< (ACE_OutputCDR &cdr, const Message &m) {
 		cdr << ACE_CDR::Float ( m.Object().x );
 		cdr << ACE_CDR::Float ( m.Object().y );
 		cdr << ACE_CDR::Float ( m.Object().z );
-		cdr << ACE_CDR::Float ( m.Object().hx );
-		cdr << ACE_CDR::Float ( m.Object().hy );
-		cdr << ACE_CDR::Float ( m.Object().hz );
+		cdr << ACE_CDR::Float ( m.Object().theta );
+		cdr << ACE_CDR::Float ( m.Object().phi );
+		cdr << ACE_CDR::Float ( m.Object().life );
 		cdr << ACE_CDR::Float ( m.Object().vx );
 		cdr << ACE_CDR::Float ( m.Object().vy );
 		cdr << ACE_CDR::Float ( m.Object().vz );
@@ -165,7 +165,8 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 	ACE_CDR::Long name_len;
 	ACE_CDR::Long cont_len;
 	ACE_CDR::Float x,y,z,
-				   hx,hy,hz,
+				   theta,phi,
+				   life,
 				   vx,vy,vz,
 				   time;
 	char name[MAX_NAME_LEN];
@@ -194,13 +195,14 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		cdr >> x;
 		cdr >> y;
 		cdr >> z;
-		cdr >> hx;
-		cdr >> hy;
-		cdr >> hz;
+		cdr >> theta;
+		cdr >> phi;
+		cdr >> life;
 		player = Player_s();
 		player.SetID(player_id);
 		player.SetPos(x,y,z);
-		player.SetHeading(hx,hy,hz);
+		player.SetHeading(theta,phi);
+		player.SetLife(life);
 		message.Player(player);
 		break;
 	case CHAT:
@@ -217,14 +219,15 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		cdr >> x;
 		cdr >> y;
 		cdr >> z;
-		cdr >> hx;
-		cdr >> hy;
-		cdr >> hz;
+		cdr >> theta;
+		cdr >> phi;
+		cdr >> life;
 		player = Player_s();
 		player.SetName(name);
 		player.SetID(player_id);
 		player.SetPos(x,y,z);
-		player.SetHeading(hx,hy,hz);
+		player.SetHeading(theta,phi);
+		player.SetLife(life);
 		message.Player(player);
 		break;
 	case CREATE:
@@ -235,9 +238,9 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		cdr >> x;
 		cdr >> y;
 		cdr >> z;
-		cdr >> hx;
-		cdr >> hy;
-		cdr >> hz;
+		cdr >> theta;
+		cdr >> phi;
+		cdr >> life;
 		cdr >> vx;
 		cdr >> vy;
 		cdr >> vz;
@@ -245,7 +248,8 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 		cont[cont_len]='\0';
 		object = Object_s((ObjectType)object_type,(int)object_id,cont);
 		object.SetPos(x,y,z);
-		object.SetHeading(hx,hy,hz);
+		object.SetHeading(theta,phi);
+		object.SetLife(life);
 		object.SetVelocity(vx,vy,vz);
 		message.Object(object);
 		message.Content(cont);

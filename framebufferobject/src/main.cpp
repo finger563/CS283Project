@@ -95,9 +95,8 @@ void RotateCamera(int x, int y) {
 	myobj.x = tempcamera.GetPosition().x;
 	myobj.y = tempcamera.GetPosition().y;
 	myobj.z = tempcamera.GetPosition().z;
-	myobj.hx = tempcamera.GetTheta();		// theta
-	myobj.hy = tempcamera.GetPhi();		// phi
-	myobj.hz = 0;		// not used
+	myobj.theta = tempcamera.GetTheta();		// theta
+	myobj.phi = tempcamera.GetPhi();		// phi
 	mymessage.Object(myobj);
 	event_handler.send(mymessage);
 #else
@@ -121,9 +120,8 @@ void SendShot() {
 	info.x = eye.GetPosition().x;
 	info.y = eye.GetPosition().y;
 	info.z = eye.GetPosition().z;
-	info.hx = eye.GetTheta();
-	info.hy = eye.GetPhi();
-	info.hz = 0;
+	info.theta = eye.GetTheta();
+	info.phi = eye.GetPhi();
 	mymessage.Player(info);
 	event_handler.send(mymessage);
 }
@@ -139,9 +137,8 @@ void SendMove() {
 	myobj.x = tempeye.GetPosition().x;
 	myobj.y = tempeye.GetPosition().y;
 	myobj.z = tempeye.GetPosition().z;
-	myobj.hx = tempeye.GetTheta();		// theta
-	myobj.hy = tempeye.GetPhi();		// phi
-	myobj.hz = 0;		// not used
+	myobj.theta = tempeye.GetTheta();		// theta
+	myobj.phi = tempeye.GetPhi();		// phi
 	mymessage.Object(myobj);
 	event_handler.send(mymessage);
 	
@@ -379,10 +376,10 @@ void updatePixels(GLubyte* dst, int size) {
 		}
 		tempobj.setPosition(Point3D(dynamic->x,dynamic->y,dynamic->z));
 		
-		float r = cos(dynamic->hy);
-		float x = r*sin(dynamic->hx),
-			  y = sin(dynamic->hy),
-			  z = r*cos(dynamic->hx);
+		float r = cos(dynamic->phi);
+		float x = r*sin(dynamic->theta),
+			  y = sin(dynamic->phi),
+			  z = r*cos(dynamic->theta);
 		Vector3D forward = normalize(Vector3D(x,y,z));
 		Vector3D up = normalize(Vector3D(0,1,0));
 		Vector3D right = normalize(Cross(up,forward));
@@ -499,6 +496,35 @@ void KeyOperations() {
 	
 		tempeye.Translate(movevector);
 	}
+	
+	switch ( rotx + roty*2 + rotz*4 ) {
+	case 0:
+		rot.SetIdentity();
+		break;
+	case 1:
+		rot = rmx;
+		break;
+	case 2:
+		rot = rmy;
+		break;
+	case 3:
+		rot = rmxy;
+		break;
+	case 4:
+		rot = rmz;
+		break;
+	case 5:
+		rot = rmxz;
+		break;
+	case 6:
+		rot = rmyz;
+		break;
+	case 7:
+		rot = rmxyz;
+		break;
+	default:
+		rot = rmxyz;
+	}
 }
 
 // displays chat history (everyone who is on server)
@@ -558,38 +584,6 @@ void PrintChat() {
 void displayCB() {
     static int index = 0;
     int nextIndex = 0;                  // pbo index used for next frame
-	
-	//KeyOperations();
-	//SendMove();
-
-	switch ( rotx + roty*2 + rotz*4 ) {
-	case 0:
-		rot.SetIdentity();
-		break;
-	case 1:
-		rot = rmx;
-		break;
-	case 2:
-		rot = rmy;
-		break;
-	case 3:
-		rot = rmxy;
-		break;
-	case 4:
-		rot = rmz;
-		break;
-	case 5:
-		rot = rmxz;
-		break;
-	case 6:
-		rot = rmyz;
-		break;
-	case 7:
-		rot = rmxyz;
-		break;
-	default:
-		rot = rmxyz;
-	}
 
     if(pboMode > 0) {
         // "index" is used to copy pixels from a PBO to a texture object
@@ -699,14 +693,11 @@ void displayCB() {
     // unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
-	if(print) {
-		PrintChat();
-	}
-	else {		// draw info messages
-		showInfo();
-		//showTransferRate();
-	}
-	
+	PrintChat();
+#if defined(DEBUG)
+	showInfo();
+#endif
+
     //printTransferRate();
     glPopMatrix();
     glutSwapBuffers();
