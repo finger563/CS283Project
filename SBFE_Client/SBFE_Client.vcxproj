@@ -101,10 +101,10 @@
     <ClCompile Include="..\Network\Dummy_Event_Handler.cpp" />
     <ClCompile Include="..\Network\helper_funcs.cpp" />
     <ClCompile Include="..\Network\Message.cpp" />
-    <ClCompile Include="src\Library\glInfo.cpp" />
-    <ClCompile Include="src\Library\library_funcs.cpp" />
-    <ClCompile Include="src\Library\Timer.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="Library\glInfo.cpp" />
+    <ClCompile Include="Library\library_funcs.cpp" />
+    <ClCompile Include="Library\Timer.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Engine\camera.h" />
@@ -121,10 +121,10 @@
     <ClInclude Include="..\Network\helper_funcs.h" />
     <ClInclude Include="..\Network\Message.h" />
     <ClInclude Include="..\Network\Player.h" />
-    <ClInclude Include="src\Library\glext.h" />
-    <ClInclude Include="src\Library\glInfo.h" />
-    <ClInclude Include="src\Library\library_funcs.h" />
-    <ClInclude Include="src\Library\Timer.h" />
+    <ClInclude Include="Library\glext.h" />
+    <ClInclude Include="Library\glInfo.h" />
+    <ClInclude Include="Library\library_funcs.h" />
+    <ClInclude Include="Library\Timer.h" />
     <ClInclude Include="src\Sprites\box.h" />
     <ClInclude Include="src\Sprites\checkerboard.h" />
     <ClInclude Include="src\Sprites\defaulttexture.h" />

@@ -15,10 +15,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // include GLEW to access OpenGL functions
-#include <GL/glew.h>
+#include "..\include\GL\glew.h"
 
 // GLUT is the toolkit to interface with the OS
-#include <GL/freeglut.h>
+#include "..\include\GL\freeglut.h"
 
 #include <iostream>
 #include <sstream>

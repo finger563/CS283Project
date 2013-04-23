@@ -1,18 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Library\glInfo.cpp">
-      <Filter>src\Library</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Library\Timer.cpp">
-      <Filter>src\Library</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Library\library_funcs.cpp">
-      <Filter>src\Library</Filter>
-    </ClCompile>
     <ClCompile Include="..\Engine\camera.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
@@ -43,6 +31,18 @@
     <ClCompile Include="..\Network\Message.cpp">
       <Filter>src\Network</Filter>
     </ClCompile>
+    <ClCompile Include="Library\glInfo.cpp">
+      <Filter>src\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\library_funcs.cpp">
+      <Filter>src\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Library\Timer.cpp">
+      <Filter>src\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -62,18 +62,6 @@
     </ClInclude>
     <ClInclude Include="src\Sprites\floorlarge.h">
       <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Library\library_funcs.h">
-      <Filter>headers\Library</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Library\glext.h">
-      <Filter>headers\Library</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Library\glInfo.h">
-      <Filter>headers\Library</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Library\Timer.h">
-      <Filter>headers\Library</Filter>
     </ClInclude>
     <ClInclude Include="..\Engine\camera.h">
       <Filter>headers\Engine</Filter>
@@ -116,6 +104,18 @@
     </ClInclude>
     <ClInclude Include="..\Engine\Textures.h">
       <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\glext.h">
+      <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\glInfo.h">
+      <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\library_funcs.h">
+      <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Timer.h">
+      <Filter>headers\Library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -21,12 +21,12 @@ using std::ends;
 #define GL_GLEXT_PROTOTYPES
 
 // include GLEW to access OpenGL functions
-#include <GL/glew.h>
+#include "..\include\GL\glew.h"
 
 const GLenum PIXEL_FORMAT = GL_BGRA;
 
 // GLUT is the toolkit to interface with the OS
-#include <GL/freeglut.h>
+#include "..\include\GL\freeglut.h"
 
 #include "glext.h"
 #include "glInfo.h"                             // glInfo struct
