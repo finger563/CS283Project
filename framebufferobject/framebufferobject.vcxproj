@@ -99,11 +99,12 @@
     <ClCompile Include="src\Engine\point.cpp" />
     <ClCompile Include="src\Engine\Polygon.cpp" />
     <ClCompile Include="src\Engine\Vertex.cpp" />
-    <ClCompile Include="src\glInfo.cpp" />
+    <ClCompile Include="src\Library\glInfo.cpp" />
+    <ClCompile Include="src\Library\library_funcs.cpp" />
+    <ClCompile Include="src\Library\Timer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\Dummy_Event_Handler.cpp" />
     <ClCompile Include="src\Network\helper_funcs.cpp" />
-    <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SBFE_Server\Message.h" />
@@ -115,6 +116,10 @@
     <ClInclude Include="src\Engine\point.h" />
     <ClInclude Include="src\Engine\Polygon.h" />
     <ClInclude Include="src\Engine\Vertex.h" />
+    <ClInclude Include="src\Library\glext.h" />
+    <ClInclude Include="src\Library\glInfo.h" />
+    <ClInclude Include="src\Library\library_funcs.h" />
+    <ClInclude Include="src\Library\Timer.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\Network\Dummy_Event_Handler.h" />
     <ClInclude Include="src\Network\helper_funcs.h" />

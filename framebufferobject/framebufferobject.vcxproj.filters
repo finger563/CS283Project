@@ -13,12 +13,6 @@
     <ClCompile Include="src\Engine\point.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\glInfo.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Timer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\Engine\camera.cpp">
       <Filter>src\Engine</Filter>
     </ClCompile>
@@ -39,6 +33,15 @@
     </ClCompile>
     <ClCompile Include="src\Engine\chat.cpp">
       <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\glInfo.cpp">
+      <Filter>src\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\Timer.cpp">
+      <Filter>src\Library</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Library\library_funcs.cpp">
+      <Filter>src\Library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +105,18 @@
     <ClInclude Include="src\Sprites\floorlarge.h">
       <Filter>headers\Sprites</Filter>
     </ClInclude>
+    <ClInclude Include="src\Library\library_funcs.h">
+      <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\glext.h">
+      <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\glInfo.h">
+      <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Library\Timer.h">
+      <Filter>headers\Library</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -124,6 +139,12 @@
     </Filter>
     <Filter Include="src\Network">
       <UniqueIdentifier>{79eaabac-9f8b-421f-ace5-875b1b71426c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers\Library">
+      <UniqueIdentifier>{b52d75ac-6477-4fd9-bf4d-58e0bf366fbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Library">
+      <UniqueIdentifier>{d97f0056-5489-43c4-a523-41417273f24f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
