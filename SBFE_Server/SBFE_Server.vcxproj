@@ -80,16 +80,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Dummy_Accept_Handler.cpp" />
-    <ClCompile Include="Dummy_Data_Handler.cpp" />
-    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="..\Engine\camera.cpp" />
+    <ClCompile Include="..\Engine\chat.cpp" />
+    <ClCompile Include="..\Engine\matrix.cpp" />
+    <ClCompile Include="..\Engine\object.cpp" />
+    <ClCompile Include="..\Engine\point.cpp" />
+    <ClCompile Include="..\Engine\Polygon.cpp" />
+    <ClCompile Include="..\Engine\Vertex.cpp" />
+    <ClCompile Include="..\Network\Dummy_Accept_Handler.cpp" />
+    <ClCompile Include="..\Network\Dummy_Data_Handler.cpp" />
+    <ClCompile Include="..\Network\Message.cpp" />
     <ClCompile Include="server.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Dummy_Accept_Handler.h" />
-    <ClInclude Include="Dummy_Data_Handler.h" />
-    <ClInclude Include="Message.h" />
-    <ClInclude Include="Server.h" />
+    <ClInclude Include="..\Engine\camera.h" />
+    <ClInclude Include="..\Engine\chat.h" />
+    <ClInclude Include="..\Engine\constants.h" />
+    <ClInclude Include="..\Engine\matrix.h" />
+    <ClInclude Include="..\Engine\Object.h" />
+    <ClInclude Include="..\Engine\point.h" />
+    <ClInclude Include="..\Engine\Polygon.h" />
+    <ClInclude Include="..\Engine\Textures.h" />
+    <ClInclude Include="..\Engine\Vertex.h" />
+    <ClInclude Include="..\Network\Dummy_Accept_Handler.h" />
+    <ClInclude Include="..\Network\Dummy_Data_Handler.h" />
+    <ClInclude Include="..\Network\Message.h" />
+    <ClInclude Include="..\Network\Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,7 @@
 #ifndef LIBRARY_FUNCS_H
 #define LIBRARY_FUNCS_H
 
-#include "../main.h"
+#include "..\..\Engine\main.h"
 
 #include <iostream>
 #include <sstream>

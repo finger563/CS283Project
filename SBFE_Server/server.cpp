@@ -20,7 +20,7 @@
 #include "ace/Get_Opt.h"		// for parsing command line arguments
 
 #include "ace/Select_Reactor.h"  // we use the Select_Reactor
-#include "Dummy_Accept_Handler.h"  // this is the event handler we need
+#include "..\Network\Dummy_Accept_Handler.h"  // this is the event handler we need
 
 using namespace std;
 

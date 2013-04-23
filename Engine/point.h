@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "..\main.h"
+#include "main.h"
 
 // Note: 3D and 2D (e.g. Point3D and Point2D) are with respect to world space
 // coordinates.  All types of points/vectors are stored in homogeneous coordinates

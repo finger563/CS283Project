@@ -2,7 +2,7 @@
 #define MAIN_H
 
 #include <limits>
-#include "Engine\constants.h"
+#include "constants.h"
 
 #define SERVER_CONTROLS_HEADING
 

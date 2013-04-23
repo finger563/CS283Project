@@ -176,7 +176,7 @@ struct Object_s {
 		y += ty * vz * time;
 		z += tz * vz * time;
 		if ( type != PLAYER )
-			life = life - time;		// overload hz as timetolive
+			life = life - time;
 		return (life > 0);
 	}
 
@@ -213,15 +213,13 @@ public:
 	}
 	~Message(){}
 	Message & operator=(const Message & m) {
-		if (this != &m) // protect against invalid self-assignment
-        {
+		if (this != &m)  {
 			type_ = m.Type();
 			t_ = m.Time();
 			object_ = m.Object();
 			player_ = m.Player();
 			strcpy(content_,m.Content());
-        }
-        // by convention, always return *this
+        } 
         return *this;
 	}
 

@@ -4,36 +4,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\matrix.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\object.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\point.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\camera.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Vertex.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Polygon.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SBFE_Server\Message.cpp">
-      <Filter>src\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Network\Dummy_Event_Handler.cpp">
-      <Filter>src\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Network\helper_funcs.cpp">
-      <Filter>src\Network</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\chat.cpp">
-      <Filter>src\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="src\Library\glInfo.cpp">
       <Filter>src\Library</Filter>
     </ClCompile>
@@ -43,6 +13,36 @@
     <ClCompile Include="src\Library\library_funcs.cpp">
       <Filter>src\Library</Filter>
     </ClCompile>
+    <ClCompile Include="..\Engine\camera.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\chat.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\matrix.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\object.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\point.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Polygon.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Engine\Vertex.cpp">
+      <Filter>src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Network\Dummy_Event_Handler.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Network\helper_funcs.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Network\Message.cpp">
+      <Filter>src\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Sprites\box.h">
@@ -51,56 +51,14 @@
     <ClInclude Include="src\Sprites\floor.h">
       <Filter>headers\Sprites</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\matrix.h">
-      <Filter>headers\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\object.h">
-      <Filter>headers\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\point.h">
-      <Filter>headers\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\main.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\camera.h">
-      <Filter>headers\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Sprites\floorsmall.h">
       <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\constants.h">
-      <Filter>headers\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\Sprites\checkerboard.h">
       <Filter>headers\Sprites</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Vertex.h">
-      <Filter>headers\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Polygon.h">
-      <Filter>headers\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Sprites\defaulttexture.h">
       <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Textures.h">
-      <Filter>headers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SBFE_Server\Message.h">
-      <Filter>headers\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Network\Dummy_Event_Handler.h">
-      <Filter>headers\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="src\network\Player.h">
-      <Filter>headers\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Network\helper_funcs.h">
-      <Filter>headers\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\chat.h">
-      <Filter>headers\Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\Sprites\floorlarge.h">
       <Filter>headers\Sprites</Filter>
@@ -116,6 +74,48 @@
     </ClInclude>
     <ClInclude Include="src\Library\Timer.h">
       <Filter>headers\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\camera.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\chat.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\constants.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\matrix.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Object.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Polygon.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Vertex.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\point.h">
+      <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\main.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Network\Dummy_Event_Handler.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Network\helper_funcs.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Network\Message.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Network\Player.h">
+      <Filter>headers\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Engine\Textures.h">
+      <Filter>headers\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

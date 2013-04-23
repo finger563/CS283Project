@@ -1,7 +1,7 @@
 #include "Polygon.h"
 
-extern float z_buffer[SIZE_X*SIZE_Y];
-extern short display_buffer[SIZE_X*SIZE_Y];
+float z_buffer[SIZE_X*SIZE_Y];
+short display_buffer[SIZE_X*SIZE_Y];
 
 // General Transformation Methods, only operate on x,y,z,w of vertices
 void Poly::Transform( const Matrix& _m ) {

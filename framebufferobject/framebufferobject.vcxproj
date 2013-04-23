@@ -91,46 +91,46 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\SBFE_Server\Message.cpp" />
-    <ClCompile Include="src\Engine\camera.cpp" />
-    <ClCompile Include="src\Engine\chat.cpp" />
-    <ClCompile Include="src\Engine\object.cpp" />
-    <ClCompile Include="src\Engine\matrix.cpp" />
-    <ClCompile Include="src\Engine\point.cpp" />
-    <ClCompile Include="src\Engine\Polygon.cpp" />
-    <ClCompile Include="src\Engine\Vertex.cpp" />
+    <ClCompile Include="..\Engine\camera.cpp" />
+    <ClCompile Include="..\Engine\chat.cpp" />
+    <ClCompile Include="..\Engine\matrix.cpp" />
+    <ClCompile Include="..\Engine\object.cpp" />
+    <ClCompile Include="..\Engine\point.cpp" />
+    <ClCompile Include="..\Engine\Polygon.cpp" />
+    <ClCompile Include="..\Engine\Vertex.cpp" />
+    <ClCompile Include="..\Network\Dummy_Event_Handler.cpp" />
+    <ClCompile Include="..\Network\helper_funcs.cpp" />
+    <ClCompile Include="..\Network\Message.cpp" />
     <ClCompile Include="src\Library\glInfo.cpp" />
     <ClCompile Include="src\Library\library_funcs.cpp" />
     <ClCompile Include="src\Library\Timer.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Network\Dummy_Event_Handler.cpp" />
-    <ClCompile Include="src\Network\helper_funcs.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\SBFE_Server\Message.h" />
-    <ClInclude Include="src\Engine\camera.h" />
-    <ClInclude Include="src\Engine\chat.h" />
-    <ClInclude Include="src\Engine\constants.h" />
-    <ClInclude Include="src\Engine\object.h" />
-    <ClInclude Include="src\Engine\matrix.h" />
-    <ClInclude Include="src\Engine\point.h" />
-    <ClInclude Include="src\Engine\Polygon.h" />
-    <ClInclude Include="src\Engine\Vertex.h" />
+    <ClInclude Include="..\Engine\camera.h" />
+    <ClInclude Include="..\Engine\chat.h" />
+    <ClInclude Include="..\Engine\constants.h" />
+    <ClInclude Include="..\Engine\main.h" />
+    <ClInclude Include="..\Engine\matrix.h" />
+    <ClInclude Include="..\Engine\Object.h" />
+    <ClInclude Include="..\Engine\point.h" />
+    <ClInclude Include="..\Engine\Polygon.h" />
+    <ClInclude Include="..\Engine\Textures.h" />
+    <ClInclude Include="..\Engine\Vertex.h" />
+    <ClInclude Include="..\Network\Dummy_Event_Handler.h" />
+    <ClInclude Include="..\Network\helper_funcs.h" />
+    <ClInclude Include="..\Network\Message.h" />
+    <ClInclude Include="..\Network\Player.h" />
     <ClInclude Include="src\Library\glext.h" />
     <ClInclude Include="src\Library\glInfo.h" />
     <ClInclude Include="src\Library\library_funcs.h" />
     <ClInclude Include="src\Library\Timer.h" />
-    <ClInclude Include="src\main.h" />
-    <ClInclude Include="src\Network\Dummy_Event_Handler.h" />
-    <ClInclude Include="src\Network\helper_funcs.h" />
-    <ClInclude Include="src\network\Player.h" />
     <ClInclude Include="src\Sprites\box.h" />
     <ClInclude Include="src\Sprites\checkerboard.h" />
     <ClInclude Include="src\Sprites\defaulttexture.h" />
     <ClInclude Include="src\Sprites\floor.h" />
     <ClInclude Include="src\Sprites\floorlarge.h" />
     <ClInclude Include="src\Sprites\floorsmall.h" />
-    <ClInclude Include="src\Textures.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

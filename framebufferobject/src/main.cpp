@@ -1,12 +1,9 @@
 
-#include "main.h"
+#include "..\..\Engine\main.h"
 
 #include "Library\library_funcs.h"		// GL and GLUT functions needed for code
 
-#include "Engine\Object.h"
-
-short display_buffer[SIZE_X*SIZE_Y];
-float z_buffer[SIZE_X*SIZE_Y];
+#include "..\..\Engine\Object.h"
 
 // These are all values toggled by user input
 int  rotx = 0,		// rotation about x axis, toggled by 'x'
@@ -59,7 +56,7 @@ float theta = 0,
 void KeyOperations();
 
 // EVERYTHING FOR CHAT CODE ///////////////////////////////////////////////////
-#include "Engine\chat.h"
+#include "..\..\Engine\chat.h"
 
 std::string userName = "";
 std::string playermsg = "";
@@ -69,7 +66,7 @@ bool typing = false;
 void PrintChat();
 
 // INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
-#include "Network\helper_funcs.h"
+#include "..\..\Network\helper_funcs.h"
 
 Camera tempeye;
 

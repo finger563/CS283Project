@@ -13,7 +13,7 @@
 
 #define DEBUG
 
-#include "..\..\..\SBFE_Server\Message.h"
+#include "Message.h"
 #include "..\Engine\chat.h"
 #include "..\Engine\camera.h"
 

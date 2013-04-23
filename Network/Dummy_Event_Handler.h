@@ -21,7 +21,7 @@ using namespace std;
 #include <ace/SOCK_Acceptor.h>    // for acceptor functionality
 #include <ace/SOCK_Connector.h>
 
-#include "..\..\..\SBFE_Server\Message.h"
+#include "Message.h"
 
 #include "Player.h"
 

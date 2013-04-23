@@ -2,7 +2,10 @@
 #define	Polygon_H
 
 #include "Vertex.h"
-#include "../Textures.h"
+#include "Textures.h"
+
+extern float z_buffer[SIZE_X*SIZE_Y];
+extern short display_buffer[SIZE_X*SIZE_Y];
 
 #define POLY_MAX_VERTICES 4		// don't want anything other than tris and quads
 

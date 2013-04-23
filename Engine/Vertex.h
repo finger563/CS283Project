@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <cstdlib>
-#include "../main.h"
+#include "main.h"
 #include "matrix.h"
 
 #define NUM_VERTEX_DATA	16
