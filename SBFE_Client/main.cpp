@@ -1,9 +1,11 @@
 
-#include "..\..\Engine\main.h"
+#include "..\Engine\main.h"
 
 #include "Library\library_funcs.h"		// GL and GLUT functions needed for code
 
-#include "..\..\Engine\Object.h"
+#include "..\Engine\Object.h"
+
+#include "..\Engine\world.h"
 
 // These are all values toggled by user input
 int  rotx = 0,		// rotation about x axis, toggled by 'x'
@@ -11,7 +13,7 @@ int  rotx = 0,		// rotation about x axis, toggled by 'x'
 	 rotz = 0,		// rotation about z axis, toggled by 'z'
 	 display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
-Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
+/*Poly testpoly = Poly(Vertex(-6.666,6.666,0,1,0,0),
 					 Vertex(13.333,6.666,0,1,1,0),
 					 Vertex(-6.666,-13.333,0,1,0,1),
 					 Vertex(),3,Vector3D(0,0,-1),TEXTURED);
@@ -20,6 +22,11 @@ Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,1
 Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
 Object testobj3 = Object(floorlarge,floorlargewidth,floorlargeheight);
 Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
+*/
+
+//test world
+
+World testWorld(0);
 
 Matrix worldToCamera=Matrix(),
 	   perspectiveProjection=Matrix(),
@@ -56,7 +63,7 @@ float theta = 0,
 void KeyOperations();
 
 // EVERYTHING FOR CHAT CODE ///////////////////////////////////////////////////
-#include "..\..\Engine\chat.h"
+#include "..\Engine\chat.h"
 
 std::string userName = "";
 std::string playermsg = "";
@@ -66,7 +73,7 @@ bool typing = false;
 void PrintChat();
 
 // INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
-#include "..\..\Network\helper_funcs.h"
+#include "..\Network\helper_funcs.h"
 
 Camera tempeye;
 
@@ -236,7 +243,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 	projectionToPixel.data[0][0] = (float)SIZE_X*0.5;	// scale x
 	projectionToPixel.data[1][1] = (float)SIZE_Y*0.5;	// scale y
 
-	testobj.generateCube();
+	/* testobj.generateCube();
 
 	testobj2.generateCube();
 	testobj2.SetRenderType(COLORED);
@@ -247,6 +254,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 	objectlist.push_back(testobj2);	
 	objectlist.push_back(testobj3);
 	objectlist.push_back(testobj4);
+	*/
+	objectlist.splice(objectlist.end(), testWorld.getRenderList());
 
 	userName = string(player.Info().name) + ":";
 

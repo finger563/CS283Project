@@ -1,12 +1,10 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include <vector>
+#include <list>
 
-#include "viewplane.h"
-#include "color.h"
 #include "Object.h"
-#include "tracer.h"
+
 
 using namespace std;
 
