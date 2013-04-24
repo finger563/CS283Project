@@ -28,9 +28,9 @@ class Server_c {
 private:
 	std::list<Object_s> objects;
 	std::list<Player_s> players;
-	long		 worldID;	// which world is the server running?
-	World		level;		// actual level which is loaded (for collision detection)
-	std::list<Object> staticlist;
+	long		 worldID;				// which world is the server running?
+	World		level;					// actual level which is loaded (for collision detection)
+	std::list<Object> staticlist;		// list of static objects in the world (collision detection)
 public:
 	Server_c() {
 		worldID=0;level=World(worldID);staticlist=level.getRenderList();

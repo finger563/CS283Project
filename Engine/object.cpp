@@ -218,6 +218,71 @@ void Object::generateFloor(float length, float depth) {
 	updateList(); 
 }
 
+void Object::RotateToHeading() {
+	float r = cos(phi);
+	float x = r*sin(theta),
+			y = sin(phi),
+			z = r*cos(theta);
+	Vector3D forward = normalize(Vector3D(x,y,z));
+	Vector3D up = normalize(Vector3D(0,1,0));
+	Vector3D right = normalize(Cross(up,forward));
+	up = normalize(Cross(forward,right));
+	Matrix m = Matrix();
+	m.data[0][0] = right.x;
+	m.data[0][1] = right.y;
+	m.data[0][2] = right.z;
+	m.data[1][0] = up.x;
+	m.data[1][1] = up.y;
+	m.data[1][2] = up.z;
+	m.data[2][0] = forward.x;
+	m.data[2][1] = forward.y;
+	m.data[2][2] = forward.z;
+	Rotate(m);
+}
+
+void Object::RotateTempToHeading() {
+	float r = cos(phi);
+	float x = r*sin(theta),
+			y = sin(phi),
+			z = r*cos(theta);
+	Vector3D forward = normalize(Vector3D(x,y,z));
+	Vector3D up = normalize(Vector3D(0,1,0));
+	Vector3D right = normalize(Cross(up,forward));
+	up = normalize(Cross(forward,right));
+	Matrix m = Matrix();
+	m.data[0][0] = right.x;
+	m.data[0][1] = right.y;
+	m.data[0][2] = right.z;
+	m.data[1][0] = up.x;
+	m.data[1][1] = up.y;
+	m.data[1][2] = up.z;
+	m.data[2][0] = forward.x;
+	m.data[2][1] = forward.y;
+	m.data[2][2] = forward.z;
+	RotateTemp(m);
+}
+
+void Object::GenerateShot(Vector3D pos, float theta_, float phi_) {
+	generateCube(1.0);
+	theta = theta_;
+	phi = phi_;
+	position = pos;
+	SetRenderType(FLAT);
+	RotateToHeading();
+}
+	
+void Object::GeneratePlayer(Vector3D pos, float theta_, float phi_,const unsigned short* texture, const int texWid, const int texHgt) {
+	tex = texture;
+	texWidth = texWid;
+	texHeight = texHgt;
+	generateCube();
+	theta = theta_;
+	phi = phi_;
+	position = pos;
+	SetRenderType(TEXTURED);
+	RotateToHeading();
+}
+
 bool Object::updateTime(int time) {
 	return true;
 }
@@ -317,22 +382,14 @@ void Object::projectileInit(Vector3D head, Vector3D pos) {
 	counter=1;
 }
 
-void Object::projectileMove() {
-	position = position + heading;
-	counter++;
 
-	if(counter >= 25)
-		kill = true;
-}
-
-bool Object::getKill() {
-	return kill;
-}
-
-size_t Object::getCount() {
-	return counter;
-}
-
-void Object::upCount() {
-	counter++;
+bool Object::CollidesWith(const Object& b) {
+	updateList();
+	RotateTempToHeading();
+	TranslateTemp(position);
+	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
+	{
+		//it->TransformToPerspective(m);
+	}
+	return false;
 }

@@ -31,6 +31,10 @@ public:
 	//Updates Temp list to whatever list is passed (i.e. Render list)
 	bool updateList(std::list<Poly> poly);
 
+	// Rotates master list (i.e. in object space) to heading given by theta/phi
+	void RotateToHeading();
+	void RotateTempToHeading();
+
 	//Clears Temp list
 	void clearTemp();
 
@@ -49,6 +53,11 @@ public:
 
 	// Generates a floor at depth, with sidelength = length
 	void generateFloor(float length = 50, float depth = -10);
+
+	void GenerateShot(Vector3D pos, float theta_, float phi_);
+	
+	void GeneratePlayer(Vector3D pos, float theta_, float phi_, 
+		const unsigned short* texture = box, const int texWid=boxtexwidth, const int texHgt=boxtexheight);
 
 	//fileParser()<-- future function
 
@@ -79,18 +88,9 @@ public:
 	
 	std::list<Poly> getRenderList();
 
-	////////////////////////////////////////
-	/////////////////Projectile functons////
-	///////////////////////////////////////
 	void projectileInit(Vector3D head, Vector3D pos = Vector3D(0, 0, 0));
 
-	void projectileMove();
-
-	bool getKill();
-
-	size_t getCount();
-
-	void upCount();
+	bool CollidesWith(const Object& b);
 
 private:
 

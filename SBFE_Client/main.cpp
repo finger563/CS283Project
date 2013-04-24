@@ -19,9 +19,6 @@ std::list<Object> objectlist;		// used for the static world objects
 std::list<Object> dynamiclist;		// used for dynamic objects received from server
 std::list<Poly> renderlist;			// aggregate polygon list to be rendered
 
-//shoot will be the projectile
-Object shot = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0, 0, 5));
-
 // INPUT HANDLING CODE ////////////////////////////////////////////////////////
 bool keyStates[256] = {};				// for regular keyboard keys
 bool keySpecialStates[256] = {};		// for "special" keyboard keys, i.e. arrow keys
@@ -273,39 +270,14 @@ void updatePixels(GLubyte* dst, int size) {
 	for (std::list<Object_s>::iterator it = dynamic.begin(); it != dynamic.end(); it++) {
 		switch ( it->type ) {
 		case PLAYER:
-			tempobj = Object(box,boxtexwidth,boxtexheight);
-			tempobj.generateCube();
-			tempobj.SetRenderType(TEXTURED);
+			tempobj.GeneratePlayer(Point3D(it->x,it->y,it->z),it->theta,it->phi);
 			break;
 		case SHOT:
-			tempobj = Object();
-			tempobj.generateCube(1.0);
-			tempobj.SetRenderType(FLAT);
+			tempobj.GenerateShot(Point3D(it->x,it->y,it->z),it->theta,it->phi);
 			break;
 		default:
 			break;
 		}
-		tempobj.setPosition(Point3D(it->x,it->y,it->z));
-		
-		float r = cos(it->phi);
-		float x = r*sin(it->theta),
-			  y = sin(it->phi),
-			  z = r*cos(it->theta);
-		Vector3D forward = normalize(Vector3D(x,y,z));
-		Vector3D up = normalize(Vector3D(0,1,0));
-		Vector3D right = normalize(Cross(up,forward));
-		up = normalize(Cross(forward,right));
-		Matrix m = Matrix();
-		m.data[0][0] = right.x;
-		m.data[0][1] = right.y;
-		m.data[0][2] = right.z;
-		m.data[1][0] = up.x;
-		m.data[1][1] = up.y;
-		m.data[1][2] = up.z;
-		m.data[2][0] = forward.x;
-		m.data[2][1] = forward.y;
-		m.data[2][2] = forward.z;
-		tempobj.Rotate(m);
 		tempobj.setVel(Vector3D(it->vx,it->vy,it->vz));
 		dynamiclist.push_back(tempobj);
 	}
