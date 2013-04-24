@@ -31,16 +31,35 @@ public:
 	float GetTheta() const { return theta; }
 	void SetAngles( const float _t, const float _p );
 
-	Point3D GetPosition();
+	Point3D GetPosition() const;
 	void SetPosition(const float x, const float y, const float z);
 
-	Point3D GetForward();
+	Point3D GetForward() const;
 	void SetForward(const float x, const float y, const float z);
 	
-	Point3D GetUp();
+	Point3D GetUp() const;
 	void SetUp(const float x, const float y, const float z);
 	
-	Point3D GetRight();
+	Point3D GetRight() const;
 	void SetRight(const float x, const float y, const float z);
+	
+	bool operator==(const Camera& c) {
+		if ( phi != c.GetPhi() )
+			return false;
+		if ( theta != c.GetTheta() )
+			return false;
+		if ( position != c.GetPosition() )
+			return false;
+		return true;
+	}
+	bool operator!=(const Camera& c) {
+		if ( phi != c.GetPhi() )
+			return true;
+		if ( theta != c.GetTheta() )
+			return true;
+		if ( position != c.GetPosition() )
+			return true;
+		return false;
+	}
 };
 #endif

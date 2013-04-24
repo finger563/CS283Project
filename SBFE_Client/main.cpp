@@ -7,6 +7,10 @@
 
 int  display_z_buffer = 0;		// render z-buffer instead of display-buffer, toggled by 'b'
 
+#include "ace/Thread_Mutex.h"
+// lock variable for mutual exclusion
+ACE_Thread_Mutex  lock;
+
 Matrix worldToCamera=Matrix(),
 	   perspectiveProjection=Matrix(),
 	   projectionToPixel=Matrix();
@@ -107,7 +111,7 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 					ACE_TEXT ("parse failed")));
 		return 0;
 	}
-	
+		
 	// grab a thread manager (we get the global singleton instance)
 	ACE_Thread_Manager *thr_mgr = ACE_Thread_Manager::instance ();
 	FuncArg_t *args;
@@ -264,10 +268,10 @@ void updatePixels(GLubyte* dst, int size) {
 	renderlist.clear();
 
 	dynamiclist.clear();
-	Object_s* dynamic = player.Objects();
+	std::list<Object_s> dynamic = player.Objects();
 	Object tempobj;
-	while ( dynamic != NULL ) {
-		switch ( dynamic->type ) {
+	for (std::list<Object_s>::iterator it = dynamic.begin(); it != dynamic.end(); it++) {
+		switch ( it->type ) {
 		case PLAYER:
 			tempobj = Object(box,boxtexwidth,boxtexheight);
 			tempobj.generateCube();
@@ -281,12 +285,12 @@ void updatePixels(GLubyte* dst, int size) {
 		default:
 			break;
 		}
-		tempobj.setPosition(Point3D(dynamic->x,dynamic->y,dynamic->z));
+		tempobj.setPosition(Point3D(it->x,it->y,it->z));
 		
-		float r = cos(dynamic->phi);
-		float x = r*sin(dynamic->theta),
-			  y = sin(dynamic->phi),
-			  z = r*cos(dynamic->theta);
+		float r = cos(it->phi);
+		float x = r*sin(it->theta),
+			  y = sin(it->phi),
+			  z = r*cos(it->theta);
 		Vector3D forward = normalize(Vector3D(x,y,z));
 		Vector3D up = normalize(Vector3D(0,1,0));
 		Vector3D right = normalize(Cross(up,forward));
@@ -302,10 +306,10 @@ void updatePixels(GLubyte* dst, int size) {
 		m.data[2][1] = forward.y;
 		m.data[2][2] = forward.z;
 		tempobj.Rotate(m);
-		tempobj.setVel(Vector3D(dynamic->vx,dynamic->vy,dynamic->vz));
+		tempobj.setVel(Vector3D(it->vx,it->vy,it->vz));
 		dynamiclist.push_back(tempobj);
-		dynamic = dynamic->next;
 	}
+
 	for (std::list<Object>::iterator it = dynamiclist.begin(); it != dynamiclist.end(); it++) {
 		it->updateList();
 		Vector3D tmppos = it->getPosition() - player.Eye().GetPosition();
@@ -590,7 +594,8 @@ void reshapeCB(int width, int height) {
 void timerCB(int millisec) {
     glutTimerFunc(millisec, timerCB, millisec);
 	KeyOperations();
-	SendMove();
+	//if ( tempeye != player.Eye() )
+		SendMove();
     glutPostRedisplay();
 }
 

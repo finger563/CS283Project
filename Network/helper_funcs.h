@@ -16,6 +16,7 @@
 
 // the following is used for logging of messages
 #include "ace/Log_Msg.h"
+#include "ace/Thread_Mutex.h"
 
 #include "ace/OS_NS_string.h"
 #include "ace/INET_Addr.h"

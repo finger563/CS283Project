@@ -322,7 +322,7 @@ int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, co
 				currenttime));
 	#endif
 	
-	if ( player.Objects() != NULL ) {
+	if ( !player.Objects().empty() ) {
 		float time = period_t.usec()/1000000.0;
 		time += period_t.sec();
 		player.Update(time);

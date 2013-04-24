@@ -180,27 +180,27 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 					#endif
 				}
 				
-				Object_s* myobjects = server.Objects();
 				mymessage.SetType(CREATE);
-				while ( myobjects != NULL ) {	// Need to send CREATE messages to this client for all objects
-					if ( myobjects->id != myid ||
-						 myobjects->type != PLAYER ) {
-						myobject.SetType(myobjects->type);
-						myobject.SetID(myobjects->id);
-						myobject.SetHeading(myobjects->theta,myobjects->phi);
-						myobject.SetLife(myobjects->life);
-						myobject.SetPos(myobjects->x,myobjects->y,myobjects->z);
-						myobject.SetContent(myobjects->content_);
+				// Need to send CREATE messages to this client for all objects
+				std::list<Object_s> objlist = server.Objects();
+				for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++) {
+					if ( it->id != myid ||
+						 it->type != PLAYER ) {
+						myobject.SetType(it->type);
+						myobject.SetID(it->id);
+						myobject.SetHeading(it->theta,it->phi);
+						myobject.SetLife(it->life);
+						myobject.SetPos(it->x,it->y,it->z);
+						myobject.SetContent(it->content_);
 						mymessage.SetObject(myobject);
 						int numbytes = this->send(this->peer(),mymessage);
 						#if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Server sent CREATE to player (%s,%d).\n"),
-							server.Player(tmp->ID),
-							tmp->ID));
+							server.Player(myid),
+							myid));
 						#endif
-					}
-					myobjects = myobjects->next;		
+					}		
 				}
 				peer_s *newpeer = new peer_s(&(this->peer()),myid);	// Have finished updating all clients
 				con_peers.Push(newpeer);							// now add the new peer to our list
@@ -228,7 +228,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 #if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("%s fired a shot!\n"),
-							mymessage.Player().name));
+							mymessage.GetPlayer().name));
 #endif
 				peer_s *tmp = &con_peers;
 				mymessage.SetType(CREATE);
@@ -273,11 +273,6 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 			break;
 		case LEAVE:
 			if ( server.Player(mymessage.GetPlayer()) ) {
-				//server.RemovePlayer(mymessage.Player().id);	
-				//server.RemoveObject(PLAYER,mymessage.Player().id);
-				//server.RemovePlayer(myid);
-				//server.RemoveObject(PLAYER,myid);
-				//con_peers.Remove(myid);
 				myobject = Object_s();
 				myobject.SetID(mymessage.GetPlayer().id);
 				myobject.SetType(PLAYER);
@@ -383,29 +378,28 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 	#endif
 
 	Message mymessage;
-	if ( server.Players() != NULL )	{
-		if ( server.Objects() != NULL ) {
-			float time = period_t.usec()/1000000.0;
-			time += period_t.sec();
-			Object_s* myobjects = server.Objects();
-			while ( myobjects != NULL ) {
-				if ( !myobjects->Update(time) ||
-					 server.DetectCollide(*myobjects) ) {	// object is no longer alive, need to remove
-					peer_s *tmp = &con_peers;
-					while (tmp->next != NULL) {
-						tmp = tmp->next;
-						mymessage.SetType(REMOVE);
-						mymessage.SetObject(*myobjects);
-						int numbytes = this->send(*(tmp->p),mymessage);
+	if ( !server.Objects().empty() ) {
+		float time = period_t.usec()/1000000.0;
+		time += period_t.sec();
+		server.UpdateObjects(time);
+		std::list<Object_s> objlist = server.Objects();
+		for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++ ) {
+			if ( it->life <= 0.0 ||
+					server.DetectCollide(*it) ) {	// object is no longer alive, need to remove
+				peer_s *tmp = &con_peers;
+				while (tmp->next != NULL) {
+					tmp = tmp->next;
+					mymessage.SetType(REMOVE);
+					mymessage.SetObject(*it);
+					int numbytes = this->send(*(tmp->p),mymessage);
 #if defined(DEBUG)
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
-							server.Player(tmp->ID),
-							tmp->ID));
+					ACE_DEBUG ((LM_DEBUG,
+						ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
+						server.Player(tmp->ID),
+						tmp->ID));
 #endif
-					}
 				}
-				myobjects = myobjects->next;
+				server.RemoveObject(it->type,it->id);
 			}
 		}
 	}

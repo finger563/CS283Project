@@ -26,19 +26,17 @@ using namespace std;
 
 class Server_c {
 private:
-	Object_s	*objects;
-	Player_s	*players;
+	std::list<Object_s> objects;
+	std::list<Player_s> players;
 	long		 worldID;	// which world is the server running?
 	World		level;		// actual level which is loaded (for collision detection)
 	std::list<Object> staticlist;
 public:
 	Server_c() {
-		objects=NULL;players=NULL;worldID=0;level=World(worldID);staticlist=level.getRenderList();
+		worldID=0;level=World(worldID);staticlist=level.getRenderList();
 	}
 	Server_c(Server_c& t) {*this=t;}
-	~Server_c() {
-		delete objects,players,this;
-	}
+	~Server_c() { }
 
 	Server_c & operator=(Server_c& t) {
 		if (this != &t) {
@@ -51,166 +49,118 @@ public:
         return *this;
 	}
 
-	Object_s * Objects() {return objects;}
-	Player_s * Players() {return players;}
+	std::list<Object_s> Objects() {return objects;}
+	std::list<Player_s> Players() {return players;}
 	long Level() { return worldID; }
 	void Level(const long w) { worldID = w; level = World(w); staticlist = level.getRenderList(); }
 
 	bool Player(Player_s& s) {
-		Player_s* tmp = players;
-		if (tmp != NULL) {
-			while (tmp!=NULL) {
-				if ( s.id == tmp->id ) 
-					return true;
-				tmp=tmp->next;
-			}
+		for (std::list<Player_s>::iterator it = players.begin(); it != players.end(); it++) {
+			if ( it->id == s.id )
+				return true;
 		}
-		ACE_ERROR ((LM_ERROR,
-			ACE_TEXT ("Error, player has not registered!\n")));
 		return false;
 	}
 
 	char* Player(ACE_CDR::Long id) {
-		Player_s* tmp = players;
-		while ( tmp != NULL) {
-			if ( tmp->id == id ) {
-				return tmp->name;
-			}
-			tmp = tmp->next;
+		for (std::list<Player_s>::iterator it = players.begin(); it != players.end(); it++) {
+			if ( it->id == id )
+				return it->name;
 		}
-
-		ACE_ERROR ((LM_ERROR,
-			ACE_TEXT ("Error, player has not registered!\n")));
 		return NULL;
 	}
 
 	void RemovePlayer(ACE_CDR::Long id) {
-		Player_s* tmp = players;
-		Player_s* prev = tmp;
-		while ( tmp != NULL) {
-			if ( tmp->id == id ) {
-				if ( tmp == players ) {
-					players = tmp->next;
-				}
-				else {
-					prev->next = tmp->next;
-				}
+		for (std::list<Player_s>::iterator it = players.begin(); it!= players.end();) {
+			if ( it->id == id ) {
 				ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("%s has been removed from players.\n"),
-						tmp->name));
-				delete tmp;
+						it->name));
+				it = players.erase(it);
 				return;
 			}
-			prev = tmp;
-			tmp = tmp->next;
+			else
+				it++;
 		}
 	}
 	
 	bool Register(Player_s& s) {
-		Player_s* tmp = players;
-		Player_s* prev = tmp;
-		while ( tmp != NULL) {
-			if ( *tmp == s ) {
-				ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("Error, %s has already registered!\n"),
-					s.name));
+		for (std::list<Player_s>::iterator it = players.begin(); it != players.end(); it++) {
+			if ( it->id == s.id )
 				return false;
-			}
-			prev = tmp;
-			tmp = tmp->next;
 		}
-		if ( prev != NULL )
-			prev->Link(new Player_s(s));
-		else 
-			players = new Player_s(s);
+		players.push_back(s);
 		ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("%s is now registered.\n"),
 				s.name));
 		return true;
 	}
 
-	void Shutdown() {
-		delete players,objects;
-		players=NULL;
-		objects=NULL;
-	}
-
 	bool Create(Object_s& a) {
-		if ( objects==NULL) {
-			objects=new Object_s(a);
-			return true;
-		}
-		else {
-			if ( a == *objects ) {
-				ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("Error, object has already been created!\n")));
+		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
+			if ( it->id == a.id && it->type == a.type )
 				return false;
-			}
-			Object_s* tmp;
-			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next) {
-				if ( a == *tmp ) {
-					ACE_ERROR ((LM_ERROR,
-						ACE_TEXT ("Error, object has already been created!\n")));
-					return false;
-				}
-			}
-			Object_s* link = new Object_s(a);
-			tmp->Link(link);
-			return true;
 		}
+		objects.push_back(a);
+		return true;
 	}
 	
 	void Move(Object_s& a) {
-		Object_s* tmp = objects;
-		while ( tmp != NULL) {
-			if ( tmp->id == a.id ) {
-				tmp->SetPos(a.x,a.y,a.z);
-				tmp->SetHeading(a.theta,a.phi);
-				// DO NOT UPDATE LIFE HERE, SERVER CONTROLS LIFE
-				tmp->SetVelocity(a.vx,a.vy,a.vz);
+		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
+			if ( it->id == a.id && it->type == a.type ) {
+				it->SetPos(a.x,a.y,a.z);
+				it->SetHeading(a.theta,a.phi);
+				it->SetVelocity(a.vx,a.vy,a.vz);
 				return;
 			}
-			tmp = tmp->next;
 		}
 	}
 	
-	bool ObjectExists(Object_s& s) {
-		if (players != NULL) {
-			if ( s == *objects )
+	bool ObjectExists(Object_s& a) {
+		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
+			if ( it->id == a.id && it->type == a.type )
 				return true;
-			Object_s* tmp=Objects();
-			while (tmp!=NULL) {
-				if ( s == *tmp ) 
-					return true;
-				tmp=tmp->next;
-			}
 		}
-		ACE_ERROR ((LM_ERROR,
-			ACE_TEXT ("Error, object has not been created!\n")));
 		return false;
+	}
+
+	void UpdateObjects(float time) {
+		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
+			if ( it->type != PLAYER )
+				it->Update(time);
+		}
+	}
+
+	float getObjectLife(ObjectType t, ACE_CDR::Long id){
+		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
+			if ( it->id == id && it->type == t )
+				return it->life;
+		}
+		return -1;
+	}
+
+	void setObjectLife(ObjectType t, ACE_CDR::Long id, float _l) {
+		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
+			if ( it->id == id && it->type == t )
+				it->SetLife(_l);
+		}
 	}
 
 	bool DetectCollide(Object_s& s);	// collision detection code
 	
 	void RemoveObject( ObjectType t, ACE_CDR::Long id ) {
-		Object_s* tmp = objects;
-		Object_s* prev = tmp;
-		while ( tmp != NULL) {
-			if ( tmp->id == id && tmp->type == t ) {
-				if ( tmp == objects ) {
-					objects = tmp->next;
-				}
-				else {
-					prev->next = tmp->next;
-				}
+		for (std::list<Object_s>::iterator it = objects.begin(); it!= objects.end();) {
+			if ( it->id == id && it->type == t ) {
+#if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("%s has been removed from objects.\n"),
-						tmp->content_));
-				delete tmp;
+						ACE_TEXT ("(%d,%d,%s) has been removed from objects.\n"),
+						it->type,it->id,it->content_));
+#endif
+				it = objects.erase(it);
 				return;
 			}
-			prev = tmp;
-			tmp = tmp->next;
+			else
+				it++;
 		}
 	}
 };

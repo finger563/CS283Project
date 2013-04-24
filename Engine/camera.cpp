@@ -76,7 +76,7 @@ Matrix Camera::GetWorldToCamera() {
 	return m;
 }
 
-Point3D Camera::GetPosition() {
+Point3D Camera::GetPosition() const {
 	return position;
 }
 
@@ -86,7 +86,7 @@ void Camera::SetPosition( const float x, const float y, const float z ) {
 	position.z = z;
 }
 
-Point3D Camera::GetForward() {
+Point3D Camera::GetForward() const {
 	return forward;
 }
 
@@ -96,7 +96,7 @@ void Camera::SetForward( const float x, const float y, const float z) {
 	forward.z = z;
 }
 
-Point3D Camera::GetUp() {
+Point3D Camera::GetUp() const {
 	return up;
 }
 
@@ -106,7 +106,7 @@ void Camera::SetUp( const float x, const float y, const float z) {
 	up.z = z;
 }
 
-Point3D Camera::GetRight() {
+Point3D Camera::GetRight() const {
 	return right;
 }
 

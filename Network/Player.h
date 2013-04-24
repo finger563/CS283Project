@@ -12,7 +12,7 @@
 #define _CS283_PLAYER_H_
 
 //#define DEBUG
-
+#include <list>
 #include "Message.h"
 #include "..\Engine\chat.h"
 #include "..\Engine\camera.h"
@@ -25,15 +25,15 @@ class Player_c {
 private:
 	bool registered;
 	Player_s	info;
-	Object_s*	objects;
+	std::list<Object_s> objects;
 	Chat_c		chat;
 	Camera		eye;
 	World		level;
 public:
-	Player_c() : info(), chat(), eye() {objects=NULL;registered=false;}
-	Player_c(const Player_s& s): info(s), chat(), eye() {objects=NULL;registered=false;}
+	Player_c() : info(), chat(), eye() {registered=false;}
+	Player_c(const Player_s& s): info(s), chat(), eye() {registered=false;}
 	Player_c(Player_c& s){*this=s;}
-	~Player_c() {delete objects, this;}
+	~Player_c() {}
 
 	Player_c & operator=(Player_c& s) {
 		if (this != &s) {
@@ -48,7 +48,7 @@ public:
 	Player_s Info() const {return info;}
 	void Info(const Player_s& s) {info=s;}
 
-	Object_s* Objects() {return objects;}
+	std::list<Object_s> Objects() {return objects;}
 
 	Chat_c Chat() const { return chat; }
 	void Chat(const Chat_c& c) { chat = c; }
@@ -68,15 +68,7 @@ public:
 	bool Registered() {return registered;}
 
 	void Create(Object_s& a) {
-		if (objects==NULL) {
-			objects = new Object_s(a);
-		}
-		else {
-			Object_s* tmp;
-			for (tmp=objects;tmp->next!=NULL;tmp=tmp->next);
-			Object_s* link = new Object_s(a);
-			tmp->Link(link);
-		}
+		objects.push_back(a);
 	}
 
 	void Move(Object_s& a) {
@@ -87,45 +79,33 @@ public:
 			tempeye = eye;
 		}
 		else {
-			Object_s* tmp = objects;
-			while ( tmp != NULL) {
-				if ( tmp->id == a.id ) {
-					tmp->SetPos(a.x,a.y,a.z);
-					tmp->SetHeading(a.theta,a.phi);
-					tmp->SetLife(a.life);
-					tmp->SetVelocity(a.vx,a.vy,a.vz);
+			for (std::list<Object_s>::iterator it = objects.begin(); it!= objects.end(); it++) {
+				if ( it->id == a.id  && it->type == a.type ) {
+					it->SetPos(a.x,a.y,a.z);
+					it->SetHeading(a.theta,a.phi);
+					it->SetLife(a.life);
+					it->SetVelocity(a.vx,a.vy,a.vz);
 					return;
 				}
-				tmp = tmp->next;
 			}
 		}
 	}
 
 	void Update(const float time) {
-		Object_s* tmp = objects;
-		while ( tmp != NULL) {
-			if ( tmp->type != PLAYER )
-				tmp->Update(time);
-			tmp = tmp->next;
+		for (std::list<Object_s>::iterator it = objects.begin(); it!= objects.end(); it++) {
+			if ( it->type != PLAYER ) {
+				it->Update(time);
+			}
 		}
 	}
 
 	void Remove(const ObjectType t, const ACE_CDR::Long _id) {
-		Object_s* tmp = objects;
-		Object_s* prev = tmp;
-		while ( tmp != NULL) {
-			if ( tmp->id == _id && tmp->type == t ) {
-				if ( tmp == objects ) {
-					objects = tmp->next;
-				}
-				else {
-					prev->next = tmp->next;
-				}
-				delete tmp;
-				return;
+		for (std::list<Object_s>::iterator it = objects.begin(); it!= objects.end();) {
+			if ( it->type == t && it->id == _id ) {
+				it = objects.erase(it);
 			}
-			prev = tmp;
-			tmp = tmp->next;
+			else
+				it++;
 		}
 	}
 };

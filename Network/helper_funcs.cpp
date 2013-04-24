@@ -5,9 +5,6 @@ string username = "TestUser";
 
 extern Player_c player;
 
-// lock variable for mutual exclusion
-ACE_Thread_Mutex  lock;
-
 Dummy_Event_Handler event_handler;
 
 // command line parsing
