@@ -132,7 +132,7 @@ FEATURES
 
 TODO
 ----
- * Finish collision detection
+ * Fix polygon collision detection; currently polygons act as infinite planes.  Bugs exist as well.
  * Physics (for jumping)
  * Build world
  * Have server randomly choose spawn points for players.
