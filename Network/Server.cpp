@@ -22,17 +22,19 @@ bool Server_c::DetectCollide(const Object_s& s) {
 
 	Message mymessage;
 	Object playerobj;
-	for (std::list<Object_s>::iterator it=objects.begin(); it != objects.end(); it ++) {	// only do dynamic-dynamic object collision on shots
-		if ( s.type == SHOT && it->type == PLAYER ) {	// don't do shot collision with shots
-			playerobj.GeneratePlayer(Point3D(it->x,it->y,it->z),it->theta,it->phi);
-			if ( playerobj.CollidesWith(myobj) )
-				return true;
+	if ( s.type == SHOT ) {
+		for (std::list<Object_s>::iterator it=objects.begin(); it != objects.end(); it ++) {	// only do dynamic-dynamic object collision on shots
+			if ( it->type == PLAYER ) {	// don't do shot collision with shots
+				playerobj.GeneratePlayer(Point3D(it->x,it->y,it->z),it->theta,it->phi);
+				if ( playerobj.CollidesWith(myobj) )
+					return true;
+			}
+		}
+		
+		for (std::list<Object>::iterator it = staticlist.begin(); it != staticlist.end(); it++) {
+				if ( it->CollidesWith(myobj) )
+					return true;
 		}
 	}
-		
-	//for (std::list<Object>::iterator it = staticlist.begin(); it != staticlist.end(); it++) {
-	//	if ( it->CollidesWith(myobj) )
-	//		return true;
-	//}
 	return false;
 }
