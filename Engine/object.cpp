@@ -366,9 +366,10 @@ void Object::TransformToPixel(Matrix& m) {
 }
 
 //returns final render list
-std::list<Poly> Object::GetRenderList() {
+std::list<Poly> Object::GetRenderList() const {
 	std::list<Poly> get;
-	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
+	std::list<Poly> local = temp;
+	for(std::list<Poly>::iterator it = local.begin(); it != local.end(); ++it)
 	{
 		if( it->visible &&
 				(
@@ -404,11 +405,29 @@ bool Object::CollidesWith(const Object& b) {
 	if ( distance <= (radius + b.GetRadius()) )
 		return true;
 	updateList();
-	RotateTempToHeading();
+	//RotateTempToHeading();
 	TranslateTemp(position);
+	std::list<Poly> blist = b.GetRenderList();
+	bool front = false,
+			back = false;
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
-		//it->TransformToPerspective(m);
+		Vector3D itvector = Vector3D( it->normal.x,
+									  it->normal.y,
+									  it->normal.z,
+									  - (it->normal.x*it->v[0].x + it->normal.y*it->v[0].y + it->normal.z*it->v[0].z) );
+		for (std::list<Poly>::iterator bpoly = blist.begin(); bpoly != blist.end(); ++bpoly) {
+			for ( int i=0;i<bpoly->numVertices;i++) {
+				Vector3D test = Vector3D(bpoly->v[i].x,bpoly->v[i].y,bpoly->v[i].z);
+				float tmp = test*itvector;
+				if ( tmp < 0 )
+					back = true;
+				else if ( tmp > 0 )
+					front = true;
+			}
+		}
 	}
+	if ( !front && back )
+		return true;
 	return false;
 }

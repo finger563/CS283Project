@@ -19,7 +19,8 @@ bool Server_c::DetectCollide(const Object_s& s) {
 	default:
 		break;
 	}
-
+	myobj.updateList();
+	myobj.TranslateTemp(myobj.GetPosition());
 	Message mymessage;
 	Object playerobj;
 	if ( s.type == SHOT ) {

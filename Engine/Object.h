@@ -84,7 +84,7 @@ public:
 	void TransformToCamera(Matrix& m);
 	void TransformToPerspective(Matrix& m);
 	void TransformToPixel(Matrix& m);	
-	std::list<Poly> GetRenderList();
+	std::list<Poly> GetRenderList() const;
 
 	void projectileInit(Vector3D head, Vector3D pos = Vector3D(0, 0, 0));
 
