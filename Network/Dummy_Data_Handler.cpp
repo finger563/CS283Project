@@ -372,26 +372,28 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 	#endif
 
 	Message mymessage;
-	if ( !server.Objects().empty() ) {
-		float time = period_t.usec()/1000000.0;
-		time += period_t.sec();
-		server.UpdateObjects(time);
-		std::list<Object_s> objlist = server.Objects();
-		for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++ ) {
-			if ( it->life <= 0.0 ||
-					server.DetectCollide(*it) ) {	// object is no longer alive, need to remove
-				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
-					mymessage.SetType(REMOVE);
-					mymessage.SetObject(*it);
-					int numbytes = this->send(*(mypeer->p),mymessage);
+	if ( con_peers.begin()->ID == myid ) {
+		if ( !server.Objects().empty() ) {
+			float time = period_t.usec()/1000000.0;
+			time += period_t.sec();
+			server.UpdateObjects(time);
+			std::list<Object_s> objlist = server.Objects();
+			for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++ ) {
+				if ( it->life <= 0.0 ||
+						server.DetectCollide(*it) ) {	// object is no longer alive, need to remove
+					for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
+						mymessage.SetType(REMOVE);
+						mymessage.SetObject(*it);
+						int numbytes = this->send(*(mypeer->p),mymessage);
 #if defined(DEBUG)
-					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
-						server.Player(mypeer->ID),
-						mypeer->ID));
+						ACE_DEBUG ((LM_DEBUG,
+							ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
+							server.Player(mypeer->ID),
+							mypeer->ID));
 #endif
+					}
+					server.RemoveObject(it->type,it->id);
 				}
-				server.RemoveObject(it->type,it->id);
 			}
 		}
 	}

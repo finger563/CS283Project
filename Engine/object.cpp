@@ -169,7 +169,7 @@ void Object::GenerateCube(float size) {
 #endif
 	}
 
-	radius = size/2.0;
+	radius = size;
 
 	updateList(); 
 }
