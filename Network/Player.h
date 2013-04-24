@@ -12,6 +12,7 @@
 #define _CS283_PLAYER_H_
 
 //#define DEBUG
+
 #include <list>
 #include "Message.h"
 #include "..\Engine\chat.h"

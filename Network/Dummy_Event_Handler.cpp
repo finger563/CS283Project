@@ -212,9 +212,8 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 			#if defined(DEBUG)
 			ACE_DEBUG ((LM_DEBUG,
 					ACE_TEXT ("Received update with time %f\n"),
-					mymessage.Time()));
+					mymessage.GetTime()));
 			#endif
-			//period_t = ACE_Time_Value(floor(mymessage.Time()),(mymessage.Time()-floor(mymessage.Time()))*1000000.0);
 			player.Update(mymessage.GetTime());
 			break;
 		case REMOVE:

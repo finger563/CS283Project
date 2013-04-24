@@ -34,7 +34,7 @@ Point3D Point3D::operator/ (const float rhs) const
 
 float Point3D::operator* (const Point3D& rhs) const 
 {
-    return (x*rhs.x + y*rhs.y + z*rhs.z);
+    return (x*rhs.x + y*rhs.y + z*rhs.z + w*rhs.w);
 }
 
 Point3D Point3D::operator+ (const Point3D& rhs) const 

@@ -404,6 +404,12 @@ void PrintChat() {
 		player.Chat().NumChatsDisplayed() : conversation.size() ;
 	std::list<string>::reverse_iterator riter = conversation.rbegin();
 
+#if defined(DEBUG)
+	ss << "Position: ("<<player.Eye().GetPosition().x<<","<<player.Eye().GetPosition().y<<","<<player.Eye().GetPosition().z<<")" << ends;
+	drawString(ss.str().c_str(), 1, 400, color, font);
+	ss.str("");
+#endif
+
 	for (int i=0; i < numChats; i++) {
 		ss << *riter << ends;
 		++riter;

@@ -64,8 +64,6 @@ bool Object::updateList() {
 	return true;
 }
 
-
-//Updates Temp list with any changes to the master list
 bool Object::updateList(std::list<Poly> poly) {
 	clearTemp();
 
@@ -86,13 +84,11 @@ bool Object::updateList(std::list<Poly> poly) {
 	return true;
 }
 
-//Replaces Temp list with render list
 void Object::clearTemp() {
 	//empties temp list
 	temp.clear();
 }
 
-//Temp List Operations
 void Object::RotateTemp(const Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
@@ -107,13 +103,11 @@ void Object::TranslateTemp(const Vector3D& v) {
 	}
 }
 
-//add polygon to lists
 void Object::add(Poly poly) {
 	master.push_back(poly);
 	updateList();
 }
 
-//generates cube
 void Object::GenerateCube(float size) {	  
 	master.clear();
 
@@ -170,11 +164,12 @@ void Object::GenerateCube(float size) {
 	}
 
 	radius = size;
+	theta = 3.141592;
+	phi = 0;
 
 	updateList(); 
 }
 
-//generates tetrahedron
 void Object::GenerateTetra(float size) {
 	Vertex p1 = Vertex(size,0,-size/sqrt(2.0)),
 			p2 = Vertex(-size,0,-size/sqrt(2.0)),
@@ -205,9 +200,7 @@ void Object::GenerateTetra(float size) {
 	updateList(); 
 }
 
-//generates cube
 void Object::GenerateFloor(float length, float depth) {
-	position = Point3D(0,depth,0);
 
 	master.clear();
 	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(-length,0,length,1,0,0),Vertex(length,0,length,1,1,0),
@@ -221,6 +214,9 @@ void Object::GenerateFloor(float length, float depth) {
 	}
 
 	radius = 0;
+	theta = 0;
+	phi = 3.141592/2.0;
+	position = Point3D(0,depth,0);
 
 	updateList(); 
 }
@@ -387,6 +383,10 @@ std::list<Poly> Object::GetRenderList() const {
 	return get;
 }
 
+std::list<Poly> Object::GetTemp() const {
+	return temp;
+}
+
 ////////////////////////////////////////
 /////////////////Projectile functons////
 ///////////////////////////////////////
@@ -405,29 +405,29 @@ bool Object::CollidesWith(const Object& b) {
 	if ( distance <= (radius + b.GetRadius()) )
 		return true;
 	updateList();
-	//RotateTempToHeading();
 	TranslateTemp(position);
-	std::list<Poly> blist = b.GetRenderList();
-	bool front = false,
-			back = false;
-	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
-	{
-		Vector3D itvector = Vector3D( it->normal.x,
-									  it->normal.y,
-									  it->normal.z,
-									  - (it->normal.x*it->v[0].x + it->normal.y*it->v[0].y + it->normal.z*it->v[0].z) );
-		for (std::list<Poly>::iterator bpoly = blist.begin(); bpoly != blist.end(); ++bpoly) {
-			for ( int i=0;i<bpoly->numVertices;i++) {
+	std::list<Poly> blist = b.GetTemp();
+	for (std::list<Poly>::iterator bpoly = blist.begin(); bpoly != blist.end(); ++bpoly) {	// for each poly of b
+		for ( int i=0;i<bpoly->numVertices;i++) {		// for each vertex in poly of b
+			bool front = false,
+				 back = false;
+			for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it) {	// for each poly in object
+				Vector3D itvector = Vector3D( it->normal.x,
+												it->normal.y,
+												it->normal.z,
+												- (it->normal.x*it->v[0].x + 
+												    it->normal.y*it->v[0].y + 
+													it->normal.z*it->v[0].z) );
 				Vector3D test = Vector3D(bpoly->v[i].x,bpoly->v[i].y,bpoly->v[i].z);
-				float tmp = test*itvector;
+				float tmp = test*itvector;	// is the vertex on the backface of each poly? i.e. is it "inside" object?
 				if ( tmp < 0 )
 					back = true;
 				else if ( tmp > 0 )
 					front = true;
 			}
+			if ( !front && back )
+				return true;
 		}
 	}
-	if ( !front && back )
-		return true;
 	return false;
 }
