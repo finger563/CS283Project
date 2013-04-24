@@ -403,7 +403,6 @@ bool Object::CollidesWith(const Object& b) {
 	float distance = magnitude(b.GetPosition() - position);
 	if ( distance <= (radius + b.GetRadius()) )
 		return true;
-	return false;
 	updateList();
 	RotateTempToHeading();
 	TranslateTemp(position);

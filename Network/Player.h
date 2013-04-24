@@ -57,7 +57,7 @@ public:
 	}
 
 	Camera Eye() const { return eye; }
-	void Eye(const Camera& e) { eye = e; }
+	void Eye(const Camera& e) { eye = e; tempeye = eye; }
 
 	World Level() const { return level; }
 	void Level(const World& l) { level = l; objectlist = level.GetRenderList(); }

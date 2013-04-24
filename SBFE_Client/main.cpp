@@ -161,6 +161,8 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 
 	userName = string(player.Info().name) + ":";
 
+	//while ( !player.Registered() );	// do nothing until player accepts us
+
     initSharedMem();
 
     // register exit callback
