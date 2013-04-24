@@ -278,31 +278,31 @@ void updatePixels(GLubyte* dst, int size) {
 		default:
 			break;
 		}
-		tempobj.setVel(Vector3D(it->vx,it->vy,it->vz));
+		tempobj.SetVelocity(Vector3D(it->vx,it->vy,it->vz));
 		dynamiclist.push_back(tempobj);
 	}
 
 	for (std::list<Object>::iterator it = dynamiclist.begin(); it != dynamiclist.end(); it++) {
 		it->updateList();
-		Vector3D tmppos = it->getPosition() - player.Eye().GetPosition();
+		Vector3D tmppos = it->GetPosition() - player.Eye().GetPosition();
 		it->TranslateTemp(tmppos);
 		worldToCamera.SetIdentity();
 		worldToCamera = worldToCamera*player.Eye().GetWorldToCamera();
 		it->TransformToCamera( worldToCamera );
 		it->TransformToPerspective( perspectiveProjection );
-		std::list<Poly> templist = it->getRenderList();
+		std::list<Poly> templist = it->GetRenderList();
 		renderlist.splice(renderlist.end(), templist);
 	}
 
 	for (std::list<Object>::iterator it = objectlist.begin(); it != objectlist.end(); it++) {
 		it->updateList();
-		Vector3D tmppos = it->getPosition() - player.Eye().GetPosition();
+		Vector3D tmppos = it->GetPosition() - player.Eye().GetPosition();
 		it->TranslateTemp(tmppos);
 		worldToCamera.SetIdentity();
 		worldToCamera = worldToCamera*player.Eye().GetWorldToCamera();
 		it->TransformToCamera( worldToCamera );
 		it->TransformToPerspective( perspectiveProjection );
-		std::list<Poly> templist = it->getRenderList();
+		std::list<Poly> templist = it->GetRenderList();
 		renderlist.splice(renderlist.end(), templist);
 	}
 

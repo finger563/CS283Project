@@ -60,8 +60,8 @@ public:
 	void Eye(const Camera& e) { eye = e; }
 
 	World Level() const { return level; }
-	void Level(const World& l) { level = l; objectlist = level.getRenderList(); }
-	void Level(const long id) { level = World(id); objectlist = level.getRenderList(); }
+	void Level(const World& l) { level = l; objectlist = level.GetRenderList(); }
+	void Level(const long id) { level = World(id); objectlist = level.GetRenderList(); }
 
 	void Register() {registered=true;}
 	void Leave()	{registered=false;}

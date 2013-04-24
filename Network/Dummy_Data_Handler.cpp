@@ -34,7 +34,7 @@ std::list<peer_s> con_peers;
 
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
-const int SHOTSPEED = 15;
+const int SHOTSPEED = 30;
 const float SHOTLIFE = 5.0;	// measured in seconds
 const float PLAYERLIFE = 100.0;		// measured in HP
 	
@@ -231,9 +231,13 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				myobject.SetID(numObjects++);
 				myobject.SetType(SHOT);
 				myobject.SetHeading(myplayer.theta,myplayer.phi);
+				float r = cos(myplayer.phi),
+					x = r*sin(myplayer.theta),
+					y = sin(myplayer.phi),
+					z = r*cos(myplayer.theta);
 				myobject.SetLife(SHOTLIFE);
 				myobject.SetVelocity(0,0,SHOTSPEED);		// velocity w.r.t. object's u/v/n axes
-				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
+				myobject.SetPos(myplayer.x + 6*x,myplayer.y+6*y,myplayer.z+6*z);
 				myobject.SetContent(myplayer.name);
 				server.Create(myobject);		// need to keep track of this object on the server
 				mymessage.SetObject(myobject);

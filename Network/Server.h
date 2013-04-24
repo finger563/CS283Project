@@ -33,7 +33,7 @@ private:
 	std::list<Object> staticlist;		// list of static objects in the world (collision detection)
 public:
 	Server_c() {
-		worldID=0;level=World(worldID);staticlist=level.getRenderList();
+		worldID=0;level=World(worldID);staticlist=level.GetRenderList();
 	}
 	Server_c(Server_c& t) {*this=t;}
 	~Server_c() { }
@@ -44,7 +44,7 @@ public:
 			players = t.Players();
 			worldID = t.worldID;
 			level = World(t.Level());
-			staticlist = level.getRenderList();
+			staticlist = level.GetRenderList();
         }
         return *this;
 	}
@@ -52,7 +52,7 @@ public:
 	std::list<Object_s> Objects() {return objects;}
 	std::list<Player_s> Players() {return players;}
 	long Level() { return worldID; }
-	void Level(const long w) { worldID = w; level = World(w); staticlist = level.getRenderList(); }
+	void Level(const long w) { worldID = w; level = World(w); staticlist = level.GetRenderList(); }
 
 	bool Player(Player_s& s) {
 		for (std::list<Player_s>::iterator it = players.begin(); it != players.end(); it++) {
@@ -146,7 +146,7 @@ public:
 		}
 	}
 
-	bool DetectCollide(Object_s& s);	// collision detection code
+	bool DetectCollide(const Object_s& s);	// collision detection code
 	
 	void RemoveObject( ObjectType t, ACE_CDR::Long id ) {
 		for (std::list<Object_s>::iterator it = objects.begin(); it!= objects.end();) {

@@ -75,7 +75,7 @@ bool World::updateList()
 }
 
 //returns renderList
-std::list<Object> World::getRenderList()
+std::list<Object> World::GetRenderList()
 {
 	return temp;
 }
@@ -98,12 +98,12 @@ void World::basicWorld()
 	Object testobj3 = Object(floorlarge,floorlargewidth,floorlargeheight);
 	Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
 
-	testobj.generateCube();
+	testobj.GenerateCube();
 
-	testobj2.generateCube();
+	testobj2.GenerateCube();
 	testobj2.SetRenderType(COLORED);
 
-	testobj3.generateFloor(75,-10);
+	testobj3.GenerateFloor(75,-10);
 
 	master.push_back(testobj);
 	master.push_back(testobj2);	

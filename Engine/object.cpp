@@ -8,21 +8,23 @@ Object::Object()
 	position = Point3D(0,0,0);
 	kill = false;
 	counter = 0;
+	radius = 0;
 }
 
 //Alternate texture, veloctity, heading, position
-Object::Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel, Point3D pos)
+Object::Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel, Point3D pos, float r)
 {
 	velocity = vel;
 	position = pos;
 	tex = texture;
 	texWidth = texWid;
 	texHeight = texHgt;
+	radius = r;
 }
 
 //Alternate Constructor
 Object::Object(Poly poly, const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel, 
-		Point3D pos)
+		Point3D pos, float r)
 {
 	velocity = vel;
 	position = pos;
@@ -35,6 +37,7 @@ Object::Object(Poly poly, const unsigned short* texture, const int texWid, const
 	tex = texture;
 	master.push_back(poly);
 	temp.push_back(poly);
+	radius = r;
 }
 
 //generate() method switch statements??
@@ -111,7 +114,7 @@ void Object::add(Poly poly) {
 }
 
 //generates cube
-void Object::generateCube(float size) {	  
+void Object::GenerateCube(float size) {	  
 	master.clear();
 
 	//stores in objects master list
@@ -166,11 +169,13 @@ void Object::generateCube(float size) {
 #endif
 	}
 
+	radius = size/2.0;
+
 	updateList(); 
 }
 
 //generates tetrahedron
-void Object::generateTetra(float size) {
+void Object::GenerateTetra(float size) {
 	Vertex p1 = Vertex(size,0,-size/sqrt(2.0)),
 			p2 = Vertex(-size,0,-size/sqrt(2.0)),
 			p3 = Vertex(0,size,size/sqrt(2.0)),
@@ -201,7 +206,7 @@ void Object::generateTetra(float size) {
 }
 
 //generates cube
-void Object::generateFloor(float length, float depth) {
+void Object::GenerateFloor(float length, float depth) {
 	position = Point3D(0,depth,0);
 
 	master.clear();
@@ -214,6 +219,8 @@ void Object::generateFloor(float length, float depth) {
 	{
 		it->SetTexture(tex, texWidth, texHeight);
 	}
+
+	radius = 0;
 
 	updateList(); 
 }
@@ -263,7 +270,7 @@ void Object::RotateTempToHeading() {
 }
 
 void Object::GenerateShot(Vector3D pos, float theta_, float phi_) {
-	generateCube(1.0);
+	GenerateCube(1.0);
 	theta = theta_;
 	phi = phi_;
 	position = pos;
@@ -275,7 +282,7 @@ void Object::GeneratePlayer(Vector3D pos, float theta_, float phi_,const unsigne
 	tex = texture;
 	texWidth = texWid;
 	texHeight = texHgt;
-	generateCube();
+	GenerateCube();
 	theta = theta_;
 	phi = phi_;
 	position = pos;
@@ -283,18 +290,31 @@ void Object::GeneratePlayer(Vector3D pos, float theta_, float phi_,const unsigne
 	RotateToHeading();
 }
 
-bool Object::updateTime(int time) {
+bool Object::UpdateTime(int time) {
 	return true;
 }
 
-bool Object::setVel(Vector3D vector) {
+bool Object::SetVelocity(const Vector3D& vector) {
 	velocity = vector;
 	return true;
 }
 
-bool Object::setPosition(Point3D pos) {
+bool Object::SetPosition(const Point3D& pos) {
 	position = pos;
 	return true;
+}
+
+Point3D Object::GetPosition(void) const {
+	return position;
+}
+
+bool Object::SetRadius(float r) {
+	radius = r;
+	return true;
+}
+
+float Object::GetRadius(void) const {
+	return radius;
 }
 
 bool Object::SetRenderType( RenderType rt ) {
@@ -303,10 +323,6 @@ bool Object::SetRenderType( RenderType rt ) {
 		it->SetRenderType(rt);
 	}
 	return true;
-}
-
-Point3D Object::getPosition(void) {
-	return position;
 }
 
 //assumes that only the temp list is being passed through
@@ -350,7 +366,7 @@ void Object::TransformToPixel(Matrix& m) {
 }
 
 //returns final render list
-std::list<Poly> Object::getRenderList() {
+std::list<Poly> Object::GetRenderList() {
 	std::list<Poly> get;
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
@@ -378,12 +394,16 @@ void Object::projectileInit(Vector3D head, Vector3D pos) {
 	//on where the mouse clicks
 	heading = head;
 	position = pos;
-	generateCube(1);
+	GenerateCube(1);
 	counter=1;
 }
 
 
 bool Object::CollidesWith(const Object& b) {
+	float distance = magnitude(b.GetPosition() - position);
+	if ( distance <= (radius + b.GetRadius()) )
+		return true;
+	return false;
 	updateList();
 	RotateTempToHeading();
 	TranslateTemp(position);

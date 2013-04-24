@@ -43,7 +43,7 @@ public:
 	bool updateList();
 
 	//returns renderList
-	std::list<Object> getRenderList();
+	std::list<Object> GetRenderList();
 
 	///////////////////////////////////////////////////////
 	///////////////// Custom Worlds///////////////////////

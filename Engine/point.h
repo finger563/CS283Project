@@ -48,19 +48,19 @@ inline static Vector3D Cross(const Vector3D& a, const Vector3D& b) {
 					 a.x*b.y - a.y*b.x);
 }
 
-inline static Vector3D normalize(const Vector3D rhs)
+inline static Vector3D normalize(const Vector3D& rhs)
 {
   float mag = sqrt(rhs.x*rhs.x + rhs.y*rhs.y + rhs.z*rhs.z);
 
     return Vector3D(rhs.x/mag,rhs.y/mag,rhs.z/mag);
 }
 
-inline static float magnitude(const Vector3D rhs)
+inline static float magnitude(const Vector3D& rhs)
 {
 	return sqrt(rhs.x*rhs.x + rhs.y*rhs.y + rhs.z*rhs.z);
 }
 
-inline static Vector3D crossProduct(const Vector3D a, const Vector3D b)
+inline static Vector3D crossProduct(const Vector3D& a, const Vector3D& b)
 {
 	return Vector3D( (a.y*b.z-a.z*b.y) , (a.z*b.x-a.x*b.z) , (a.x*b.y-a.y*b.x) );
 }
@@ -93,7 +93,7 @@ public:
 
 typedef Point2D Vector2D;
 
-inline static float magnitude(const Vector2D rhs)
+inline static float magnitude(const Vector2D& rhs)
 {
 	return sqrt(rhs.x*rhs.x + rhs.y*rhs.y);
 }

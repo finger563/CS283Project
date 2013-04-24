@@ -16,11 +16,11 @@ public:
 
 	//Alternate Constructor
 	Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
-		Point3D pos = Point3D(0,0,0));
+		Point3D pos = Point3D(0,0,0), float r = 0);
 
 	//Alternate Constructor
 	Object(Poly poly, const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
-		Point3D pos = Point3D(0,0,0));
+		Point3D pos = Point3D(0,0,0), float r = 0);
 
 	//Destructor
 	~Object(){}
@@ -46,13 +46,13 @@ public:
 	void add(Poly poly);
 
 	//Generates cube with with sidelength = size*2
-	void generateCube(float size = 5);
+	void GenerateCube(float size = 5);
 
 	//Generates tetrahedron
-	void generateTetra(float size = 5);
+	void GenerateTetra(float size = 5);
 
 	// Generates a floor at depth, with sidelength = length
-	void generateFloor(float length = 50, float depth = -10);
+	void GenerateFloor(float length = 50, float depth = -10);
 
 	void GenerateShot(Vector3D pos, float theta_, float phi_);
 	
@@ -61,19 +61,18 @@ public:
 
 	//fileParser()<-- future function
 
-	bool updateTime(int time);
+	bool UpdateTime(int time);
 
-	//sets velocity
-	bool setVel(Vector3D vector);
+	bool SetVelocity(const Vector3D& vector);
 
-	//sets position
-	bool setPosition(Point3D pos);
+	bool SetPosition(const Point3D& pos);
+	Point3D GetPosition(void) const;
+
+	bool SetRadius(float r);
+	float GetRadius(void) const;
 
 	// sets rendertype for all polygons
 	bool SetRenderType( RenderType rt );
-
-	//gets Position
-	Point3D getPosition(void);
 
 	//assumes that only the temp list is being passed through
 	void Rotate(Matrix& m);
@@ -81,12 +80,11 @@ public:
 	//assumes that only the temp list is being passed through
 	void Translate(Vector3D& v);
 
-	//transforms polygons to screen
+	// Pipeline functions
 	void TransformToCamera(Matrix& m);
 	void TransformToPerspective(Matrix& m);
-	void TransformToPixel(Matrix& m);
-	
-	std::list<Poly> getRenderList();
+	void TransformToPixel(Matrix& m);	
+	std::list<Poly> GetRenderList();
 
 	void projectileInit(Vector3D head, Vector3D pos = Vector3D(0, 0, 0));
 
@@ -96,9 +94,10 @@ private:
 
 	std::list<Poly> master;
 	std::list<Poly> temp;
+	Point3D position;
 	Vector3D heading, velocity; 
 	float theta,phi;
-	Point3D position;
+	float radius;
 	const unsigned short* tex;
 	int texWidth;
 	int texHeight;
