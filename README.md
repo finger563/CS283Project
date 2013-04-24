@@ -132,7 +132,7 @@ FEATURES
 
 TODO
 ----
- * Collision detection
+ * Finish collision detection
  * Physics (for jumping)
  * Build world
  * Have server randomly choose spawn points for players.
