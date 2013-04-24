@@ -167,38 +167,10 @@ public:
 
 struct peer_s {
 	ACE_SOCK_Stream *p;
-	peer_s *next;
 	ACE_CDR::Long ID;
 
-	peer_s() {p=NULL;next=NULL;ID=-1;}
-	peer_s(ACE_SOCK_Stream* newpeer,ACE_CDR::Long id) {next=NULL;p=newpeer;ID=id;}
-
-	void Push(peer_s *newpeer) {
-		peer_s *tmp = this;
-		while (tmp->next!=NULL) {
-			tmp=tmp->next;
-		}
-		tmp->next = newpeer;
-	}
-	
-	void Remove(ACE_CDR::Long id) {
-		peer_s *tmp = this;
-		peer_s *prev = this;
-		while (tmp->next != NULL) {
-			prev = tmp;
-			tmp = tmp->next;
-			if ( tmp->ID == id ) {
-				prev->next = tmp->next;
-				delete tmp;
-				return;
-			}
-		}
-	}
-
-	void RemoveALL() {
-		delete next;
-		next = NULL;
-	}
+	peer_s() {p=NULL;ID=-1;}
+	peer_s(ACE_SOCK_Stream* newpeer,ACE_CDR::Long id) {p=newpeer;ID=id;}
 };
 
 #endif /* _CS283_SERVER_H_ */

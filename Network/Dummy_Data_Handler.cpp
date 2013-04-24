@@ -30,7 +30,7 @@ using namespace std;
 
 Server_c server;
 
-peer_s con_peers;
+std::list<peer_s> con_peers;
 
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
@@ -158,7 +158,6 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 					myplayer.id));
 				#endif
 				
-				peer_s *tmp = &con_peers;
 				mymessage.SetType(CREATE);
 				myplayer = mymessage.GetPlayer();
 				myobject.SetID(myid);
@@ -169,14 +168,13 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				myobject.SetContent(myplayer.name);
 				server.Create(myobject);		// need to keep track of this object on the server
 				mymessage.SetObject(myobject);
-				while (tmp->next!=NULL) {		// Let other clients know of this new client
-					tmp = tmp->next;
-					int numbytes = this->send(*(tmp->p),mymessage);
+				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {		// Let other clients know of this new client
+					int numbytes = this->send(*(mypeer->p),mymessage);
 					#if defined(DEBUG)
 					ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
-						server.Player(tmp->ID),
-						tmp->ID));
+						server.Player(mypeer->ID),
+						mypeer->ID));
 					#endif
 				}
 				
@@ -202,22 +200,20 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 						#endif
 					}		
 				}
-				peer_s *newpeer = new peer_s(&(this->peer()),myid);	// Have finished updating all clients
-				con_peers.Push(newpeer);							// now add the new peer to our list
+				peer_s newpeer = peer_s(&(this->peer()),myid);	// Have finished updating all clients
+				con_peers.push_back(newpeer);					// now add the new peer to our list
 			}
 			break;
 		case CHAT:
 			if ( true ) {//server.Player(mymessage.Player()) ) {	// Player is registered, propagate their chat
-				peer_s *tmp = &con_peers;
-				while (tmp->next!=NULL) {	// don't need to alter message, it is already chat!
-					tmp = tmp->next;
-					if ( tmp->ID != myid ) {
-						int numbytes = this->send(*(tmp->p),mymessage);
+				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {	// don't need to alter message, it is already chat!
+					if ( mypeer->ID != myid ) {
+						int numbytes = this->send(*(mypeer->p),mymessage);
 #if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Server propagated CHAT to player (%s,%d).\n"),
-							server.Player(tmp->ID),
-							tmp->ID));
+							server.Player(mypeer->ID),
+							mypeer->ID));
 #endif
 					}
 				}
@@ -230,7 +226,6 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 							ACE_TEXT ("%s fired a shot!\n"),
 							mymessage.GetPlayer().name));
 #endif
-				peer_s *tmp = &con_peers;
 				mymessage.SetType(CREATE);
 				myplayer = mymessage.GetPlayer();
 				myobject.SetID(numObjects++);
@@ -242,31 +237,28 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				myobject.SetContent(myplayer.name);
 				server.Create(myobject);		// need to keep track of this object on the server
 				mymessage.SetObject(myobject);
-				while (tmp->next!=NULL) {
-					tmp = tmp->next;
-					int numbytes = this->send(*(tmp->p),mymessage);
+				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
+					int numbytes = this->send(*(mypeer->p),mymessage);
 #if defined(DEBUG)
 					ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("Server sent CREATE object to player (%s,%d).\n"),
-						server.Player(tmp->ID),
-						tmp->ID));
+						server.Player(mypeer->ID),
+						mypeer->ID));
 #endif
 				}
 			}
 			break;
 		case MOVE:
 			if ( server.ObjectExists(mymessage.GetObject()) ) {
-				peer_s *tmp = &con_peers;
 				myobject = Object_s(mymessage.GetObject());
 				server.Move(myobject);		// need to update server's state
-				while (tmp->next!=NULL) {	// and also send move to clients
-					tmp = tmp->next;
-					int numbytes = this->send(*(tmp->p),mymessage);
+				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {	// and also send move to clients
+					int numbytes = this->send(*(mypeer->p),mymessage);
 #if defined(DEBUG)
 					ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("Server sent MOVE object to player (%s,%d).\n"),
-						server.Player(tmp->ID),
-						tmp->ID));
+						server.Player(mypeer->ID),
+						mypeer->ID));
 #endif
 				}
 			}
@@ -278,16 +270,14 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				myobject.SetType(PLAYER);
 				mymessage.SetType(REMOVE);		// Send remove to players
 				mymessage.SetObject(myobject);
-				peer_s *tmp = &con_peers;
-				while (tmp->next!=NULL) {	// and also send remove to clients
-					tmp = tmp->next;
-					if ( tmp->ID != mymessage.GetPlayer().id ) {
-						int numbytes = this->send(*(tmp->p),mymessage);
+				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {	// and also send remove to clients
+					if ( mypeer->ID != mymessage.GetPlayer().id ) {
+						int numbytes = this->send(*(mypeer->p),mymessage);
 #if defined(DEBUG)
 						ACE_DEBUG ((LM_DEBUG,
 							ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
-							server.Player(tmp->ID),
-							tmp->ID));
+							server.Player(mypeer->ID),
+							mypeer->ID));
 #endif
 					}
 				}
@@ -386,17 +376,15 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 		for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++ ) {
 			if ( it->life <= 0.0 ||
 					server.DetectCollide(*it) ) {	// object is no longer alive, need to remove
-				peer_s *tmp = &con_peers;
-				while (tmp->next != NULL) {
-					tmp = tmp->next;
+				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
 					mymessage.SetType(REMOVE);
 					mymessage.SetObject(*it);
-					int numbytes = this->send(*(tmp->p),mymessage);
+					int numbytes = this->send(*(mypeer->p),mymessage);
 #if defined(DEBUG)
 					ACE_DEBUG ((LM_DEBUG,
 						ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
-						server.Player(tmp->ID),
-						tmp->ID));
+						server.Player(mypeer->ID),
+						mypeer->ID));
 #endif
 				}
 				server.RemoveObject(it->type,it->id);
@@ -427,7 +415,13 @@ int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 	this->reactor()->cancel_timer(this);
 	server.RemovePlayer(myid);
 	server.RemoveObject(PLAYER,myid);
-	con_peers.Remove(myid);
+	for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); ) {
+		if ( mypeer->ID == myid ) {
+			mypeer = con_peers.erase(mypeer);
+		}
+		else
+			mypeer++;
+	}
 
 	m = ACE_Event_Handler::ALL_EVENTS_MASK |
 		ACE_Event_Handler::DONT_CALL;

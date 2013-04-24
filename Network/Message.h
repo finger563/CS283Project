@@ -50,9 +50,8 @@ struct Player_s {
 		  theta, phi,	// heading vector
 		  life,			// time to live
 		  vx,vy,vz;		// velocity vector
-	Player_s*		next;
 	
-	Player_s() {next=NULL;id=0;memset(name,0,MAX_NAME_LEN);}
+	Player_s() {id=0;memset(name,0,MAX_NAME_LEN);}
 	Player_s(const Player_s &s) { 
 		id = s.id;
 		strcpy(name,s.name);
@@ -65,9 +64,8 @@ struct Player_s {
 		vx = s.vx;
 		vy = s.vy;
 		vz = s.vz;
-		next=NULL;
 	}
-	Player_s(char* n,ACE_CDR::Long i){next=NULL;id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
+	Player_s(char* n,ACE_CDR::Long i){id=i;memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	
 	Player_s & operator=(const Player_s &s) {
 		if (this != &s) {
@@ -82,9 +80,7 @@ struct Player_s {
 			vx = s.vx;
 			vy = s.vy;
 			vz = s.vz;
-			next=NULL;
         }
-        // by convention, always return *this
         return *this;
 	}
 
@@ -94,8 +90,6 @@ struct Player_s {
 	void SetHeading(const float _t, const float _p) { theta = _t; phi = _p; }
 	void SetLife(const float _l) { life = _l; }
 	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
-	
-	void Link(Player_s* s){next = s;}
 	
 	bool operator==(const Player_s &b) {
 		if ( id ==b.id && strcmp(name,b.name)==0 )
@@ -113,9 +107,8 @@ struct Object_s {
 		  life,			// time to live
 		  vx,vy,vz;		// velocity vector
 	char			content_[MAX_CONT_LEN];
-	Object_s*	next;
 	
-	Object_s() {next=NULL;type=SHOT;id=0;memset(content_,0,MAX_CONT_LEN);}
+	Object_s() {type=SHOT;id=0;memset(content_,0,MAX_CONT_LEN);}
 	Object_s(const Object_s &a) {
 		type = a.type;
 		id = a.id;
@@ -129,9 +122,8 @@ struct Object_s {
 		vx = a.vx;
 		vy = a.vy;
 		vz = a.vz;
-		next=NULL;
 	}
-	Object_s(ObjectType t, ACE_CDR::Long i,char* c){next=NULL;type=t;id=i;strcpy(content_,c);}
+	Object_s(ObjectType t, ACE_CDR::Long i,char* c){type=t;id=i;strcpy(content_,c);}
 	
 	Object_s & operator=(const Object_s &a) {
 		if (this != &a) {
@@ -147,9 +139,7 @@ struct Object_s {
 			vx = a.vx;
 			vy = a.vy;
 			vz = a.vz;
-			next=NULL;
         }
-        // by convention, always return *this
         return *this;
 	}
 
@@ -160,8 +150,6 @@ struct Object_s {
 	void SetHeading(const float _t, const float _p) { theta = _t; phi = _p; }
 	void SetLife(const float _l) { life = _l; }
 	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
-
-	void Link(Object_s* a){next = a;}
 	
 	bool Update(const float time) {
 		float tr = cos(phi);

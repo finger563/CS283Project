@@ -594,8 +594,7 @@ void reshapeCB(int width, int height) {
 void timerCB(int millisec) {
     glutTimerFunc(millisec, timerCB, millisec);
 	KeyOperations();
-	//if ( tempeye != player.Eye() )
-		SendMove();
+	SendMove();
     glutPostRedisplay();
 }
 

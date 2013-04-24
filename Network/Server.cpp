@@ -4,7 +4,7 @@
 #include <list>
 #include "..\Engine\Object.h"
 
-extern peer_s con_peers;
+extern std::list<peer_s> con_peers;
 
 // Do collision detection here
 bool Server_c::DetectCollide(Object_s& s) {
@@ -22,7 +22,6 @@ bool Server_c::DetectCollide(Object_s& s) {
 		if ( s.type == SHOT && it->type == PLAYER ) {	// don't do shot collision with shots
 			Object playerobj;
 
-			peer_s *tmp = &con_peers;
 		}
 	}
 		
