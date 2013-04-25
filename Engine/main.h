@@ -4,6 +4,9 @@
 #include <limits>
 #include "constants.h"
 
+// for input handling
+const int	UPDATE_TIME = 30;		// input updates in milliseconds
+
 // constants
 const int    SCREEN_WIDTH    = 1000;
 const int    SCREEN_HEIGHT   = 600;

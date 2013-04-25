@@ -58,35 +58,38 @@ void SendChat(string sendstring) {
 }
 
 void SendShot() {
-	Message mymessage;
-	mymessage.SetType(SHOOT);
-	Player_s info = player.Info();
-	Camera eye = player.Eye();
-	info.x = eye.GetPosition().x;
-	info.y = eye.GetPosition().y;
-	info.z = eye.GetPosition().z;
-	info.theta = eye.GetTheta();
-	info.phi = eye.GetPhi();
-	mymessage.SetPlayer(info);
-	event_handler.send(mymessage);
+	if ( player.Registered() ) {
+		Message mymessage;
+		mymessage.SetType(SHOOT);
+		Player_s info = player.Info();
+		Camera eye = player.Eye();
+		info.x = eye.GetPosition().x;
+		info.y = eye.GetPosition().y;
+		info.z = eye.GetPosition().z;
+		info.theta = eye.GetTheta();
+		info.phi = eye.GetPhi();
+		mymessage.SetPlayer(info);
+		event_handler.send(mymessage);
+	}
 }
 
 void SendMove() {
-	Message mymessage;
-	mymessage.SetType(MOVE);
-	Object_s myobj = Object_s();
-	myobj.SetType(PLAYER);
-	myobj.SetID(player.Info().id);
-	myobj.SetContent(player.Info().name);
+	if ( player.Registered() ) {
+		Message mymessage;
+		mymessage.SetType(MOVE);
+		Object_s myobj = Object_s();
+		myobj.SetType(PLAYER);
+		myobj.SetID(player.Info().id);
+		myobj.SetContent(player.Info().name);
 	
-	myobj.x = tempeye.GetPosition().x;
-	myobj.y = tempeye.GetPosition().y;
-	myobj.z = tempeye.GetPosition().z;
-	myobj.theta = tempeye.GetTheta();		// theta
-	myobj.phi = tempeye.GetPhi();		// phi
-	mymessage.SetObject(myobj);
-	event_handler.send(mymessage);
-	
+		myobj.x = tempeye.GetPosition().x;
+		myobj.y = tempeye.GetPosition().y;
+		myobj.z = tempeye.GetPosition().z;
+		myobj.theta = tempeye.GetTheta();		// theta
+		myobj.phi = tempeye.GetPhi();		// phi
+		mymessage.SetObject(myobj);
+		event_handler.send(mymessage);
+	}
 	theta = 0;		// zero the delta's for the angles
 	phi = 0;
 }
