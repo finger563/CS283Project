@@ -24,6 +24,11 @@ using namespace std;
 
 //#define DEBUG
 
+const float		SHOTDAMAGE = 20;
+const int		SHOTSPEED = 30;
+const float		SHOTLIFE = 5.0;			// measured in seconds
+const float		PLAYERLIFE = 100.0;		// measured in HP
+
 class Server_c {
 private:
 	std::list<Object_s> objects;

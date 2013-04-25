@@ -28,7 +28,7 @@ bool Server_c::DetectCollide(const Object_s& s) {
 			if ( it->type == PLAYER ) {	// don't do shot collision with shots
 				playerobj.GeneratePlayer(Point3D(it->x,it->y,it->z),it->theta,it->phi);
 				if ( playerobj.CollidesWith(myobj) ) {
-					it->life = it->life - 20;
+					it->life = it->life - SHOTDAMAGE;
 					return true;
 				}
 			}

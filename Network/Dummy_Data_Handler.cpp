@@ -34,9 +34,6 @@ std::list<peer_s> con_peers;
 
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
-const int SHOTSPEED = 30;
-const float SHOTLIFE = 5.0;			// measured in seconds
-const float PLAYERLIFE = 100.0;		// measured in HP
 	
 ACE_Time_Value period_t (0,50000);	// update period (seconds,microseconds)
 
