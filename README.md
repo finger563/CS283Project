@@ -117,14 +117,16 @@ Controls for the game:
 FEATURES
 --------
  * Chat over network with usernames & chat history
- * Server selects spawn location for players
+ * Server selects spawn location for players, as well as world that is loaded
  * Player can move about freely in virtual world and fire projectiles using mouse and keyboard
  * Server correctly tracks connected/registered players and handles terminated connections
+   * Players can be killed by other players' shots (or their own shots) and will respawn upon death.
  * Server correctly tracks dynamic objects (shots/players)
    * Sends all currently active dynamic objects to players that join later
    * Dynamic objects must be created by the server (including all players and shots); clients request creation
    * Propagates player movements to other connected clients using AMI-style interface (like QUAKE)
    * Gracefully handles players leaving (either with a LEAVE command or when they kill process with interrupt).
+   * Handles collision detection for shot-world and shot-player collisions
  * Perspective-correct texturemapping, normal interpolation, z-buffering, and color interpolation
  * Support for different rendering types for objects
  * Extendable messaging format
@@ -132,10 +134,8 @@ FEATURES
 
 TODO
 ----
- * Fix polygon collision detection; currently polygons act as infinite planes.  Bugs exist as well.
  * Physics (for jumping)
- * Build world
+ * Finish world 1 implementation.  Work on World 2 implementation
  * Have server randomly choose spawn points for players.
- * Allow killing of characters and their subsequent respawn
  * Lighting system (smooth shading, shadowing, etc.)
  * Sprite system for particles/explosions/HUD
