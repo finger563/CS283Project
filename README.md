@@ -135,6 +135,7 @@ FEATURES
 TODO
 ----
  * Physics (for jumping)
+ * Implement restricted player movement (player-world collision detection)
  * Finish world 1 implementation.  Work on World 2 implementation
  * Have server randomly choose spawn points for players.
  * Lighting system (smooth shading, shadowing, etc.)
