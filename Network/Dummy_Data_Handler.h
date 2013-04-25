@@ -1,12 +1,9 @@
 // $Id$
 //
-// Author: Aniruddha Gokhale
-// CS283 Network Class Sample Code; Now used for CS387
+// Original Author: Aniruddha Gokhale
+// Author: William Emfinger
 // Date Created : Feb 17, 2007
-// Date Modified : Feb 9, 2012
-//
-//
-// Dummy_Data_Handler header file.
+// Date Modified : April 17, 2013
 // 
 // We demonstrate the use of the reactor framework in conjunction with
 // the acceptor-connector framework
@@ -14,8 +11,6 @@
 // Code is based on C++NPv1 and C++NPv2 books
 //
 
-// notice how we protect double inclusion of declarations by virtue of
-// having these preprocessor symbols
 #if !defined (_CS387_DUMMY_DATA_HANDLER_H_)
 #define _CS387_DUMMY_DATA_HANDLER_H_
 
@@ -26,41 +21,32 @@
 
 #include "Message.h"
 
-
-// our data communication handler inherits from ACE_Event_Handler so
-// that it can be registered with the Reactor.  We also maintain a
-// SOCK_Stream object (Bridge design pattern).
 class Dummy_Data_Handler : public ACE_Event_Handler
 {
 public:
-  // constructor (pass a pointer to the reactor). By default we assume
-  // a system-wide default reactor that ACE defines
   Dummy_Data_Handler (ACE_Reactor *r = ACE_Reactor::instance ());
 
-  // define an initialization method 
   virtual int open (void);
 
-  /* now define the event handler's callback methods.  These are the
-     methods that we will get dispatched on the events */
+  // Network Helper functions
+  void		SendMessage( Message& m, long id = -1 );
+  Player_s	AcceptPlayer( Player_s& myplayer );
+  Object_s	CreatePlayer( Player_s& myplayer );
+  void		SendObjects( );
+  Object_s	CreateShot( Player_s& myplayer );
 
-  // handle incoming events. The event we are interested in is the
-  // incoming data.
-  virtual int handle_input (ACE_HANDLE h = ACE_INVALID_HANDLE);
-
+  // Reactor Callback Functions
+  virtual int	handle_input (ACE_HANDLE h = ACE_INVALID_HANDLE);
+  int			handle_timeout (const ACE_Time_Value & current_time, const void * act);
+  virtual int	handle_close (ACE_HANDLE h = ACE_INVALID_HANDLE,
+                              ACE_Reactor_Mask = 0);
+  
   int send(ACE_SOCK_Stream &p, const Message &message);
   int recv_message ( Message& message);
 
-  int handle_timeout (const ACE_Time_Value & current_time, const void * act);
-
-  // handle clean up events. The parameters are what the reactor
-  // framework will pass us when it calls us 
-  virtual int handle_close (ACE_HANDLE h = ACE_INVALID_HANDLE,
-                            ACE_Reactor_Mask = 0);
-
   // the following method must be defined since the reactor needs to
   // keep a mapping between the underlying handle and the
-  // corresponding handler.  Note that it is defined as a const method
-  // since it does not modify any state.
+  // corresponding handler.
   virtual ACE_HANDLE get_handle (void) const;
 
   // need access to the underlying sock stream so it can be updated by
@@ -76,14 +62,8 @@ protected:
   ~Dummy_Data_Handler (void);
 
 private:
-
-  // maintain a handle to the peer.  We adopt a strategy to use an
-  // underscore after the variable for private data members of a
-  // class. 
-  ACE_SOCK_Stream peer_;
-
-  ACE_CDR::Long myid;
-
+  ACE_SOCK_Stream peer_;	// maintain a handle to the peer
+  ACE_CDR::Long myid;		// id of player connected to us
 };
 
 #endif /* _CS387_DUMMY_DATA_HANDLER_H_ */

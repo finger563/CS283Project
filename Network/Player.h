@@ -38,6 +38,7 @@ public:
 
 	Player_c & operator=(Player_c& s) {
 		if (this != &s) {
+			registered = s.registered;
 			info = s.Info();
 			objects = s.Objects();
 			chat = s.Chat();

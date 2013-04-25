@@ -104,7 +104,6 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 	Message mymessage;
 	mymessage.SetType(REGISTER);
 	mymessage.SetPlayer(player.Info());
-	player.Register();
 	this->send(mymessage);
 
 	// everything went well. Return success
@@ -144,7 +143,8 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 		// Now process message
 		switch (mymessage.GetType()) {
 		case ACCEPT:		// the server has accepted us
-			player.Level(mymessage.GetWorld());
+			if ( !player.Registered() )
+				player.Level(mymessage.GetWorld());
 			myplayer = player.Info();
 			myplayer.id = mymessage.GetPlayer().id;
 			myeye.SetPosition(mymessage.GetPlayer().x,mymessage.GetPlayer().y,mymessage.GetPlayer().z);

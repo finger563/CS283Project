@@ -131,7 +131,7 @@ public:
 		}
 	}
 
-	float getObjectLife(ObjectType t, ACE_CDR::Long id){
+	float GetObjectLife(ObjectType t, ACE_CDR::Long id){
 		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
 			if ( it->id == id && it->type == t )
 				return it->life;
@@ -139,7 +139,7 @@ public:
 		return -1;
 	}
 
-	void setObjectLife(ObjectType t, ACE_CDR::Long id, float _l) {
+	void SetObjectLife(ObjectType t, ACE_CDR::Long id, float _l) {
 		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
 			if ( it->id == id && it->type == t )
 				it->SetLife(_l);

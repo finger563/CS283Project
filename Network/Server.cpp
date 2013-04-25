@@ -27,8 +27,10 @@ bool Server_c::DetectCollide(const Object_s& s) {
 		for (std::list<Object_s>::iterator it=objects.begin(); it != objects.end(); it ++) {	// only do dynamic-dynamic object collision on shots
 			if ( it->type == PLAYER ) {	// don't do shot collision with shots
 				playerobj.GeneratePlayer(Point3D(it->x,it->y,it->z),it->theta,it->phi);
-				if ( playerobj.CollidesWith(myobj) )
+				if ( playerobj.CollidesWith(myobj) ) {
+					it->life = it->life - 20;
 					return true;
+				}
 			}
 		}
 		

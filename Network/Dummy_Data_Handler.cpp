@@ -35,25 +35,16 @@ std::list<peer_s> con_peers;
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
 const int SHOTSPEED = 30;
-const float SHOTLIFE = 5.0;	// measured in seconds
+const float SHOTLIFE = 5.0;			// measured in seconds
 const float PLAYERLIFE = 100.0;		// measured in HP
 	
-//ACE_Time_Value period_t (1,500000);		// update every 30,000 us = 30 ms.
-ACE_Time_Value period_t (0,50000);		// update every 30,000 us = 30 ms.
+ACE_Time_Value period_t (0,50000);	// update period (seconds,microseconds)
 
-// constructor (pass a pointer to the reactor). By default we assume
-// a system-wide default reactor that ACE defines
-Dummy_Data_Handler::Dummy_Data_Handler (ACE_Reactor *r)
-// simply pass on the pointer to the reactor to the underlying event
-// handler 
-  : ACE_Event_Handler (r)
-{
+Dummy_Data_Handler::Dummy_Data_Handler (ACE_Reactor *r) 
+  : ACE_Event_Handler (r) {
 }
 
-
-// destructor (does nothing)
-Dummy_Data_Handler::~Dummy_Data_Handler (void)
-{
+Dummy_Data_Handler::~Dummy_Data_Handler (void) {
 }
 
 // initialization method that registers ourselves with the reactor. 
@@ -87,28 +78,108 @@ int Dummy_Data_Handler::open (void)
 	this->reactor()->schedule_timer(this,
 									0,
 									period_t);
+	
+	myid = numPlayers++;
 
 	// everything went well. Return success
 	return 0;
 }
 
-/* now define the event handler's callback methods  */
+// NETWORK HELPER FUNCTIONS	/////////////////////////////////////////////////////////
+peer_s GetPeer( long id ) {
+	for (std::list<peer_s>::iterator it = con_peers.begin(); it != con_peers.end(); it++ ) {
+		if ( it->ID == id ) {
+			return *it;
+		}
+	}
+}
 
-// handle incoming data
+void Dummy_Data_Handler::SendMessage( Message& m, long id ) {
+	for (std::list<peer_s>::iterator it = con_peers.begin(); it != con_peers.end(); it++ ) {
+		if ( it->ID != id ) {
+			int numbytes = this->send(*(it->p),m);
+		}
+	}
+}
+
+Player_s Dummy_Data_Handler::AcceptPlayer( Player_s& myplayer ) {
+	Message m;
+	m.SetType(ACCEPT);
+	m.SetWorld(server.Level());	// let player know which world to load
+	myplayer.SetHeading(0,0);
+	myplayer.SetLife(PLAYERLIFE);
+	myplayer.SetPos(10,0,10);
+	m.SetPlayer(myplayer);
+	int numbytes = this->send(this->peer(),m);
+	return myplayer;
+}
+
+Object_s Dummy_Data_Handler::CreatePlayer( Player_s& myplayer ) {
+	Message m;
+	m.SetType(CREATE);
+	Object_s myobject;
+	myobject.SetID(myid);
+	myobject.SetType(PLAYER);
+	myobject.SetHeading(myplayer.theta,myplayer.phi);
+	myobject.SetLife(PLAYERLIFE);
+	myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
+	myobject.SetContent(myplayer.name);
+	m.SetObject(myobject);
+	//for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {		// Let other clients know of this new client
+	//	int numbytes = this->send(*(mypeer->p),m);
+	//}
+	SendMessage(m);
+	return myobject;
+}
+
+void Dummy_Data_Handler::SendObjects( ) {	// Need to send CREATE messages to this client for active dynamic objects
+	Message m;
+	Object_s myobject;
+	m.SetType(CREATE);
+	std::list<Object_s> objlist = server.Objects();
+	for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++) {
+		if ( it->id != myid ||
+				it->type != PLAYER ) {
+			myobject.SetType(it->type);
+			myobject.SetID(it->id);
+			myobject.SetHeading(it->theta,it->phi);
+			myobject.SetLife(it->life);
+			myobject.SetPos(it->x,it->y,it->z);
+			myobject.SetContent(it->content_);
+			m.SetObject(myobject);
+			int numbytes = this->send(this->peer(),m);
+		}		
+	}
+}
+
+Object_s Dummy_Data_Handler::CreateShot( Player_s& myplayer ) {
+	Message m;
+	m.SetType(CREATE);
+	Object_s myobject;
+	myobject.SetID(numObjects++);
+	myobject.SetType(SHOT);
+	myobject.SetHeading(myplayer.theta,myplayer.phi);
+	float r = cos(myplayer.phi),
+		x = r*sin(myplayer.theta),
+		y = sin(myplayer.phi),
+		z = r*cos(myplayer.theta);
+	myobject.SetLife(SHOTLIFE);
+	myobject.SetVelocity(0,0,SHOTSPEED);		// velocity w.r.t. object's u/v/n axes
+	myobject.SetPos(myplayer.x + 6*x,myplayer.y+6*y,myplayer.z+6*z);
+	myobject.SetContent(myplayer.name);
+	m.SetObject(myobject);
+	//for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
+	//	int numbytes = this->send(*(mypeer->p),m);
+	//}
+	SendMessage(m);
+	return myobject;
+}
+
+// REACTOR CALLBACK FUNCTIONS	/////////////////////////////////////////////////////
 int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
-#if defined(DEBUG)
-	// for debugging
-	ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Dummy_Data_Handler::handle_input invoked\n")));
-#endif
-	// here is where we receive all data. In our case this is just a dummy
-	// program where we receive some data and we send a reply back.
-	string reply;
-
-	// note that unless there is a well defined protocol between the two
-	// ends we never 
-	//ssize_t bytesReceived = this->peer_.recv (buffer, 1024);
-
+	#if defined(DEBUG)
+	ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Dummy_Data_Handler::handle_input invoked\n")));
+	#endif
 	Message mymessage;
 	Player_s myplayer;
 	Object_s myobject;
@@ -133,138 +204,57 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 		// we let the reactor trigger the handle close
 		return -1;
 
-	} else {
-		// some data is received.
-		// Now process message
+	} else {		// Now process message
 		switch (mymessage.GetType())
 		{
 		case REGISTER:
-			myid = numPlayers++;
 			myplayer = mymessage.GetPlayer();
 			myplayer.SetID(myid);
 			if ( server.Register(myplayer) )
 			{
-				mymessage.SetType(ACCEPT);
-				mymessage.SetWorld(server.Level());	// let player know which world to load
-				myplayer.SetHeading(0,0);
-				myplayer.SetLife(PLAYERLIFE);
-				myplayer.SetPos(10,0,10);
-				mymessage.SetPlayer(myplayer);
-				int numbytes = this->send(this->peer(),mymessage);
+				myplayer = AcceptPlayer( myplayer );
 				#if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG,
 					ACE_TEXT ("Server ACCEPTed player (%s,%d).\n"),
-					myplayer.name,
-					myplayer.id));
+					myplayer.name, myplayer.id));
 				#endif
 				
-				mymessage.SetType(CREATE);
-				myplayer = mymessage.GetPlayer();
-				myobject.SetID(myid);
-				myobject.SetType(PLAYER);
-				myobject.SetHeading(myplayer.theta,myplayer.phi);
-				myobject.SetLife(PLAYERLIFE);
-				myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
-				myobject.SetContent(myplayer.name);
+				myobject = CreatePlayer( myplayer );	// Send CREATE message to connected players
+				#if defined(DEBUG)
+				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent CREATE player to other players.\n"));
+				#endif
 				server.Create(myobject);		// need to keep track of this object on the server
-				mymessage.SetObject(myobject);
-				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {		// Let other clients know of this new client
-					int numbytes = this->send(*(mypeer->p),mymessage);
-					#if defined(DEBUG)
-					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent CREATE player to player (%s,%d).\n"),
-						server.Player(mypeer->ID),
-						mypeer->ID));
-					#endif
-				}
-				
-				mymessage.SetType(CREATE);
-				// Need to send CREATE messages to this client for all objects
-				std::list<Object_s> objlist = server.Objects();
-				for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++) {
-					if ( it->id != myid ||
-						 it->type != PLAYER ) {
-						myobject.SetType(it->type);
-						myobject.SetID(it->id);
-						myobject.SetHeading(it->theta,it->phi);
-						myobject.SetLife(it->life);
-						myobject.SetPos(it->x,it->y,it->z);
-						myobject.SetContent(it->content_);
-						mymessage.SetObject(myobject);
-						int numbytes = this->send(this->peer(),mymessage);
-						#if defined(DEBUG)
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent CREATE to player (%s,%d).\n"),
-							server.Player(myid),
-							myid));
-						#endif
-					}		
-				}
+				SendObjects();					// send all current objects to the new player
 				peer_s newpeer = peer_s(&(this->peer()),myid);	// Have finished updating all clients
 				con_peers.push_back(newpeer);					// now add the new peer to our list
 			}
 			break;
-		case CHAT:
-			if ( true ) {//server.Player(mymessage.Player()) ) {	// Player is registered, propagate their chat
-				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {	// don't need to alter message, it is already chat!
-					if ( mypeer->ID != myid ) {
-						int numbytes = this->send(*(mypeer->p),mymessage);
-#if defined(DEBUG)
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server propagated CHAT to player (%s,%d).\n"),
-							server.Player(mypeer->ID),
-							mypeer->ID));
-#endif
-					}
-				}
-			}
+		case CHAT:	// don't mind if players who are unregistered chat (we'll pretend they're spectators)
+			SendMessage(mymessage,myid);	// don't need to alter message, it is chat. Do not send to the player who sent it
+			#if defined(DEBUG)
+			ACE_DEBUG ((LM_DEBUG,
+				ACE_TEXT ("Server propagated CHAT from player (%s,%d).\n"),
+				server.Player(myid), myid));
+			#endif
 			break;
 		case SHOOT:
 			if ( server.Player(mymessage.GetPlayer()) ) {
-#if defined(DEBUG)
-				ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("%s fired a shot!\n"),
-							mymessage.GetPlayer().name));
-#endif
-				mymessage.SetType(CREATE);
 				myplayer = mymessage.GetPlayer();
-				myobject.SetID(numObjects++);
-				myobject.SetType(SHOT);
-				myobject.SetHeading(myplayer.theta,myplayer.phi);
-				float r = cos(myplayer.phi),
-					x = r*sin(myplayer.theta),
-					y = sin(myplayer.phi),
-					z = r*cos(myplayer.theta);
-				myobject.SetLife(SHOTLIFE);
-				myobject.SetVelocity(0,0,SHOTSPEED);		// velocity w.r.t. object's u/v/n axes
-				myobject.SetPos(myplayer.x + 6*x,myplayer.y+6*y,myplayer.z+6*z);
-				myobject.SetContent(myplayer.name);
+				#if defined(DEBUG)
+				ACE_DEBUG ((LM_DEBUG,ACE_TEXT ("%s fired a shot!\n"), myplayer.name));
+				#endif
+				myobject = CreateShot( myplayer );
 				server.Create(myobject);		// need to keep track of this object on the server
-				mymessage.SetObject(myobject);
-				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
-					int numbytes = this->send(*(mypeer->p),mymessage);
-#if defined(DEBUG)
-					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent CREATE object to player (%s,%d).\n"),
-						server.Player(mypeer->ID),
-						mypeer->ID));
-#endif
-				}
 			}
 			break;
 		case MOVE:
 			if ( server.ObjectExists(mymessage.GetObject()) ) {
 				myobject = Object_s(mymessage.GetObject());
 				server.Move(myobject);		// need to update server's state
-				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {	// and also send move to clients
-					int numbytes = this->send(*(mypeer->p),mymessage);
-#if defined(DEBUG)
-					ACE_DEBUG ((LM_DEBUG,
-						ACE_TEXT ("Server sent MOVE object to player (%s,%d).\n"),
-						server.Player(mypeer->ID),
-						mypeer->ID));
-#endif
-				}
+				SendMessage(mymessage);		// and also send move to clients
+				#if defined(DEBUG)
+				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent MOVE object to players.\n"));
+				#endif
 			}
 			break;
 		case LEAVE:
@@ -272,19 +262,9 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				myobject = Object_s();
 				myobject.SetID(mymessage.GetPlayer().id);
 				myobject.SetType(PLAYER);
-				mymessage.SetType(REMOVE);		// Send remove to players
+				mymessage.SetType(REMOVE);
 				mymessage.SetObject(myobject);
-				for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {	// and also send remove to clients
-					if ( mypeer->ID != mymessage.GetPlayer().id ) {
-						int numbytes = this->send(*(mypeer->p),mymessage);
-#if defined(DEBUG)
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
-							server.Player(mypeer->ID),
-							mypeer->ID));
-#endif
-					}
-				}
+				SendMessage(mymessage,mymessage.GetPlayer().id);	// Send remove to other clients
 			}
 			break;
 		default:
@@ -293,7 +273,6 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 			break;
 		}
 	}
-	// success
 	return 0;
 }
 
@@ -363,17 +342,16 @@ int Dummy_Data_Handler::recv_message(Message& message) {
 	return -1;
 }
 
-// handle timeout events.
-int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act) {	
+int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, const void* act) {	
 	#if defined(DEBUG)
-	// for debugging
-	ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Dummy_Data_Handler::handle_timeout invoked\n")));
+	ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Dummy_Data_Handler::handle_timeout invoked\n")));
 	#endif
 
 	Message mymessage;
-	if ( con_peers.begin()->ID == myid ) {
-		if ( !server.Objects().empty() ) {
+	Player_s myplayer;
+	Object_s myobject;
+	if ( con_peers.begin()->ID == myid ) {	// only want one handle_timeout running on the server
+		if ( !server.Objects().empty() ) {	// do we have something to update?
 			float time = period_t.usec()/1000000.0;
 			time += period_t.sec();
 			server.UpdateObjects(time);
@@ -381,18 +359,40 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 			for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++ ) {
 				if ( it->life <= 0.0 ||
 						server.DetectCollide(*it) ) {	// object is no longer alive, need to remove
-					for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
+					if ( it->type != PLAYER ) {
 						mymessage.SetType(REMOVE);
 						mymessage.SetObject(*it);
-						int numbytes = this->send(*(mypeer->p),mymessage);
-#if defined(DEBUG)
-						ACE_DEBUG ((LM_DEBUG,
-							ACE_TEXT ("Server sent REMOVE object to player (%s,%d).\n"),
-							server.Player(mypeer->ID),
-							mypeer->ID));
-#endif
+						SendMessage(mymessage);
+						server.RemoveObject(it->type,it->id);
 					}
-					server.RemoveObject(it->type,it->id);
+					else if ( it->type == PLAYER ) {		// Player was killed by shots, need to respawn
+						it->life = PLAYERLIFE;
+						mymessage.SetType(ACCEPT);
+						mymessage.SetWorld(server.Level());
+						myplayer.SetHeading(0,0);
+						myplayer.SetID(it->id);
+						myplayer.SetLife(PLAYERLIFE);
+						myplayer.SetPos(10,0,10);
+						myplayer.SetName(it->content_);
+						mymessage.SetPlayer(myplayer);
+						peer_s mypeer = GetPeer(myplayer.id);
+						int numbytes = this->send(*(mypeer.p),mymessage);
+						#if defined(DEBUG)
+						ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server respawned player (%s,%d).\n"), myplayer.name, myplayer.id));
+						#endif
+				
+						mymessage.SetType(MOVE);
+						myobject.SetID(myplayer.id);
+						myobject.SetType(PLAYER);
+						myobject.SetHeading(myplayer.theta,myplayer.phi);
+						myobject.SetLife(PLAYERLIFE);
+						myobject.SetPos(myplayer.x,myplayer.y,myplayer.z);
+						myobject.SetContent(myplayer.name);
+						mymessage.SetObject(myobject);
+						server.Move(myobject);
+						server.SetObjectLife(it->type, it->id, PLAYERLIFE);
+						SendMessage(mymessage,myplayer.id);
+					}
 				}
 			}
 		}
@@ -405,18 +405,10 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value & current_time, con
 	return 0;
 }
 
-// handle clean up events. The parameters are what the reactor framework
-// will pass us when it calls us.  For this code we really do not care
-// about these parameters. But complex applications could do various
-// things such as deregistering the handler only for that mask and when
-// the mask becomes 0, then delete ourself.
-int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
-{
-#if defined(DEBUG)
-	// for debugging
-	ACE_DEBUG ((LM_DEBUG,
-				ACE_TEXT ("Dummy_Data_Handler::handle_close invoked\n")));
-#endif
+int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m) {
+	#if defined(DEBUG)
+	ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Dummy_Data_Handler::handle_close invoked\n")));
+	#endif
 	// Stop and cancel the periodic timer associated with this reactor
 	this->reactor()->cancel_timer(this);
 	server.RemovePlayer(myid);
@@ -437,12 +429,7 @@ int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 	// that are held by the SOCK_Stream data member. Then follow up with
 	// deallocating the memory allocated to hold us.
 	this->peer_.close ();
-  
-	//this->reactor()->end_reactor_event_loop();
 
-	// notice how we clean up the allocated memory by deallocating
-	// ourselves :-). 
-	//
 	// Deallocation is absolutely necessary since recall that we had
 	// dynamically allocated ourselves. Also note that there can never be
 	// a case where we are allocated on the stack because our destructor
@@ -452,34 +439,10 @@ int Dummy_Data_Handler::handle_close (ACE_HANDLE h, ACE_Reactor_Mask m)
 	return 0;
 }
 
-// the following method must be defined since the reactor needs to
-// keep a mapping between the underlying handle and the
-// corresponding handler.  Note that it is defined as a const method
-// since it does not modify any state.
-ACE_HANDLE Dummy_Data_Handler::get_handle (void) const
-{
-#if defined(DEBUG)
-  // for debugging
-  cout << "Dummy_Data_Handler::get_handle invoked" << endl;
-#endif
-  // since the ACE_SOCK_Stream class inherits from the ACE_SOCK
-  // class, we simply invoke the get_handle method on the acceptor
-  // data member which is the variable peer_
+ACE_HANDLE Dummy_Data_Handler::get_handle (void) const {
   return this->peer_.get_handle ();
 } 
 
-// return a reference to the underlying peer.  This is a required method
-// used by the acceptor in its accept () method. Please see how it is
-// used in the handle_input of the Dummy_Accept_Handler.
-ACE_SOCK_Stream & Dummy_Data_Handler::peer (void)
-{
-#if defined(DEBUG)
-  // for debugging
-  cout << "Dummy_Data_Handler::peer invoked" << endl;
-#endif
-  return this->peer_;
+ACE_SOCK_Stream & Dummy_Data_Handler::peer (void) {
+	return this->peer_;
 }
-
-
-
-
