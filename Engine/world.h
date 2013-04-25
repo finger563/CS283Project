@@ -51,6 +51,8 @@ public:
 
 	//basic layout
 	void basicWorld();
+
+	void boxedIn();
 };
 
 

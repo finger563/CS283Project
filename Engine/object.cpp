@@ -64,6 +64,8 @@ bool Object::updateList() {
 	return true;
 }
 
+
+//Updates Temp list with any changes to the master list
 bool Object::updateList(std::list<Poly> poly) {
 	clearTemp();
 
@@ -84,11 +86,13 @@ bool Object::updateList(std::list<Poly> poly) {
 	return true;
 }
 
+//Replaces Temp list with render list
 void Object::clearTemp() {
 	//empties temp list
 	temp.clear();
 }
 
+//Temp List Operations
 void Object::RotateTemp(const Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
@@ -103,11 +107,13 @@ void Object::TranslateTemp(const Vector3D& v) {
 	}
 }
 
+//add polygon to lists
 void Object::add(Poly poly) {
 	master.push_back(poly);
 	updateList();
 }
 
+//generates cube
 void Object::GenerateCube(float size) {	  
 	master.clear();
 
@@ -164,12 +170,11 @@ void Object::GenerateCube(float size) {
 	}
 
 	radius = size;
-	theta = 3.141592;
-	phi = 0;
 
 	updateList(); 
 }
 
+//generates tetrahedron
 void Object::GenerateTetra(float size) {
 	Vertex p1 = Vertex(size,0,-size/sqrt(2.0)),
 			p2 = Vertex(-size,0,-size/sqrt(2.0)),
@@ -200,7 +205,9 @@ void Object::GenerateTetra(float size) {
 	updateList(); 
 }
 
+//generates floor
 void Object::GenerateFloor(float length, float depth) {
+	position = Point3D(0,depth,0);
 
 	master.clear();
 	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(-length,0,length,1,0,0),Vertex(length,0,length,1,1,0),
@@ -214,10 +221,82 @@ void Object::GenerateFloor(float length, float depth) {
 	}
 
 	radius = 0;
-	theta = 0;
-	phi = 3.141592/2.0;
+
+	updateList(); 
+}
+
+//Incomplete...
+void Object::GenerateCeiling(float length, float depth) {
 	position = Point3D(0,depth,0);
 
+	theta = 0;
+	phi= 0;
+
+	master.clear();
+	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(-length,0,length,1,0,0),Vertex(length,0,length,1,1,0),
+							Vertex(),3,Vector3D(0,1,0),TEXTURED));
+	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(length,0,length,1,1,0),Vertex(length,0,-length,1,1,1),
+							Vertex(),3,Vector3D(0,1,0),TEXTURED));
+
+	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->SetTexture(tex, texWidth, texHeight);
+	}
+
+	radius = 0;
+
+	RotateToHeading(Vector3D(0,-1,0));
+	updateList(); 
+}
+
+//Generates wall
+//Wall types: 0 = front: faces the player init
+///////////// 1 = left: the left of player init
+///////////// 2 = right: to the right of player init
+///////////// 3 = back: behind player init
+void Object::GenerateWall(size_t type, float length, float depth) {
+	
+	switch (type)
+	{
+		case 0: //front
+			theta = 0;
+			phi= 3.14/2;
+			position = Point3D(0, depth,length);
+			break;
+		case 1: //left
+			theta = -3.14/2;
+			phi= 3.14/2;
+			position = Point3D(-length, depth, 0);
+			break;
+		case 2: //right
+			theta = 3.14/2;
+			phi= 3.14/2;
+			position = Point3D(length, depth,0);
+			break;
+		case 3: //behind
+			theta = 3.14;
+			phi= 3.14/2;
+			position = Point3D(0, depth,-length);
+			break;
+
+	}
+
+	
+
+	master.clear();
+	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(-length,0,length,1,0,0),Vertex(length,0,length,1,1,0),
+							Vertex(),3,Vector3D(0,1,0),TEXTURED));
+	master.push_back( Poly( Vertex(-length,0,-length,1,0,1),Vertex(length,0,length,1,1,0),Vertex(length,0,-length,1,1,1),
+							Vertex(),3,Vector3D(0,1,0),TEXTURED));
+
+	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->SetTexture(tex, texWidth, texHeight);
+	}
+
+	radius = 0;
+
+	RotateToHeading();
 	updateList(); 
 }
 
@@ -228,6 +307,28 @@ void Object::RotateToHeading() {
 			z = r*cos(theta);
 	Vector3D forward = normalize(Vector3D(x,y,z));
 	Vector3D up = normalize(Vector3D(0,1,0));
+	Vector3D right = normalize(Cross(up,forward));
+	up = normalize(Cross(forward,right));
+	Matrix m = Matrix();
+	m.data[0][0] = right.x;
+	m.data[0][1] = right.y;
+	m.data[0][2] = right.z;
+	m.data[1][0] = up.x;
+	m.data[1][1] = up.y;
+	m.data[1][2] = up.z;
+	m.data[2][0] = forward.x;
+	m.data[2][1] = forward.y;
+	m.data[2][2] = forward.z;
+	Rotate(m);
+}
+
+void Object::RotateToHeading(Vector3D changeUp) {
+	float r = cos(phi);
+	float x = r*sin(theta),
+			y = sin(phi),
+			z = r*cos(theta);
+	Vector3D forward = normalize(Vector3D(x,y,z));
+	Vector3D up = normalize(changeUp);
 	Vector3D right = normalize(Cross(up,forward));
 	up = normalize(Cross(forward,right));
 	Matrix m = Matrix();
@@ -383,10 +484,6 @@ std::list<Poly> Object::GetRenderList() const {
 	return get;
 }
 
-std::list<Poly> Object::GetTemp() const {
-	return temp;
-}
-
 ////////////////////////////////////////
 /////////////////Projectile functons////
 ///////////////////////////////////////
@@ -405,29 +502,29 @@ bool Object::CollidesWith(const Object& b) {
 	if ( distance <= (radius + b.GetRadius()) )
 		return true;
 	updateList();
+	//RotateTempToHeading();
 	TranslateTemp(position);
-	std::list<Poly> blist = b.GetTemp();
-	for (std::list<Poly>::iterator bpoly = blist.begin(); bpoly != blist.end(); ++bpoly) {	// for each poly of b
-		for ( int i=0;i<bpoly->numVertices;i++) {		// for each vertex in poly of b
-			bool front = false,
-				 back = false;
-			for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it) {	// for each poly in object
-				Vector3D itvector = Vector3D( it->normal.x,
-												it->normal.y,
-												it->normal.z,
-												- (it->normal.x*it->v[0].x + 
-												    it->normal.y*it->v[0].y + 
-													it->normal.z*it->v[0].z) );
+	std::list<Poly> blist = b.GetRenderList();
+	bool front = false,
+			back = false;
+	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
+	{
+		Vector3D itvector = Vector3D( it->normal.x,
+									  it->normal.y,
+									  it->normal.z,
+									  - (it->normal.x*it->v[0].x + it->normal.y*it->v[0].y + it->normal.z*it->v[0].z) );
+		for (std::list<Poly>::iterator bpoly = blist.begin(); bpoly != blist.end(); ++bpoly) {
+			for ( int i=0;i<bpoly->numVertices;i++) {
 				Vector3D test = Vector3D(bpoly->v[i].x,bpoly->v[i].y,bpoly->v[i].z);
-				float tmp = test*itvector;	// is the vertex on the backface of each poly? i.e. is it "inside" object?
+				float tmp = test*itvector;
 				if ( tmp < 0 )
 					back = true;
 				else if ( tmp > 0 )
 					front = true;
 			}
-			if ( !front && back )
-				return true;
 		}
 	}
+	if ( !front && back )
+		return true;
 	return false;
 }

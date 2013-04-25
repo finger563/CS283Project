@@ -33,6 +33,7 @@ public:
 
 	// Rotates master list (i.e. in object space) to heading given by theta/phi
 	void RotateToHeading();
+	void RotateToHeading(Vector3D changeUp);
 	void RotateTempToHeading();
 
 	//Clears Temp list
@@ -53,6 +54,16 @@ public:
 
 	// Generates a floor at depth, with sidelength = length
 	void GenerateFloor(float length = 50, float depth = -10);
+
+	// Generates a ceiling at depth, with sidelength = length
+	void GenerateCeiling(float length, float depth);
+
+	//Generates wall
+	//Wall types: 0 = front: faces the player init
+	///////////// 1 = back: behind player init
+	///////////// 2 = left: the left of player init
+	///////////// 3 = right: to the right of player init
+	void GenerateWall(size_t type, float length = 50, float depth = -10);
 
 	void GenerateShot(Vector3D pos, float theta_, float phi_);
 	
@@ -85,7 +96,6 @@ public:
 	void TransformToPerspective(Matrix& m);
 	void TransformToPixel(Matrix& m);	
 	std::list<Poly> GetRenderList() const;
-	std::list<Poly> GetTemp() const;
 
 	void projectileInit(Vector3D head, Vector3D pos = Vector3D(0, 0, 0));
 
@@ -104,6 +114,7 @@ private:
 	int texHeight;
 	size_t counter;
 	bool kill;
+	//Object* next;
 };
 
 #endif
