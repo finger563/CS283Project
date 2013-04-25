@@ -35,7 +35,7 @@ std::list<peer_s> con_peers;
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
 	
-ACE_Time_Value period_t (0,50000);	// update period (seconds,microseconds)
+ACE_Time_Value period_t (0,30000);	// update period (seconds,microseconds)
 
 Dummy_Data_Handler::Dummy_Data_Handler (ACE_Reactor *r) 
   : ACE_Event_Handler (r) {

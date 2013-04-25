@@ -96,6 +96,7 @@ public:
 	void TransformToPerspective(Matrix& m);
 	void TransformToPixel(Matrix& m);	
 	std::list<Poly> GetRenderList() const;
+	std::list<Poly> GetTemp() const;
 
 	void projectileInit(Vector3D head, Vector3D pos = Vector3D(0, 0, 0));
 
@@ -114,7 +115,6 @@ private:
 	int texHeight;
 	size_t counter;
 	bool kill;
-	//Object* next;
 };
 
 #endif
