@@ -107,12 +107,14 @@ struct Object_s {
 		  life,			// time to live
 		  vx,vy,vz;		// velocity vector
 	char			content_[MAX_CONT_LEN];
+	char			killedby[MAX_CONT_LEN];
 	
-	Object_s() {type=SHOT;id=0;memset(content_,0,MAX_CONT_LEN);}
+	Object_s() {type=SHOT;id=0;memset(content_,0,MAX_CONT_LEN);memset(killedby,0,MAX_CONT_LEN);}
 	Object_s(const Object_s &a) {
 		type = a.type;
 		id = a.id;
 		strcpy(content_,a.content_);
+		strcpy(killedby,a.killedby);
 		x = a.x;
 		y = a.y;
 		z = a.z;
@@ -123,13 +125,14 @@ struct Object_s {
 		vy = a.vy;
 		vz = a.vz;
 	}
-	Object_s(ObjectType t, ACE_CDR::Long i,char* c){type=t;id=i;strcpy(content_,c);}
+	Object_s(ObjectType t, ACE_CDR::Long i,char* c){type=t;id=i;strcpy(content_,c);memset(killedby,0,MAX_CONT_LEN);}
 	
 	Object_s & operator=(const Object_s &a) {
 		if (this != &a) {
 			type = a.type;
 			id = a.id;
 			strcpy(content_,a.content_);
+			strcpy(killedby,a.killedby);
 			x = a.x;
 			y = a.y;
 			z = a.z;
@@ -145,7 +148,8 @@ struct Object_s {
 
 	void SetID(ACE_CDR::Long i) {id = i;}
 	void SetType(ObjectType t) { type = t; }
-	void SetContent(const char* n) {memset(content_,0,MAX_NAME_LEN);strcpy(content_,n);}
+	void SetContent(const char* n) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,n);}
+	void SetKilledby(const char* k) {memset(killedby,0,MAX_CONT_LEN);strcpy(killedby,k);}
 	void SetPos(const float _x, const float _y, const float _z) { x=_x;y=_y;z=_z;}
 	void SetHeading(const float _t, const float _p) { theta = _t; phi = _p; }
 	void SetLife(const float _l) { life = _l; }
@@ -163,8 +167,7 @@ struct Object_s {
 		x += tx * vz * time;
 		y += ty * vz * time;
 		z += tz * vz * time;
-		if ( type != PLAYER )
-			life = life - time;
+		life = life - time;
 		return (life > 0);
 	}
 

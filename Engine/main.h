@@ -5,7 +5,8 @@
 #include "constants.h"
 
 // for input handling
-const int	UPDATE_TIME = 30;		// input updates in milliseconds
+const int	INPUT_UPDATE_TIME = 20;			// input updates in milliseconds
+const int	NETWORK_UPDATE_TIME = 30;		// network updates in milliseconds
 
 // constants
 const int    SCREEN_WIDTH    = 1000;

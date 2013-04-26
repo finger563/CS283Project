@@ -36,7 +36,8 @@ const GLenum PIXEL_FORMAT = GL_BGRA;
 // GLUT CALLBACK functions ////////////////////////////////////////////////////
 void displayCB();
 void reshapeCB(int w, int h);
-void timerCB(int millisec);
+void KeyboardTimerCB(int millisec);
+void NetworkTimerCB(int millisec);
 void idleCB();
 void keyboardCB(unsigned char key, int x, int y);
 void keyboardUpCB(unsigned char key, int x, int y);

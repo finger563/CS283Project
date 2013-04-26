@@ -82,11 +82,16 @@ void SendMove() {
 		myobj.SetID(player.Info().id);
 		myobj.SetContent(player.Info().name);
 	
-		myobj.x = tempeye.GetPosition().x;
-		myobj.y = tempeye.GetPosition().y;
-		myobj.z = tempeye.GetPosition().z;
-		myobj.theta = tempeye.GetTheta();		// theta
-		myobj.phi = tempeye.GetPhi();		// phi
+		//myobj.x = tempeye.GetPosition().x;
+		//myobj.y = tempeye.GetPosition().y;
+		//myobj.z = tempeye.GetPosition().z;
+		//myobj.theta = tempeye.GetTheta();		// theta
+		//myobj.phi = tempeye.GetPhi();		// phi
+		myobj.x = player.Eye().GetPosition().x;
+		myobj.y = player.Eye().GetPosition().y;
+		myobj.z = player.Eye().GetPosition().z;
+		myobj.theta = player.Eye().GetTheta();		// theta
+		myobj.phi = player.Eye().GetPhi();		// phi
 		mymessage.SetObject(myobj);
 		event_handler.send(mymessage);
 	}
@@ -349,6 +354,8 @@ void updatePixels(GLubyte* dst, int size) {
 void KeyOperations() {
 	if ( !typing ) {
 		Vector3D movevector = Vector3D();
+		Camera eye = player.Eye();
+		Point3D pos = player.Eye().GetPosition();
 
 		if (keyStates['w'] || keyStates['W']) { // Up
 			movevector = movevector + (Vector3D(0,0,1));
@@ -367,22 +374,26 @@ void KeyOperations() {
 		}
 
 		if (keyStates[' ']) { // space
-			tempeye.SetPosition(tempeye.GetPosition().x,
-				                tempeye.GetPosition().y + 1,
-								tempeye.GetPosition().z);
+			//tempeye.SetPosition(tempeye.GetPosition().x,
+			//	                tempeye.GetPosition().y + 1,
+			//					tempeye.GetPosition().z);
+			eye.SetPosition(pos.x, pos.y + 1, pos.z);
 		}
 
 		if (keyStates['c'] || keyStates['C']) {
-			tempeye.SetPosition(tempeye.GetPosition().x,
-				                tempeye.GetPosition().y - 1,
-								tempeye.GetPosition().z);
+			//tempeye.SetPosition(tempeye.GetPosition().x,
+			//	                tempeye.GetPosition().y - 1,
+			//					tempeye.GetPosition().z);
+			eye.SetPosition(pos.x, pos.y - 1, pos.z);
 		}
 
 		if (keyStates['b'] || keyStates['B']) {
 			display_z_buffer = !display_z_buffer;
 		}
 	
-		tempeye.Translate(movevector);
+		//tempeye.Translate(movevector);
+		eye.Translate(movevector);
+		player.Eye(eye);
 	}
 }
 
@@ -574,11 +585,15 @@ void reshapeCB(int width, int height) {
     toPerspective();
 }
 
-void timerCB(int millisec) {
-    glutTimerFunc(millisec, timerCB, millisec);
+void KeyboardTimerCB(int millisec) {
+    glutTimerFunc(millisec, KeyboardTimerCB, millisec);
 	KeyOperations();
-	SendMove();
     glutPostRedisplay();
+}
+
+void NetworkTimerCB(int millisec) {
+    glutTimerFunc(millisec, NetworkTimerCB, millisec);
+	SendMove();
 }
 
 void idleCB() {
@@ -673,8 +688,8 @@ void mouseMotionCB(int x, int y) {
 
 void mousePassiveMotionCB(int x, int y) {
 	if ( !warped ) {
-		theta += (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH);
-		phi += -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT);
+		theta = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH);
+		phi = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT);
 		if ( theta > 2.0*3.141592 ) {
 			theta = theta - 2.0*3.141592;
 		}
@@ -687,7 +702,10 @@ void mousePassiveMotionCB(int x, int y) {
 		else if ( phi < -3.141592/2.0 ) {
 			phi = -3.141592/2.0;
 		}
-		tempeye.Rotate(theta,phi);
+		//tempeye.Rotate(theta,phi);
+		Camera eye = player.Eye();
+		eye.Rotate(theta,phi);
+		player.Eye(eye);
 		glutWarpPointer(glutGet(GLUT_WINDOW_WIDTH) / 2, glutGet(GLUT_WINDOW_HEIGHT) / 2);
 		warped = true;
 	}

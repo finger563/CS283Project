@@ -27,8 +27,6 @@ Player_c player;
 extern string ip_addr;
 
 ACE_Time_Value period_t (0,50000);
-//ACE_Time_Value period_t (1,0);
-//ACE_Time_Value previous_time (0);
 
 
 // constructor (pass a pointer to the reactor). By default we assume
@@ -111,8 +109,6 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 }
 
 /* now define the event handler's callback methods  */
-
-// handle incoming data
 int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 	#if defined(DEBUG)
   // for debugging
@@ -143,8 +139,10 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 		// Now process message
 		switch (mymessage.GetType()) {
 		case ACCEPT:		// the server has accepted us
-			if ( !player.Registered() )
+			if ( !player.Registered() ) {
 				player.Level(mymessage.GetWorld());
+				player.Register();
+			}
 			myplayer = player.Info();
 			myplayer.id = mymessage.GetPlayer().id;
 			myeye.SetPosition(mymessage.GetPlayer().x,mymessage.GetPlayer().y,mymessage.GetPlayer().z);
@@ -160,7 +158,6 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 			#endif
 			player.Eye(myeye);
 			player.Info(myplayer);	// update the data structure with the ID number from the server
-			player.Register();
 			break;
 		case CREATE:		// server has sent a create command for an object
 			#if defined(DEBUG)
@@ -311,7 +308,6 @@ int Dummy_Event_Handler::recv_message(Message& message) {
 	return -1;
 }
 
-// handle timeout events.
 int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act) {	
 	float currenttime = current_time.usec() / 1000000.0;
 	currenttime += current_time.sec();

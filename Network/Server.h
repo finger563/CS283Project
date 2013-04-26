@@ -28,6 +28,7 @@ const float		SHOTDAMAGE = 20;
 const int		SHOTSPEED = 30;
 const float		SHOTLIFE = 5.0;			// measured in seconds
 const float		PLAYERLIFE = 100.0;		// measured in HP
+const int		UPDATE_TIME = 30000;	// measured in microseconds
 
 class Server_c {
 private:

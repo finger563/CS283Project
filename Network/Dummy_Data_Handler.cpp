@@ -35,7 +35,7 @@ std::list<peer_s> con_peers;
 static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
 	
-ACE_Time_Value period_t (0,30000);	// update period (seconds,microseconds)
+ACE_Time_Value period_t (0,UPDATE_TIME);	// update period (seconds,microseconds)
 
 Dummy_Data_Handler::Dummy_Data_Handler (ACE_Reactor *r) 
   : ACE_Event_Handler (r) {
@@ -72,11 +72,11 @@ int Dummy_Data_Handler::open (void)
 		return -1;
 	}
   
+	myid = numPlayers++;
+
 	this->reactor()->schedule_timer(this,
 									0,
 									period_t);
-	
-	myid = numPlayers++;
 
 	// everything went well. Return success
 	return 0;
@@ -247,8 +247,8 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 		case MOVE:
 			if ( server.ObjectExists(mymessage.GetObject()) ) {
 				myobject = Object_s(mymessage.GetObject());
-				server.Move(myobject);		// need to update server's state
-				SendMessage(mymessage);		// and also send move to clients
+				server.Move(myobject);			// need to update server's state
+				SendMessage(mymessage,myid);	// and also send move to other clients
 				#if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent MOVE object to players.\n"));
 				#endif
@@ -363,6 +363,10 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, cons
 						server.RemoveObject(it->type,it->id);
 					}
 					else if ( it->type == PLAYER ) {		// Player was killed by shots, need to respawn
+						mymessage.SetType(CHAT);
+						string killedstring = string(it->content_) + " was killed by " + string(it->killedby);
+						mymessage.SetContent(killedstring.c_str());
+						SendMessage(mymessage);
 						it->life = PLAYERLIFE;
 						mymessage.SetType(ACCEPT);
 						mymessage.SetWorld(server.Level());
