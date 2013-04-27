@@ -44,7 +44,7 @@ Object::Object(Poly poly, const unsigned short* texture, const int texWid, const
 
 //Updates Temp list with any changes to the master list
 bool Object::updateList() {
-	clearTemp();
+	temp.clear();
 
 	if(!master.empty())
 	{
@@ -84,6 +84,64 @@ bool Object::updateList(std::list<Poly> poly) {
 	return true;
 }
 
+void Object::Rotate(Matrix& m) {
+	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->Transform(m);
+	}
+}
+
+void Object::Translate(Vector3D& v) {
+	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
+	{
+		it->Translate(v.x,v.y,v.z);
+	}
+}
+
+void Object::RotateToHeading() {
+	float r = cos(phi);
+	float x = r*sin(theta),
+			y = sin(phi),
+			z = r*cos(theta);
+	Vector3D forward = normalize(Vector3D(x,y,z));
+	Vector3D up = normalize(Vector3D(0,1,0));
+	Vector3D right = normalize(Cross(up,forward));
+	up = normalize(Cross(forward,right));
+	Matrix m = Matrix();
+	m.data[0][0] = right.x;
+	m.data[0][1] = right.y;
+	m.data[0][2] = right.z;
+	m.data[1][0] = up.x;
+	m.data[1][1] = up.y;
+	m.data[1][2] = up.z;
+	m.data[2][0] = forward.x;
+	m.data[2][1] = forward.y;
+	m.data[2][2] = forward.z;
+	Rotate(m);
+}
+
+void Object::RotateToHeading(Vector3D changeUp) {
+	float r = cos(phi);
+	float x = r*sin(theta),
+			y = sin(phi),
+			z = r*cos(theta);
+	Vector3D forward = normalize(Vector3D(x,y,z));
+	Vector3D up = normalize(changeUp);
+	Vector3D right = normalize(Cross(up,forward));
+	up = normalize(Cross(forward,right));
+	Matrix m = Matrix();
+	m.data[0][0] = right.x;
+	m.data[0][1] = right.y;
+	m.data[0][2] = right.z;
+	m.data[1][0] = up.x;
+	m.data[1][1] = up.y;
+	m.data[1][2] = up.z;
+	m.data[2][0] = forward.x;
+	m.data[2][1] = forward.y;
+	m.data[2][2] = forward.z;
+	Rotate(m);
+}
+
 void Object::clearTemp() {
 	//empties temp list
 	temp.clear();
@@ -101,6 +159,28 @@ void Object::TranslateTemp(const Vector3D& v) {
 	{
 		it->Translate(v);
 	}
+}
+
+void Object::RotateTempToHeading() {
+	float r = cos(phi);
+	float x = r*sin(theta),
+			y = sin(phi),
+			z = r*cos(theta);
+	Vector3D forward = normalize(Vector3D(x,y,z));
+	Vector3D up = normalize(Vector3D(0,1,0));
+	Vector3D right = normalize(Cross(up,forward));
+	up = normalize(Cross(forward,right));
+	Matrix m = Matrix();
+	m.data[0][0] = right.x;
+	m.data[0][1] = right.y;
+	m.data[0][2] = right.z;
+	m.data[1][0] = up.x;
+	m.data[1][1] = up.y;
+	m.data[1][2] = up.z;
+	m.data[2][0] = forward.x;
+	m.data[2][1] = forward.y;
+	m.data[2][2] = forward.z;
+	RotateTemp(m);
 }
 
 void Object::add(Poly poly) {
@@ -295,72 +375,6 @@ void Object::GenerateWall(size_t type, float length, float depth) {
 	updateList(); 
 }
 
-void Object::RotateToHeading() {
-	float r = cos(phi);
-	float x = r*sin(theta),
-			y = sin(phi),
-			z = r*cos(theta);
-	Vector3D forward = normalize(Vector3D(x,y,z));
-	Vector3D up = normalize(Vector3D(0,1,0));
-	Vector3D right = normalize(Cross(up,forward));
-	up = normalize(Cross(forward,right));
-	Matrix m = Matrix();
-	m.data[0][0] = right.x;
-	m.data[0][1] = right.y;
-	m.data[0][2] = right.z;
-	m.data[1][0] = up.x;
-	m.data[1][1] = up.y;
-	m.data[1][2] = up.z;
-	m.data[2][0] = forward.x;
-	m.data[2][1] = forward.y;
-	m.data[2][2] = forward.z;
-	Rotate(m);
-}
-
-void Object::RotateToHeading(Vector3D changeUp) {
-	float r = cos(phi);
-	float x = r*sin(theta),
-			y = sin(phi),
-			z = r*cos(theta);
-	Vector3D forward = normalize(Vector3D(x,y,z));
-	Vector3D up = normalize(changeUp);
-	Vector3D right = normalize(Cross(up,forward));
-	up = normalize(Cross(forward,right));
-	Matrix m = Matrix();
-	m.data[0][0] = right.x;
-	m.data[0][1] = right.y;
-	m.data[0][2] = right.z;
-	m.data[1][0] = up.x;
-	m.data[1][1] = up.y;
-	m.data[1][2] = up.z;
-	m.data[2][0] = forward.x;
-	m.data[2][1] = forward.y;
-	m.data[2][2] = forward.z;
-	Rotate(m);
-}
-
-void Object::RotateTempToHeading() {
-	float r = cos(phi);
-	float x = r*sin(theta),
-			y = sin(phi),
-			z = r*cos(theta);
-	Vector3D forward = normalize(Vector3D(x,y,z));
-	Vector3D up = normalize(Vector3D(0,1,0));
-	Vector3D right = normalize(Cross(up,forward));
-	up = normalize(Cross(forward,right));
-	Matrix m = Matrix();
-	m.data[0][0] = right.x;
-	m.data[0][1] = right.y;
-	m.data[0][2] = right.z;
-	m.data[1][0] = up.x;
-	m.data[1][1] = up.y;
-	m.data[1][2] = up.z;
-	m.data[2][0] = forward.x;
-	m.data[2][1] = forward.y;
-	m.data[2][2] = forward.z;
-	RotateTemp(m);
-}
-
 void Object::GenerateShot(Vector3D pos, float theta_, float phi_) {
 	GenerateCube(1.0);
 	theta = theta_;
@@ -380,6 +394,7 @@ void Object::GeneratePlayer(Vector3D pos, float theta_, float phi_,const unsigne
 	position = pos;
 	SetRenderType(TEXTURED);
 	RotateToHeading();
+	updateList();
 }
 
 bool Object::UpdateTime(int time) {
@@ -417,23 +432,6 @@ bool Object::SetRenderType( RenderType rt ) {
 	return true;
 }
 
-//assumes that only the temp list is being passed through
-void Object::Rotate(Matrix& m) {
-	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
-	{
-		it->Transform(m);
-	}
-}
-
-//assumes that only the temp list is being passed through
-void Object::Translate(Vector3D& v) {
-	for(std::list<Poly>::iterator it = master.begin(); it != master.end(); ++it)
-	{
-		it->Translate(v.x,v.y,v.z);
-	}
-}
-
-//returns modified polygon list
 void Object::TransformToCamera(Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
@@ -441,7 +439,6 @@ void Object::TransformToCamera(Matrix& m) {
 	}
 }
 
-//returns modified polygon list
 void Object::TransformToPerspective(Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
@@ -449,7 +446,6 @@ void Object::TransformToPerspective(Matrix& m) {
 	}
 }
 
-//returns modified polygon list
 void Object::TransformToPixel(Matrix& m) {
 	for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it)
 	{
@@ -498,31 +494,43 @@ void Object::projectileInit(Vector3D head, Vector3D pos) {
 
 bool Object::CollidesWith(const Object& b) {
 	float distance = magnitude(b.GetPosition() - position);
-	if ( distance <= (radius + b.GetRadius()) )
-		return true;
-	updateList();
+	//if ( distance >= (radius + b.GetRadius()) )
+	//	return false;
+	if ( !updateList() )
+		return false;
 	TranslateTemp(position);
 	std::list<Poly> blist = b.GetTemp();
 	for (std::list<Poly>::iterator bpoly = blist.begin(); bpoly != blist.end(); ++bpoly) {	// for each poly of b
-		for ( int i=0;i<bpoly->numVertices;i++) {		// for each vertex in poly of b
-			bool front = false,
-				 back = false;
-			for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it) {	// for each poly in object
-				Vector3D itvector = Vector3D( it->normal.x,
-												it->normal.y,
-												it->normal.z,
-											- (it->normal.x*it->v[0].x + 
-												it->normal.y*it->v[0].y + 
-												it->normal.z*it->v[0].z) );
-				Vector3D test = Vector3D(bpoly->v[i].x,bpoly->v[i].y,bpoly->v[i].z);
-				float tmp = test*itvector;	// is the vertex on the backface of each poly? i.e. is it "inside" object?
-				if ( tmp < 0 )
-					back = true;
-				else if ( tmp > 0 )
-					front = true;
+		Vector3D p0 = Vector3D(bpoly->v[0].x,bpoly->v[0].y,bpoly->v[0].z),
+				 p1 = Vector3D(bpoly->v[1].x,bpoly->v[1].y,bpoly->v[1].z),
+				 p2 = Vector3D(bpoly->v[2].x,bpoly->v[2].y,bpoly->v[2].z);
+		for(std::list<Poly>::iterator it = temp.begin(); it != temp.end(); ++it) {	// for each poly in object
+			Vector3D A = Vector3D(it->v[0].x,it->v[0].y,it->v[0].z),
+					 B = Vector3D(it->v[1].x,it->v[1].y,it->v[1].z),
+					 C = Vector3D(it->v[2].x,it->v[2].y,it->v[2].z);
+			Vector3D p,n1,n2,n3;
+			float t = (-it->normal * (p0 - A)) / (it->normal * (p1-p0));
+			if ( t > 0 && t < 1 ) {
+				p = p0 + (p1-p0)*t;
+				n1 = normalize(Cross(A-B,p-B));
+				n2 = normalize(Cross(B-C,p-C));
+				n3 = normalize(Cross(C-A,p-A));
+				if ( n1*n2 > 0 &&
+					 n2*n3 > 0 )
+					 return true;
 			}
-			if ( !front && back )
-				return true;
+			else {
+				t = (-it->normal * (p0 - A)) / (it->normal * (p2-p0));
+				if ( t > 0 && t < 1 ) {
+					p = p0 + (p2-p0)*t;
+					n1 = normalize(Cross(A-B,p-B));
+					n2 = normalize(Cross(B-C,p-C));
+					n3 = normalize(Cross(C-A,p-A));
+					if ( n1*n2 > 0 &&
+						 n2*n3 > 0 )
+						 return true;
+				}
+			}
 		}
 	}
 	return false;

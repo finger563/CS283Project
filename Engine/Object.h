@@ -31,18 +31,6 @@ public:
 	//Updates Temp list to whatever list is passed (i.e. Render list)
 	bool updateList(std::list<Poly> poly);
 
-	// Rotates master list (i.e. in object space) to heading given by theta/phi
-	void RotateToHeading();
-	void RotateToHeading(Vector3D changeUp);
-	void RotateTempToHeading();
-
-	//Clears Temp list
-	void clearTemp();
-
-	//Temp list operations
-	void RotateTemp(const Matrix& m);
-	void TranslateTemp(const Vector3D& v);
-
 	//add polygon to lists
 	void add(Poly poly);
 
@@ -84,12 +72,18 @@ public:
 
 	// sets rendertype for all polygons
 	bool SetRenderType( RenderType rt );
-
-	//assumes that only the temp list is being passed through
+	
+	// Master list operations
+	void RotateToHeading();
+	void RotateToHeading(Vector3D changeUp);
 	void Rotate(Matrix& m);
-
-	//assumes that only the temp list is being passed through
 	void Translate(Vector3D& v);
+
+	//Temp list operations
+	void clearTemp();
+	void RotateTemp(const Matrix& m);
+	void TranslateTemp(const Vector3D& v);
+	void RotateTempToHeading();
 
 	// Pipeline functions
 	void TransformToCamera(Matrix& m);

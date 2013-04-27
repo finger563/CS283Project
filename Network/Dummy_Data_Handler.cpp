@@ -162,12 +162,9 @@ Object_s Dummy_Data_Handler::CreateShot( Player_s& myplayer ) {
 		z = r*cos(myplayer.theta);
 	myobject.SetLife(SHOTLIFE);
 	myobject.SetVelocity(0,0,SHOTSPEED);		// velocity w.r.t. object's u/v/n axes
-	myobject.SetPos(myplayer.x + 6*x,myplayer.y+6*y,myplayer.z+6*z);
+	myobject.SetPos(myplayer.x + SHOTOFFSET*x,myplayer.y+SHOTOFFSET*y,myplayer.z+SHOTOFFSET*z);
 	myobject.SetContent(myplayer.name);
 	m.SetObject(myobject);
-	//for (std::list<peer_s>::iterator mypeer = con_peers.begin(); mypeer != con_peers.end(); mypeer++ ) {
-	//	int numbytes = this->send(*(mypeer->p),m);
-	//}
 	SendMessage(m);
 	return myobject;
 }
@@ -247,8 +244,9 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 		case MOVE:
 			if ( server.ObjectExists(mymessage.GetObject()) ) {
 				myobject = Object_s(mymessage.GetObject());
-				server.Move(myobject);			// need to update server's state
-				SendMessage(mymessage,myid);	// and also send move to other clients
+				myobject = server.Move(myobject);		// need to update server's state
+				mymessage.SetObject(myobject);
+				SendMessage(mymessage);					// update all clients (sender will receive life update)
 				#if defined(DEBUG)
 				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent MOVE object to players.\n"));
 				#endif
@@ -351,7 +349,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, cons
 		if ( !server.Objects().empty() ) {	// do we have something to update?
 			float time = period_t.usec()/1000000.0;
 			time += period_t.sec();
-			server.UpdateObjects(time);
+			server.UpdateObjects(time);			// upate position of all shots
 			std::list<Object_s> objlist = server.Objects();
 			for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++ ) {
 				if ( it->life <= 0.0 ||

@@ -81,12 +81,7 @@ void SendMove() {
 		myobj.SetType(PLAYER);
 		myobj.SetID(player.Info().id);
 		myobj.SetContent(player.Info().name);
-	
-		//myobj.x = tempeye.GetPosition().x;
-		//myobj.y = tempeye.GetPosition().y;
-		//myobj.z = tempeye.GetPosition().z;
-		//myobj.theta = tempeye.GetTheta();		// theta
-		//myobj.phi = tempeye.GetPhi();		// phi
+
 		myobj.x = player.Eye().GetPosition().x;
 		myobj.y = player.Eye().GetPosition().y;
 		myobj.z = player.Eye().GetPosition().z;
@@ -355,7 +350,6 @@ void KeyOperations() {
 	if ( !typing ) {
 		Vector3D movevector = Vector3D();
 		Camera eye = player.Eye();
-		Point3D pos = player.Eye().GetPosition();
 
 		if (keyStates['w'] || keyStates['W']) { // Up
 			movevector = movevector + (Vector3D(0,0,1));
@@ -374,24 +368,21 @@ void KeyOperations() {
 		}
 
 		if (keyStates[' ']) { // space
-			//tempeye.SetPosition(tempeye.GetPosition().x,
-			//	                tempeye.GetPosition().y + 1,
-			//					tempeye.GetPosition().z);
-			eye.SetPosition(pos.x, pos.y + 1, pos.z);
+			eye.SetPosition(eye.GetPosition().x,
+							eye.GetPosition().y + 1,
+							eye.GetPosition().z);
 		}
 
-		if (keyStates['c'] || keyStates['C']) {
-			//tempeye.SetPosition(tempeye.GetPosition().x,
-			//	                tempeye.GetPosition().y - 1,
-			//					tempeye.GetPosition().z);
-			eye.SetPosition(pos.x, pos.y - 1, pos.z);
+		if (keyStates['c']) {
+			eye.SetPosition(eye.GetPosition().x,
+							eye.GetPosition().y - 1,
+							eye.GetPosition().z);
 		}
 
-		if (keyStates['b'] || keyStates['B']) {
+		if (keyStates['b']) {
 			display_z_buffer = !display_z_buffer;
 		}
 	
-		//tempeye.Translate(movevector);
 		eye.Translate(movevector);
 		player.Eye(eye);
 	}
@@ -419,7 +410,12 @@ void PrintChat() {
 	std::list<string>::reverse_iterator riter = conversation.rbegin();
 
 #if defined(DEBUG)
-	ss << "Position: ("<<player.Eye().GetPosition().x<<","<<player.Eye().GetPosition().y<<","<<player.Eye().GetPosition().z<<")" << ends;
+	ss << "Player: ("<<player.Eye().GetPosition().x<<
+					","<<player.Eye().GetPosition().y<<
+					","<<player.Eye().GetPosition().z<<
+					"), ("<<player.Eye().GetTheta()<<
+					","<<player.Eye().GetPhi()<<
+					"),"<<player.Info().life<< ends;
 	drawString(ss.str().c_str(), 1, 400, color, font);
 	ss.str("");
 #endif

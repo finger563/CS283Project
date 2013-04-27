@@ -24,7 +24,8 @@ using namespace std;
 
 //#define DEBUG
 
-const float		SHOTDAMAGE = 20;
+const float		SHOTDAMAGE = 20.0;
+const float		SHOTOFFSET = 10.0;
 const int		SHOTSPEED = 30;
 const float		SHOTLIFE = 5.0;			// measured in seconds
 const float		PLAYERLIFE = 100.0;		// measured in HP
@@ -111,13 +112,21 @@ public:
 		return true;
 	}
 	
-	void Move(Object_s& a) {
+	Object_s Move(Object_s& a) {
 		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
 			if ( it->id == a.id && it->type == a.type ) {
 				it->SetPos(a.x,a.y,a.z);
 				it->SetHeading(a.theta,a.phi);
 				it->SetVelocity(a.vx,a.vy,a.vz);
-				return;
+				return *it;
+			}
+		}
+	}
+
+	Object_s GetObject(ObjectType t, ACE_CDR::Long id) {
+		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
+			if ( it->id == id && it->type == t ) {
+				return *it;
 			}
 		}
 	}

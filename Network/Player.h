@@ -76,9 +76,7 @@ public:
 	void Move(Object_s& a) {
 		
 		if ( a.id == info.id && a.type == PLAYER ) {
-			//eye.SetPosition(a.x,a.y,a.z);
-			//eye.SetAngles(a.theta,a.phi);
-			//tempeye = eye;
+			info.life = a.life;
 		}
 		else {
 			for (std::list<Object_s>::iterator it = objects.begin(); it!= objects.end(); it++) {
