@@ -16,11 +16,11 @@ public:
 
 	//Alternate Constructor
 	Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
-		Point3D pos = Point3D(0,0,0), float r = 0);
+		Point3D pos = Point3D(0,0,0), float _rx = 0, float _ry = 0, float _rz = 0);
 
 	//Alternate Constructor
 	Object(Poly poly, const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
-		Point3D pos = Point3D(0,0,0), float r = 0);
+		Point3D pos = Point3D(0,0,0), float _rx = 0, float _ry = 0, float _rz = 0);
 
 	//Destructor
 	~Object(){}
@@ -67,8 +67,10 @@ public:
 	bool SetPosition(const Point3D& pos);
 	Point3D GetPosition(void) const;
 
-	bool SetRadius(float r);
-	float GetRadius(void) const;
+	bool SetBoudingEllipsoid(float x, float y, float z);
+	float GetRadiusX(void) const;
+	float GetRadiusY(void) const;
+	float GetRadiusZ(void) const;
 
 	// sets rendertype for all polygons
 	bool SetRenderType( RenderType rt );
@@ -103,7 +105,7 @@ private:
 	Point3D position;
 	Vector3D heading, velocity; 
 	float theta,phi;
-	float radius;
+	float rx,ry,rz;
 	const unsigned short* tex;
 	int texWidth;
 	int texHeight;

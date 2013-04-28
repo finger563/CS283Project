@@ -588,8 +588,20 @@ void KeyboardTimerCB(int millisec) {
 }
 
 void NetworkTimerCB(int millisec) {
-    glutTimerFunc(millisec, NetworkTimerCB, millisec);
+	ACE_hrtime_t elapsed;
+	player.GetMicroseconds(elapsed);
+	if ( elapsed < MIN_NETWORK_UPDATE_TIME*1000 ) 
+		millisec = MIN_NETWORK_UPDATE_TIME;
+	else
+		millisec = elapsed/1000;
+	if ( millisec > MAX_NETWORK_UPDATE_TIME )
+		millisec = MAX_NETWORK_UPDATE_TIME;
+	//cout << millisec << endl;
+	player.StopTimer();
+	player.ResetTimer();
 	SendMove();
+	player.StartTimer();
+    glutTimerFunc(millisec, NetworkTimerCB, millisec);
 }
 
 void idleCB() {

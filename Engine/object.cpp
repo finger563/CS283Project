@@ -8,23 +8,27 @@ Object::Object()
 	position = Point3D(0,0,0);
 	kill = false;
 	counter = 0;
-	radius = 0;
+	rx = 0;
+	ry = 0;
+	rz = 0;
 }
 
 //Alternate texture, veloctity, heading, position
-Object::Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel, Point3D pos, float r)
+Object::Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel, Point3D pos, float _rx, float _ry, float _rz)
 {
 	velocity = vel;
 	position = pos;
 	tex = texture;
 	texWidth = texWid;
 	texHeight = texHgt;
-	radius = r;
+	rx = _rx;
+	ry = _ry;
+	rz = _rz;
 }
 
 //Alternate Constructor
 Object::Object(Poly poly, const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel, 
-		Point3D pos, float r)
+		Point3D pos, float _rx, float _ry, float _rz)
 {
 	velocity = vel;
 	position = pos;
@@ -37,7 +41,9 @@ Object::Object(Poly poly, const unsigned short* texture, const int texWid, const
 	tex = texture;
 	master.push_back(poly);
 	temp.push_back(poly);
-	radius = r;
+	rx = _rx;
+	ry = _ry;
+	rz = _rz;
 }
 
 //generate() method switch statements??
@@ -242,8 +248,10 @@ void Object::GenerateCube(float size) {
 			0,0,0.9);
 #endif
 	}
-
-	radius = size;
+	
+	rx = size;
+	ry = size;
+	rz = size;
 	theta = 3.141592;
 	phi = 0;
 
@@ -292,8 +300,10 @@ void Object::GenerateFloor(float length, float depth) {
 	{
 		it->SetTexture(tex, texWidth, texHeight);
 	}
-
-	radius = 0;
+	
+	rx = length/2.0;
+	ry = 0;
+	rz = length/2.0;
 	theta = 0;
 	phi = 3.141592/2.0;
 	position = Point3D(0,depth,0);
@@ -317,8 +327,10 @@ void Object::GenerateCeiling(float length, float depth) {
 	{
 		it->SetTexture(tex, texWidth, texHeight);
 	}
-
-	radius = 0;
+	
+	rx = length/2.0;
+	ry = 0;
+	rz = length/2.0;
 
 	RotateToHeading(Vector3D(0,-1,0));
 	updateList(); 
@@ -368,8 +380,10 @@ void Object::GenerateWall(size_t type, float length, float depth) {
 	{
 		it->SetTexture(tex, texWidth, texHeight);
 	}
-
-	radius = 0;
+	
+	rx = length/2.0;
+	ry = length/2.0;
+	rz = length/2.0;
 
 	RotateToHeading();
 	updateList(); 
@@ -415,13 +429,23 @@ Point3D Object::GetPosition(void) const {
 	return position;
 }
 
-bool Object::SetRadius(float r) {
-	radius = r;
+bool Object::SetBoudingEllipsoid(float x, float y, float z) {
+	rx = x;
+	ry = y;
+	rz = z;
 	return true;
 }
 
-float Object::GetRadius(void) const {
-	return radius;
+float Object::GetRadiusX(void) const {
+	return rx;
+}
+
+float Object::GetRadiusY(void) const {
+	return ry;
+}
+
+float Object::GetRadiusZ(void) const {
+	return rz;
 }
 
 bool Object::SetRenderType( RenderType rt ) {
@@ -494,7 +518,7 @@ void Object::projectileInit(Vector3D head, Vector3D pos) {
 
 bool Object::CollidesWith(const Object& b) {
 	float distance = magnitude(b.GetPosition() - position);
-	//if ( distance >= (radius + b.GetRadius()) )
+	//if ( distance >= (radius + b.getradius()) )
 	//	return false;
 	if ( !updateList() )
 		return false;

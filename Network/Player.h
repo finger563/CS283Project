@@ -30,9 +30,10 @@ private:
 	Chat_c		chat;
 	Camera		eye;
 	World		level;
+	ACE_High_Res_Timer timer;
 public:
-	Player_c() : info(), chat(), eye() {registered=false;}
-	Player_c(const Player_s& s): info(s), chat(), eye() {registered=false;}
+	Player_c() : info(), chat(), eye() {registered=false;ResetTimer();}
+	Player_c(const Player_s& s): info(s), chat(), eye() {registered=false;ResetTimer();}
 	Player_c(Player_c& s){*this=s;}
 	~Player_c() {}
 
@@ -65,6 +66,11 @@ public:
 	void Level(const World& l) { level = l; objectlist = level.GetRenderList(); }
 	void Level(const long id) { level = World(id); objectlist = level.GetRenderList(); }
 
+	void StartTimer() { timer.start(); }
+	void StopTimer() { timer.stop(); }
+	void ResetTimer() { timer.reset(); }
+	void GetMicroseconds(ACE_hrtime_t& usecs) { timer.elapsed_microseconds(usecs); }
+
 	void Register() {registered=true;}
 	void Leave()	{registered=false;}
 	bool Registered() {return registered;}
@@ -76,6 +82,7 @@ public:
 	void Move(Object_s& a) {
 		
 		if ( a.id == info.id && a.type == PLAYER ) {
+			StopTimer();		// have gotten a response
 			info.life = a.life;
 		}
 		else {

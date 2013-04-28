@@ -6,7 +6,9 @@
 
 // for input handling
 const int	INPUT_UPDATE_TIME = 20;			// input updates in milliseconds
-const int	NETWORK_UPDATE_TIME = 30;		// network updates in milliseconds
+const int	NETWORK_UPDATE_TIME = 300;		// initial network updates in milliseconds
+const int	MIN_NETWORK_UPDATE_TIME = 50;	// minimum time between sending network updates
+const int	MAX_NETWORK_UPDATE_TIME = 200;	// maximum time between sending network updates
 
 // constants
 const int    SCREEN_WIDTH    = 1000;
