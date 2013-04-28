@@ -119,6 +119,7 @@ FEATURES
  * Chat over network with usernames & chat history
  * Server selects spawn location for players, as well as world that is loaded
  * Player can move about freely in virtual world and fire projectiles using mouse and keyboard
+   * Players measure RTT for their movement messages and meter their updates to the server based on this time.
  * Server correctly tracks connected/registered players and handles terminated connections
    * Players can be killed by other players' shots (or their own shots) and will respawn upon death.
    * All players see <Player X> was killed by <Player Y> in their chat window.  
@@ -135,7 +136,6 @@ FEATURES
 
 TODO
 ----
- * Metered messaging rate based on RTT
  * Physics (for jumping) : on client side.
  * Implement restricted player movement (player-world collision detection) : client side
  * Finish world 1 implementation.  Work on World 2 implementation
