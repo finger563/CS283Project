@@ -134,6 +134,7 @@ FEATURES
 
 TODO
 ----
+ * Metered messaging rate based on RTT
  * Physics (for jumping)
  * Implement restricted player movement (player-world collision detection)
  * Finish world 1 implementation.  Work on World 2 implementation
