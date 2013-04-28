@@ -121,6 +121,7 @@ FEATURES
  * Player can move about freely in virtual world and fire projectiles using mouse and keyboard
  * Server correctly tracks connected/registered players and handles terminated connections
    * Players can be killed by other players' shots (or their own shots) and will respawn upon death.
+   * All players see <Player X> was killed by <Player Y> in their chat window.  
  * Server correctly tracks dynamic objects (shots/players)
    * Sends all currently active dynamic objects to players that join later
    * Dynamic objects must be created by the server (including all players and shots); clients request creation
@@ -134,8 +135,9 @@ FEATURES
 
 TODO
 ----
- * Physics (for jumping)
- * Implement restricted player movement (player-world collision detection)
+ * Metered messaging rate based on RTT
+ * Physics (for jumping) : on client side.
+ * Implement restricted player movement (player-world collision detection) : client side
  * Finish world 1 implementation.  Work on World 2 implementation
  * Have server randomly choose spawn points for players.
  * Lighting system (smooth shading, shadowing, etc.)
