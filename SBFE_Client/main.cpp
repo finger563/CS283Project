@@ -596,7 +596,9 @@ void NetworkTimerCB(int millisec) {
 		millisec = elapsed/1000;
 	if ( millisec > MAX_NETWORK_UPDATE_TIME )
 		millisec = MAX_NETWORK_UPDATE_TIME;
-	//cout << millisec << endl;
+	#ifdef DEBUG
+	cout << "RTT: " << millisec << " ms." << endl;
+	#endif
 	player.StopTimer();
 	player.ResetTimer();
 	SendMove();
