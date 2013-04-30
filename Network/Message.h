@@ -28,7 +28,7 @@ const int MAX_CONT_LEN=256;		// Max length of single chat message
 
 enum MessageType {
 	REGISTER,	// Players REGISTER with the server initially
-	ACCEPT,		//	Then the server responds using ACCEPT with a player ID, and the initial position/heading
+	ACCEPT,		//	Then the server responds using ACCEPT with a player ID, and the initial position/heading/life as well as world ID
 	CHAT,		// Players send CHAT messages with username and text to server, it relays the message to other players
 	SHOOT,		// Players send SHOOT command to Server, it replies/relays CREATE message to *all* players
 	CREATE,		// Server sends CREATE message when a new object is created by a player (shot, player, etc.)
@@ -234,8 +234,6 @@ public:
 
 	const char*	GetContent() const {return content_;}
 	void		SetContent(const char* c) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,c);}
-
-	bool FormMessage(bool isServer);
 };
 
 

@@ -281,11 +281,3 @@ int operator>> (ACE_InputCDR &cdr, Message &message) {
 
 	return cdr.good_bit();
 }
-
-bool Message::FormMessage(bool isServer) {
-	if (isServer) {
-	}
-	else {
-	}
-	return false;
-}
