@@ -34,23 +34,14 @@ README Contents
 
 Overall Game Design
 -------------------
-The game is designed as an old-school fast paced first person shooter, in the likes of the original Quake.
-Players can move and fire quickly, and the objective in the game is to frag (kill) the other players without
-getting fragged yourself.  There is a chat system which lets players communicate (trash-talk) each other, 
-and the server lets all players know who kills whom.  
+The game is designed as an old-school fast paced first person shooter, in the likes of the original Quake.  Players can move and fire quickly, and the objective in the game is to frag (kill) the other players without getting fragged yourself.  There is a chat system which lets players communicate (trash-talk) each other, and the server lets all players know who kills whom.  
 
 Network System Design
 ---------------------
-The networking part of the system is designed such that players initiate a connection to the server using a 
-REGISTER message.  If the server has slots available, it will send an ACCEPT message to the player, which 
-contains the world ID the server is running, as well as the player's starting position, heading, and health (life).  
-The server keeps track of all players that are currently connected and dissemenates the currently active players 
+The networking part of the system is designed such that players initiate a connection to the server using a REGISTER message.  If the server has slots available, it will send an ACCEPT message to the player, which contains the world ID the server is running, as well as the player's starting position, heading, and health (life).  The server keeps track of all players that are currently connected and dissemenates the currently active players 
 to the joining player.  
 
-Players can fire a shot by issuing a SHOOT message to the server.  The server will then send
-a CREATE object message which will create that shot on all players' clients.  Any shots which are currently active
-when a player joins a game will also be sent to the player's client.  The server handles the shot's collision detection,
-and therefore has the final (only) say in whether a player was hit by a shot or not.  
+Players can fire a shot by issuing a SHOOT message to the server.  The server will then send a CREATE object message which will create that shot on all players' clients.  Any shots which are currently active when a player joins a game will also be sent to the player's client.  The server handles the shot's collision detection, and therefore has the final (only) say in whether a player was hit by a shot or not.  
 
 The server has a periodic callback routine which does shot collision detection against all players and all objects in the (static) world.  If a shot collides with an object, the shot is removed from the server's dynamic object list and a REMOVE message is sent to all players.  Moreover, if the object the shot collides with is a player, the server decrements the player's life.  If a player's life reaches 0, the server sends a CHAT message to all players, informing them that <player 1> was killed by <player 2>.  It then sends an ACCEPT message to that player again to reset them to a new spawn location and to reset their life meter.  Players can communicate with each other using CHAT messages, which the server does not keep track of, instead the server simply relays all chat messages to all other players.  If the shot does not collide with anything, the shot's life is decremented.  In this way, shots become inactive after a certain amount of time and can then be removed, so that the number of objects the server has to keep track of does not grow ad infinitum.  
 
