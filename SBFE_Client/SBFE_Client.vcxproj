@@ -126,16 +126,19 @@
     <ClInclude Include="..\Network\helper_funcs.h" />
     <ClInclude Include="..\Network\Message.h" />
     <ClInclude Include="..\Network\Player.h" />
+    <ClInclude Include="..\Sprites\box.h" />
+    <ClInclude Include="..\Sprites\ceiling.h" />
+    <ClInclude Include="..\Sprites\checkerboard.h" />
+    <ClInclude Include="..\Sprites\defaulttexture.h" />
+    <ClInclude Include="..\Sprites\floor.h" />
+    <ClInclude Include="..\Sprites\floorlarge.h" />
+    <ClInclude Include="..\Sprites\floorsmall.h" />
+    <ClInclude Include="..\Sprites\stone.h" />
+    <ClInclude Include="..\Sprites\wood.h" />
     <ClInclude Include="Library\glext.h" />
     <ClInclude Include="Library\glInfo.h" />
     <ClInclude Include="Library\library_funcs.h" />
     <ClInclude Include="Library\Timer.h" />
-    <ClInclude Include="src\Sprites\box.h" />
-    <ClInclude Include="src\Sprites\checkerboard.h" />
-    <ClInclude Include="src\Sprites\defaulttexture.h" />
-    <ClInclude Include="src\Sprites\floor.h" />
-    <ClInclude Include="src\Sprites\floorlarge.h" />
-    <ClInclude Include="src\Sprites\floorsmall.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

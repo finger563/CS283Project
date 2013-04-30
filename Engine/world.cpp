@@ -101,7 +101,7 @@ void World::basicWorld()
 
 	Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
 	Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(10,-5,15));
-	Object testobj3 = Object(floorlarge,floorlargewidth,floorlargeheight);
+	Object testobj3 = Object(stone,stonewidth,stoneheight);
 	Object testobj4 = Object(testpoly,box,boxtexwidth,boxtexheight,Vector3D(),Point3D(0,0,15));
 
 	testobj.GenerateCube();
@@ -128,12 +128,12 @@ void World::boxedIn()
 	testobj2.GenerateCube();
 	testobj2.SetRenderType(COLORED);
 
-	Object wall1 =  Object(floorlarge,floorlargewidth,floorlargeheight);
-	Object wall2 =  Object(floorlarge,floorlargewidth,floorlargeheight);
-	Object wall3 =  Object(floorlarge,floorlargewidth,floorlargeheight);
-	Object wall4 =  Object(floorlarge,floorlargewidth,floorlargeheight);
-	Object floor =  Object(floorlarge,floorlargewidth,floorlargeheight);
-	Object ceiling =  Object(floorlarge,floorlargewidth,floorlargeheight);
+	Object wall1 =  Object(stone,stonewidth,stoneheight);
+	Object wall2 =  Object(stone,stonewidth,stoneheight);
+	Object wall3 =  Object(stone,stonewidth,stoneheight);
+	Object wall4 =  Object(stone,stonewidth,stoneheight);
+	Object floor =  Object(wood,woodwidth,woodheight);
+	Object ceiling =  Object(ceilingtex,ceilingtexwidth,ceilingtexheight);
 
 	wall1.GenerateWall(0,length,length + depth);
 	wall2.GenerateWall(1,length,length + depth);

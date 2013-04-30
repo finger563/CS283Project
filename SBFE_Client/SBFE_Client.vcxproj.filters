@@ -48,24 +48,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Sprites\box.h">
-      <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprites\floor.h">
-      <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprites\floorsmall.h">
-      <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprites\checkerboard.h">
-      <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprites\defaulttexture.h">
-      <Filter>headers\Sprites</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Sprites\floorlarge.h">
-      <Filter>headers\Sprites</Filter>
-    </ClInclude>
     <ClInclude Include="..\Engine\camera.h">
       <Filter>headers\Engine</Filter>
     </ClInclude>
@@ -122,6 +104,33 @@
     </ClInclude>
     <ClInclude Include="..\Engine\world.h">
       <Filter>headers\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\box.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\ceiling.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\checkerboard.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\defaulttexture.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\floor.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\floorlarge.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\floorsmall.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\stone.h">
+      <Filter>headers\Sprites</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Sprites\wood.h">
+      <Filter>headers\Sprites</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
