@@ -38,9 +38,12 @@ bool print = true;
 bool typing = false;
 
 void PrintChat();
+void PrintDebug();
 
 // INCLUDES AND DECLARATION FOR NETWORK CODE //////////////////////////////////
 #include "..\Network\helper_funcs.h"
+
+int RTT_ = 0;
 
 Camera tempeye;
 
@@ -388,7 +391,6 @@ void KeyOperations() {
 	}
 }
 
-// displays chat history (everyone who is on server)
 void PrintChat() {
     // backup current model-view matrix
     glPushMatrix();                     // save current modelview matrix
@@ -408,17 +410,10 @@ void PrintChat() {
 	numChats = ( conversation.size() > player.Chat().NumChatsDisplayed() ) ? 
 		player.Chat().NumChatsDisplayed() : conversation.size() ;
 	std::list<string>::reverse_iterator riter = conversation.rbegin();
-
-#if defined(DEBUG)
-	ss << "Player: ("<<player.Eye().GetPosition().x<<
-					","<<player.Eye().GetPosition().y<<
-					","<<player.Eye().GetPosition().z<<
-					"), ("<<player.Eye().GetTheta()<<
-					","<<player.Eye().GetPhi()<<
-					"),"<<player.Info().life<< ends;
-	drawString(ss.str().c_str(), 1, 400, color, font);
+	
+	ss << "Health: " << player.Info().life << ends;
+	drawString(ss.str().c_str(), glutGet(GLUT_WINDOW_WIDTH) - 8*strlen(ss.str().c_str()), 1, color, font);
 	ss.str("");
-#endif
 
 	for (int i=0; i < numChats; i++) {
 		ss << *riter << ends;
@@ -448,6 +443,49 @@ void PrintChat() {
     glMatrixMode(GL_MODELVIEW);      // switch to modelview matrix
     glPopMatrix();                   // restore to previous modelview matrix
 }
+
+void PrintDebug() {
+    // backup current model-view matrix
+    glPushMatrix();                     // save current modelview matrix
+    glLoadIdentity();                   // reset modelview matrix
+
+    // set to 2D orthogonal projection
+    glMatrixMode(GL_PROJECTION);     // switch to projection matrix
+    glPushMatrix();                  // save current projection matrix
+    glLoadIdentity();                // reset projection matrix
+    gluOrtho2D(0, screenWidth, 0, screenHeight); // set to orthogonal projection
+
+    float color[4] = {1, 1, 1, 1};
+    stringstream ss;
+
+	ss << "Position: ("<<player.Eye().GetPosition().x<<
+					","<<player.Eye().GetPosition().y<<
+					","<<player.Eye().GetPosition().z<<
+					")" << ends;
+	drawString(ss.str().c_str(), 1, glutGet(GLUT_WINDOW_HEIGHT)-13, color, font);
+	ss.str("");
+	ss << "Orientation: ("<<player.Eye().GetTheta()<<
+						","<<player.Eye().GetPhi()<< ")" << ends;
+	drawString(ss.str().c_str(), 1, glutGet(GLUT_WINDOW_HEIGHT)-13*2, color, font);
+	ss.str("");
+	ss << "RTT: " << RTT_ << " ms." << ends;
+	drawString(ss.str().c_str(), 1, glutGet(GLUT_WINDOW_HEIGHT)-13*3, color, font);
+	ss.str("");
+    ss << "Updating Time: " << updateTime << " ms" << ends;
+    drawString(ss.str().c_str(), 1, glutGet(GLUT_WINDOW_HEIGHT)-13*4, color, font);
+    ss.str("");
+
+    // unset floating format
+    ss << std::resetiosflags(std::ios_base::fixed | std::ios_base::floatfield);
+
+    // restore projection matrix
+    glPopMatrix();                   // restore to previous projection matrix
+
+    // restore modelview matrix
+    glMatrixMode(GL_MODELVIEW);      // switch to modelview matrix
+    glPopMatrix();                   // restore to previous modelview matrix
+}
+
 
 //=============================================================================
 // CALLBACKS
@@ -566,8 +604,8 @@ void displayCB() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
 	PrintChat();
-#if defined(DEBUG)
-	showInfo();
+#if defined(ON_SCREEN_DEBUG)
+	PrintDebug();
 #endif
 
     //printTransferRate();
@@ -596,9 +634,7 @@ void NetworkTimerCB(int millisec) {
 		millisec = elapsed/1000;
 	if ( millisec > MAX_NETWORK_UPDATE_TIME )
 		millisec = MAX_NETWORK_UPDATE_TIME;
-	#ifdef DEBUG
-	cout << "RTT: " << millisec << " ms." << endl;
-	#endif
+	RTT_=millisec;
 	player.StopTimer();
 	player.ResetTimer();
 	SendMove();
