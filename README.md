@@ -137,19 +137,24 @@ Install Perl first, then install and build ACE.
 Follow these steps to install ACE (in Windows):
  
  * Uncompress ACE to C:\ACE_wrappers (or some other folder of your choice)
- * Define environment variable ACE_ROOT to be C:\ACE_wrappers (or whatever folder you chose)
- * Define environment variable MPC_ROOT to be %ACE_ROOT%\MPC
- * Update the path to be PATH=%PATH%;%ACE_ROOT%\bin;%ACE_ROOT%\lib
- * Create config.h in %ACE_ROOT%\ace directory, putting in the file:
- 
-	\#define ACE_HAS_STANDARD_CPP_LIBRARY 1
+ * Define environment variables
 
-	\#include "ace/config-win32.h"
+		ACE_ROOT = C:\ACE_wrappers (or whatever folder you chose)
+		MPC_ROOT = %ACE_ROOT%\MPC
+
+ * Update the path to be 
+
+		PATH=%PATH%;%ACE_ROOT%\bin;%ACE_ROOT%\lib
+		
+ * Create config.h in %ACE_ROOT%\ace directory, putting in the file: 
+	
+		#define ACE_HAS_STANDARD_CPP_LIBRARY 1 
+		#include "ace/config-win32.h"
 	
  * open command prompt, 
  
-	cd %ACE_ROOT%\ace
-	mwc.pl -type vc10 ace.mwc
+		cd %ACE_ROOT%\ace
+		mwc.pl -type vc10 ace.mwc
 	
  * open the ACE_wrappers_vc10 project in the %ACE_ROOT% folder and build 
    the solution (build both Debug and Release).
