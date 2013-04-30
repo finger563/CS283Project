@@ -215,7 +215,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				
 				myobject = CreatePlayer( myplayer );	// Send CREATE message to connected players
 				#if defined(DEBUG)
-				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent CREATE player to other players.\n"));
+				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent CREATE player to other players.\n")));
 				#endif
 				server.Create(myobject);		// need to keep track of this object on the server
 				SendObjects();					// send all current objects to the new player
@@ -248,7 +248,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				mymessage.SetObject(myobject);
 				SendMessage(mymessage);					// update all clients (sender will receive life update)
 				#if defined(DEBUG)
-				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent MOVE object to players.\n"));
+				ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Server sent MOVE object to players.\n")));
 				#endif
 			}
 			break;

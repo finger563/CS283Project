@@ -22,8 +22,6 @@ using namespace std;
 #include "..\Engine\Object.h"
 #include "..\Engine\world.h"
 
-//#define DEBUG
-
 const float		SHOTDAMAGE = 20.0;
 const float		SHOTOFFSET = 6.0;
 const int		SHOTSPEED = 30;

@@ -11,9 +11,6 @@
 #if !defined (_CS283_PLAYER_H_)
 #define _CS283_PLAYER_H_
 
-//#define DEBUG							// for console debugging
-#define ON_SCREEN_DEBUG					// for showing info on screen (pos,heading,RTT,update time)
-
 #include <list>
 #include "Message.h"
 #include "..\Engine\chat.h"

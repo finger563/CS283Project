@@ -4,6 +4,9 @@
 #include <limits>
 #include "constants.h"
 
+//#define DEBUG							// for console debugging
+#define ON_SCREEN_DEBUG					// for showing info on screen (pos,heading,RTT,update time)
+
 // for input handling
 const int	INPUT_UPDATE_TIME = 20;			// input updates in milliseconds
 const int	NETWORK_UPDATE_TIME = 300;		// initial network updates in milliseconds
