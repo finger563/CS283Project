@@ -20,6 +20,7 @@ using namespace std;
 
 // the following is used for logging of messages
 #include "ace/Log_Msg.h"
+#include "ace\OS.h"
 
 // headers necessary for this file
 #include "ace/OS_NS_string.h"
@@ -36,6 +37,7 @@ static ACE_CDR::Long numPlayers = 0;
 static ACE_CDR::Long numObjects = 0;
 	
 ACE_Time_Value period_t (0,UPDATE_TIME);	// update period (seconds,microseconds)
+double prevtime = 0;
 
 Dummy_Data_Handler::Dummy_Data_Handler (ACE_Reactor *r) 
   : ACE_Event_Handler (r) {
@@ -73,6 +75,9 @@ int Dummy_Data_Handler::open (void)
 	}
   
 	myid = numPlayers++;
+	
+	ACE_Time_Value temptime = ACE_OS::gettimeofday();
+	prevtime = temptime.sec() + temptime.usec()/1000000.0;
 
 	this->reactor()->schedule_timer(this,
 									0,
@@ -344,6 +349,9 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, cons
 	ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Dummy_Data_Handler::handle_timeout invoked\n")));
 	#endif
 
+	double elapsed = currenttime - prevtime;
+	prevtime = currenttime;
+
 	Message mymessage;
 	Player_s myplayer;
 	Object_s myobject;
@@ -351,7 +359,7 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, cons
 		if ( !server.Objects().empty() ) {	// do we have something to update?
 			double time = period_t.usec()/1000000.0;
 			time += period_t.sec();
-			server.UpdateObjects(time);			// upate position of all shots
+			server.UpdateObjects(elapsed);			// upate position of all shots
 			std::list<Object_s> objlist = server.Objects();
 			for (std::list<Object_s>::iterator it=objlist.begin(); it != objlist.end(); it++ ) {
 				if ( it->life <= 0.0 ||

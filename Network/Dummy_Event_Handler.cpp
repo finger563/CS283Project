@@ -18,6 +18,7 @@ using namespace std;
 
 // the following is used for logging of messages
 #include "ace/Log_Msg.h"
+#include "ace\OS.h"
 
 // headers necessary for this file
 #include "ace/OS_NS_string.h"
@@ -47,8 +48,8 @@ Dummy_Event_Handler::~Dummy_Event_Handler (void) {
 // initialization method that registers ourselves with the reactor. 
 int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 	#if defined(DEBUG)
-  // for debugging
-  cout << "Dummy_Event_Handler::open invoked" << endl;
+	// for debugging
+	cout << "Dummy_Event_Handler::open invoked" << endl;
 	#endif
 	
 	string server_ip = ip_addr;
@@ -56,8 +57,7 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 	// initialize the address data structure. 
 	if (server_addr_.set (server_ip.c_str()) == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%t] Player : Network Thread - "),
-					ACE_TEXT ("failed to set IP address and port (%m)\n")));
+					ACE_TEXT ("[%t] Player : Network Thread - failed to set IP address and port (%m)\n")));
 		return 1;
 	}
   
@@ -67,8 +67,7 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 	// connect. 
 	if (this->connector_.connect (this->peer_, server_addr_) == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%t] Player : Network Thread - "),
-					ACE_TEXT ("cannot connect to server (%m)\n")));
+					ACE_TEXT ("[%t] Player : Network Thread - cannot connect to server (%m)\n")));
 		return 1;
 	}
 
@@ -94,12 +93,8 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 	// disable non blocking I/O
 	this->peer_.disable (ACE_NONBLOCK);
 	
-	struct timespec mytime;
-	if ( ACE_OS::clock_gettime(CLOCK_REALTIME,&mytime) == -1 ) {
-		ACE_ERROR((LM_ERROR,
-				   ACE_TEXT("[%P] Dummy_Event_Handler::open - failed to get current time!\n")));
-	}
-	prevtime = mytime.tv_sec + mytime.tv_nsec/1000000000.0;
+	ACE_Time_Value temptime = ACE_OS::gettimeofday();
+	prevtime = temptime.sec() + temptime.usec()/1000000.0;
 
 	this->reactor()->schedule_timer(this,
 									0,
@@ -137,8 +132,7 @@ int Dummy_Event_Handler::handle_input (ACE_HANDLE h) {
 	if (bytesReceived == -1) { 
 		// this is an error condition
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%P] Dummy_Event_Handler::handle_input - "),
-					ACE_TEXT ("failed on recv (%m)\n")));
+					ACE_TEXT ("[%P] Dummy_Event_Handler::handle_input - failed on recv (%m)\n")));
 		// we let the reactor trigger the handle close
 		return -1;
 	} 
@@ -272,11 +266,11 @@ int Dummy_Event_Handler::send(const Message& message) {
 }
 
 int Dummy_Event_Handler::recv_message(Message& message) {
-	int MAXHOSTNAMELEN = 100;
+	int MAXHOSTNAMELEN_RECV = 100;
 	ACE_INET_Addr peer_addr;
 	peer_.get_remote_addr(peer_addr);
-	ACE_Message_Block* mblk = new ACE_Message_Block (MAXHOSTNAMELEN +1);
-	peer_addr.get_host_name (mblk->wr_ptr(),MAXHOSTNAMELEN);
+	ACE_Message_Block* mblk = new ACE_Message_Block (MAXHOSTNAMELEN_RECV +1);
+	peer_addr.get_host_name (mblk->wr_ptr(),MAXHOSTNAMELEN_RECV);
 	mblk->wr_ptr(strlen (mblk->wr_ptr())+1);
 	
 	ACE_Message_Block *payload = new ACE_Message_Block (ACE_DEFAULT_CDR_BUFSIZE);
@@ -328,9 +322,7 @@ int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, co
 	prevtime = currenttime;
 	
 	if ( !player.Objects().empty() ) {
-		double time = period_t.usec()/1000000.0;
-		time += period_t.sec();
-		player.Update(time);
+		player.Update(elapsed);
 	}
 	
 	this->reactor()->schedule_timer(this,

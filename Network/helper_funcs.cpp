@@ -64,8 +64,7 @@ void *thread_func (void *arg)
 	// and host network interface.
 	if (event_handler.open (myargv) == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%t] Player : Network Thread - "),
-					ACE_TEXT ("failed to initialize client (%m)\n")));
+					ACE_TEXT ("[%t] Player : Network Thread - failed to initialize client (%m)\n")));
 		return 0;
 	}
 	
@@ -73,8 +72,7 @@ void *thread_func (void *arg)
 	// back whenever there are events
 	if (reactor->run_reactor_event_loop () == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%t] Player : Network Thread - "),
-					ACE_TEXT ("failed in reactor's event loop (%m)\n")));
+					ACE_TEXT ("[%t] Player : Network Thread - failed in reactor's event loop (%m)\n")));
 		return 0;
 	}
 

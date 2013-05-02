@@ -70,8 +70,8 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv [])
 	// Set the IP address for the server
 	if (server_addr.set (ip_addr.c_str()) == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%P] server - "),
-					ACE_TEXT ("failed to set ip address (%m)\n")));
+					ACE_TEXT ("[%P] server - failed to set ip address (%s)\n"),
+					ip_addr.c_str()));
 		return 1;
 	}
 
@@ -117,8 +117,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv [])
 	// and host network interface.
 	if (accept_handler.open (server_addr) == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%P] server - "),
-					ACE_TEXT ("failed to initialize server (%m)\n")));
+					ACE_TEXT ("[%P] server - failed to initialize server (%m)\n")));
 		return 1;
 	}
 	char myip[32];
@@ -129,8 +128,7 @@ int ACE_TMAIN (int argc, ACE_TCHAR *argv [])
 	// back whenever there are events
 	if (reactor->run_reactor_event_loop () == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%P] server - "),
-					ACE_TEXT ("failed in reactor's event loop (%m)\n")));
+					ACE_TEXT ("[%P] server - failed in reactor's event loop (%m)\n")));
 		return 1;
 	}
 
