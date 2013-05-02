@@ -3,7 +3,7 @@ CS283Project : Super Block Fighter Extreme
 
 CS 283 Networked 3D Game Project
 
-This project is written by William Emfinger and Paul Mcneil for Vanderbilt's 
+This project is written by William Emfinger and Paul McNeil for Vanderbilt's 
 spring 2013 CS283 Computer Networks class.
 
 The program is a networked 3D first person game in which the player can use the 
@@ -31,6 +31,7 @@ README Contents
 * Getting the project files
 * Running the Server
 * Running the game (client)
+* Results
 
 Overall Game Design
 -------------------
@@ -52,7 +53,7 @@ they do one of two things.  If the object to be moved corresponds to them (as in
 The period at which the players send MOVE messages to the server is determined by the RTT the players measure from 
 sending a MOVE message to the server and getting a corresponding MOVE message back (with their ID and TYPE).  
 
-If players exit thier clients, they send LEAVE messages to the server to inform the server they are leaving the game.  When the server receives a LEAVE message, it sends a REMOVE object to all other players, informing them that the player has left the game.  Moreover, if a client force-quits their game (meaning a LEAVE message is not sent to the server), the server detects the closure of the client's connection and removes the player from the server's data structures and sends the REMOVE message to all other players.  
+If players exit their clients, they send LEAVE messages to the server to inform the server they are leaving the game.  When the server receives a LEAVE message, it sends a REMOVE object to all other players, informing them that the player has left the game.  Moreover, if a client force-quits their game (meaning a LEAVE message is not sent to the server), the server detects the closure of the client's connection and removes the player from the server's data structures and sends the REMOVE message to all other players.  
 
 For reference, the message types are listed here:
  * REGISTER: Players REGISTER with the server initially
@@ -217,3 +218,26 @@ Controls for the game:
  * enter (during chat): send message
  * backspace (during chat): remove last character added
  * escape: quit program or (during chat) exit chat
+
+Methods
+-------------------
+The program was tested on two tiers: localized testing and intranet testing.
+
+Localized testing occurred often throughout the development of the program. Each time a new feature was added, 
+it was intergrated into the system to ensure continuity. These changes were tested on at least two different systems. 
+Following the localized testing, intranet testing occurred to evaluate the messaging protocol and state synchronization.
+
+Intranet testing occurred on the ISIS and Featheringhill intranets. It consisted of running the program on two independent systems.
+The systems would then join to test the functionality of each game feature. Special attention was paid to the chat,
+player and object movements, and players entrance/exit from a game.
+
+Results
+-------------------
+Localized testing served to eliminate many client-side inconsistencies in the code. Issues such as visual glitches and 
+rotation limitations were corrected to these tests. Locailized state synchronization testing revealed latencies as well
+as messaginng errors. As a result of repetitive testing, the game properly implements all of the client-size functionality 
+
+Intranet testing served to eliminate the remaining errors that could not be tested locally such as router delays.
+Testing on the ISIS network was unsuccessful due to its firewall and other security protocols. However, testing on the 
+Featheringill network was successful. Player and object movements synchronized reasonible across the intranet as did 
+inter-player messaging. 
