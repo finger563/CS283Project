@@ -390,11 +390,28 @@ void Object::GenerateWall(size_t type, double length, double depth) {
 }
 
 void Object::GenerateShot(Vector3D pos, double theta_, double phi_) {
-	GenerateCube(1.0);
+	master.clear();
+
+	master.push_back(Poly( Vertex(0, 0, 4,1),
+						   Vertex(0, 2, -2,1),
+						   Vertex(0, -2, -2,1),
+						   Vertex(),3,Vector3D(1,0,0),COLORED));
+	master.begin()->SetDoubleSided(true);
+	master.begin()->SetVertexColors(rand()/(double)RAND_MAX,rand()/(double)RAND_MAX,rand()/(double)RAND_MAX,
+									rand()/(double)RAND_MAX,rand()/(double)RAND_MAX,rand()/(double)RAND_MAX,
+									rand()/(double)RAND_MAX,rand()/(double)RAND_MAX,rand()/(double)RAND_MAX);
+	
+	rx = 0;
+	ry = 0;
+	rz = 0;
+	theta = 0;
+	phi = 0;
+
+	updateList(); 
 	theta = theta_;
 	phi = phi_;
 	position = pos;
-	SetRenderType(FLAT);
+	//SetRenderType(FLAT);
 	RotateToHeading();
 }
 	
@@ -483,7 +500,7 @@ std::list<Poly> Object::GetRenderList() const {
 	std::list<Poly> local = temp;
 	for(std::list<Poly>::iterator it = local.begin(); it != local.end(); ++it)
 	{
-		if( it->visible &&
+		if( ( it->visible || it->doublesided ) &&
 				(
 				it->v[0].z > 0 ||
 				it->v[1].z > 0 ||

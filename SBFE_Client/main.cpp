@@ -105,7 +105,7 @@ void SendLeave() {
 }
 
 // MAIN FUNCTION ///////////////////////////////////////////////////////////////
-int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {    
+saint ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {    
 	// parse the arguments
 	ACE_DEBUG ((LM_DEBUG,
 				"Player: parse the args\n"));

@@ -266,6 +266,19 @@ void Poly::HomogeneousDivide( ) {
 
 void Poly::SetupRasterization( ) {
 	double al,ar;
+
+	if ( doublesided ) {
+		Vector3D eye = Vector3D(0,0,-1);
+		Vector3D cull = eye - Vector3D(v[0].ex,v[0].ey,v[0].ez);
+		double test = cull*normal;
+		if ( test > 0 ) {
+			Vertex temp[4];
+			for (int i=0;i<numVertices;i++)
+				temp[i] = v[numVertices-i-1];
+			for (int i=0;i<numVertices;i++)
+				v[i] = temp[i];
+		}
+	}
 	
 	YSort(ySorted);
 	Vertex vl,vr;

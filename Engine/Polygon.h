@@ -34,6 +34,7 @@ public:
 
 	Vector3D normal;	// for backface culling
 	bool visible;		// for backface culling
+	bool doublesided;	// for doublesided polygons
 	
 	// THESE ARE FOR RENDERING QUICKLY
 	Vertex ySorted[POLY_MAX_VERTICES];		// may not need this; just sort v[]
@@ -48,6 +49,7 @@ public:
 		texwidth = defaulttexturewidth;
 		texheight = defaulttextureheight;
 		r=g=b=1;
+		doublesided = false;
 	}
     Poly(const Vertex& _v1,
 		 const Vertex& _v2,
@@ -73,10 +75,13 @@ public:
 		r=rgb.x;
 		b=rgb.y;
 		g=rgb.z;
+		doublesided = false;
 	}
     ~Poly(){}
 
 	// Polygon variable setter methods
+	void SetDoubleSided( bool ds ) { doublesided = ds; }
+	bool GetDoubleSided( void ) { return doublesided; }
 	void SetTexture( const unsigned short *tex, 
 					 const int width, const int height) { 
 		texture = tex; texwidth = width; texheight = height;
