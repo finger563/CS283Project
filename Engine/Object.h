@@ -16,11 +16,11 @@ public:
 
 	//Alternate Constructor
 	Object(const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
-		Point3D pos = Point3D(0,0,0), float _rx = 0, float _ry = 0, float _rz = 0);
+		Point3D pos = Point3D(0,0,0), double _rx = 0, double _ry = 0, double _rz = 0);
 
 	//Alternate Constructor
 	Object(Poly poly, const unsigned short* texture, const int texWid, const int texHgt, Vector3D vel = Vector3D(0,0,0), 
-		Point3D pos = Point3D(0,0,0), float _rx = 0, float _ry = 0, float _rz = 0);
+		Point3D pos = Point3D(0,0,0), double _rx = 0, double _ry = 0, double _rz = 0);
 
 	//Destructor
 	~Object(){}
@@ -35,27 +35,27 @@ public:
 	void add(Poly poly);
 
 	//Generates cube with with sidelength = size*2
-	void GenerateCube(float size = 5);
+	void GenerateCube(double size = 5);
 
 	//Generates tetrahedron
-	void GenerateTetra(float size = 5);
+	void GenerateTetra(double size = 5);
 
 	// Generates a floor at depth, with sidelength = length
-	void GenerateFloor(float length = 50, float depth = -10);
+	void GenerateFloor(double length = 50, double depth = -10);
 
 	// Generates a ceiling at depth, with sidelength = length
-	void GenerateCeiling(float length, float depth);
+	void GenerateCeiling(double length, double depth);
 
 	//Generates wall
 	//Wall types: 0 = front: faces the player init
 	///////////// 1 = back: behind player init
 	///////////// 2 = left: the left of player init
 	///////////// 3 = right: to the right of player init
-	void GenerateWall(size_t type, float length = 50, float depth = -10);
+	void GenerateWall(size_t type, double length = 50, double depth = -10);
 
-	void GenerateShot(Vector3D pos, float theta_, float phi_);
+	void GenerateShot(Vector3D pos, double theta_, double phi_);
 	
-	void GeneratePlayer(Vector3D pos, float theta_, float phi_, 
+	void GeneratePlayer(Vector3D pos, double theta_, double phi_, 
 		const unsigned short* texture = box, const int texWid=boxtexwidth, const int texHgt=boxtexheight);
 
 	//fileParser()<-- future function
@@ -67,10 +67,10 @@ public:
 	bool SetPosition(const Point3D& pos);
 	Point3D GetPosition(void) const;
 
-	bool SetBoudingEllipsoid(float x, float y, float z);
-	float GetRadiusX(void) const;
-	float GetRadiusY(void) const;
-	float GetRadiusZ(void) const;
+	bool SetBoudingEllipsoid(double x, double y, double z);
+	double GetRadiusX(void) const;
+	double GetRadiusY(void) const;
+	double GetRadiusZ(void) const;
 
 	// sets rendertype for all polygons
 	bool SetRenderType( RenderType rt );
@@ -104,8 +104,8 @@ private:
 	std::list<Poly> temp;
 	Point3D position;
 	Vector3D heading, velocity; 
-	float theta,phi;
-	float rx,ry,rz;
+	double theta,phi;
+	double rx,ry,rz;
 	const unsigned short* tex;
 	int texWidth;
 	int texHeight;

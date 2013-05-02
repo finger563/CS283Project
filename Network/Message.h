@@ -46,7 +46,7 @@ enum ObjectType {	// These are the types of dynamic objects which need to be tra
 struct Player_s {
 	char			name[MAX_NAME_LEN];
 	ACE_CDR::Long	id;
-	float x,y,z,		// position vector
+	double x,y,z,		// position vector
 		  theta, phi,	// heading vector
 		  life,			// time to live
 		  vx,vy,vz;		// velocity vector
@@ -86,10 +86,10 @@ struct Player_s {
 
 	void SetName(const char* n) {memset(name,0,MAX_NAME_LEN);strcpy(name,n);}
 	void SetID(ACE_CDR::Long i) {id = i;}
-	void SetPos(const float _x, const float _y, const float _z) { x=_x;y=_y;z=_z;}
-	void SetHeading(const float _t, const float _p) { theta = _t; phi = _p; }
-	void SetLife(const float _l) { life = _l; }
-	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
+	void SetPos(const double _x, const double _y, const double _z) { x=_x;y=_y;z=_z;}
+	void SetHeading(const double _t, const double _p) { theta = _t; phi = _p; }
+	void SetLife(const double _l) { life = _l; }
+	void SetVelocity(const double _x, const double _y, const double _z) { vx=_x;vy=_y;vz=_z;}
 	
 	bool operator==(const Player_s &b) {
 		if ( id ==b.id && strcmp(name,b.name)==0 )
@@ -102,7 +102,7 @@ struct Player_s {
 struct Object_s {
 	ObjectType		type;
 	ACE_CDR::Long	id;
-	float x,y,z,		// position vector
+	double x,y,z,		// position vector
 		  theta,phi,	// heading vector
 		  life,			// time to live
 		  vx,vy,vz;		// velocity vector
@@ -150,17 +150,17 @@ struct Object_s {
 	void SetType(ObjectType t) { type = t; }
 	void SetContent(const char* n) {memset(content_,0,MAX_CONT_LEN);strcpy(content_,n);}
 	void SetKilledby(const char* k) {memset(killedby,0,MAX_CONT_LEN);strcpy(killedby,k);}
-	void SetPos(const float _x, const float _y, const float _z) { x=_x;y=_y;z=_z;}
-	void SetHeading(const float _t, const float _p) { theta = _t; phi = _p; }
-	void SetLife(const float _l) { life = _l; }
-	void SetVelocity(const float _x, const float _y, const float _z) { vx=_x;vy=_y;vz=_z;}
+	void SetPos(const double _x, const double _y, const double _z) { x=_x;y=_y;z=_z;}
+	void SetHeading(const double _t, const double _p) { theta = _t; phi = _p; }
+	void SetLife(const double _l) { life = _l; }
+	void SetVelocity(const double _x, const double _y, const double _z) { vx=_x;vy=_y;vz=_z;}
 	
-	bool Update(const float time) {
-		float tr = cos(phi);
-		float tx = tr*sin(theta),
+	bool Update(const double time) {
+		double tr = cos(phi);
+		double tx = tr*sin(theta),
 			  ty = sin(phi),
 			  tz = tr*cos(theta);
-		float mag = sqrt(tx*tx + ty*ty + tz*tz);
+		double mag = sqrt(tx*tx + ty*ty + tz*tz);
 		tx = tx/mag;
 		ty = ty/mag;
 		tz = tz/mag;
@@ -182,7 +182,7 @@ struct Object_s {
 class Message {
 private:
 	MessageType type_;
-	float		t_;				// time differential for update
+	double		t_;				// time differential for update
 	ACE_CDR::Long	world_;		// which world is the server running?
 	Object_s	object_;
 	Player_s	player_;
@@ -223,8 +223,8 @@ public:
 	void	SetWorld(const long w) { world_ = w; }
 	long	GetWorld() const { return world_; }
 
-	void	SetTime(const float time) { t_ = time; }
-	float	GetTime() const { return t_; }
+	void	SetTime(const double time) { t_ = time; }
+	double	GetTime() const { return t_; }
 
 	void		SetObject(const Object_s& o) {object_=o;}
 	Object_s	GetObject() const {return object_;}

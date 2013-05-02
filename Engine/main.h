@@ -69,6 +69,6 @@ const int    DATA_SIZE = IMAGE_WIDTH * IMAGE_HEIGHT * CHANNEL_COUNT;
 #endif
 
 #define BACKGROUND_COLOR	RGB_BLACK
-#define DEFAULT_Z_BUFFER	((float)10000)
+#define DEFAULT_Z_BUFFER	((double)10000)
 
 #endif

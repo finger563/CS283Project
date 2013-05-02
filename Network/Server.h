@@ -22,12 +22,12 @@ using namespace std;
 #include "..\Engine\Object.h"
 #include "..\Engine\world.h"
 
-const float		SHOTDAMAGE = 20.0;
-const float		SHOTOFFSET = 6.0;
+const double		SHOTDAMAGE = 20.0;
+const double		SHOTOFFSET = 6.0;
 const int		SHOTSPEED = 30;
-const float		SHOTLIFE = 5.0;			// measured in seconds
-const float		PLAYERLIFE = 100.0;		// measured in HP
-const int		UPDATE_TIME = 30000;	// measured in microseconds
+const double		SHOTLIFE = 5.0;			// measured in seconds
+const double		PLAYERLIFE = 100.0;		// measured in HP
+const int		UPDATE_TIME = 40000;	// measured in microseconds
 
 class Server_c {
 private:
@@ -137,14 +137,14 @@ public:
 		return false;
 	}
 
-	void UpdateObjects(float time) {
+	void UpdateObjects(double time) {
 		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
 			if ( it->type != PLAYER )
 				it->Update(time);
 		}
 	}
 
-	float GetObjectLife(ObjectType t, ACE_CDR::Long id){
+	double GetObjectLife(ObjectType t, ACE_CDR::Long id){
 		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
 			if ( it->id == id && it->type == t )
 				return it->life;
@@ -152,7 +152,7 @@ public:
 		return -1;
 	}
 
-	void SetObjectLife(ObjectType t, ACE_CDR::Long id, float _l) {
+	void SetObjectLife(ObjectType t, ACE_CDR::Long id, double _l) {
 		for (std::list<Object_s>::iterator it = objects.begin(); it != objects.end(); it++) {
 			if ( it->id == id && it->type == t )
 				it->SetLife(_l);

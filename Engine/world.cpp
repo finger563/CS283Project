@@ -119,8 +119,8 @@ void World::basicWorld()
 
 void World::boxedIn()
 {
-	float length = 75;
-	float depth = -10;
+	double length = 75;
+	double depth = -10;
 
 	Object testobj = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));
 	Object testobj2 = Object(box,boxtexwidth,boxtexheight,Vector3D(),Point3D(-10,-5,15));

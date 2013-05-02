@@ -156,7 +156,7 @@ Object_s Dummy_Data_Handler::CreateShot( Player_s& myplayer ) {
 	myobject.SetID(numObjects++);
 	myobject.SetType(SHOT);
 	myobject.SetHeading(myplayer.theta,myplayer.phi);
-	float r = cos(myplayer.phi),
+	double r = cos(myplayer.phi),
 		x = r*sin(myplayer.theta),
 		y = sin(myplayer.phi),
 		z = r*cos(myplayer.theta);
@@ -338,6 +338,8 @@ int Dummy_Data_Handler::recv_message(Message& message) {
 }
 
 int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, const void* act) {	
+	double currenttime = current_time.usec() / 1000000.0;
+	currenttime += current_time.sec();
 	#if defined(DEBUG)
 	ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Dummy_Data_Handler::handle_timeout invoked\n")));
 	#endif
@@ -345,9 +347,9 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, cons
 	Message mymessage;
 	Player_s myplayer;
 	Object_s myobject;
-	if ( con_peers.begin()->ID == myid ) {	// only want one handle_timeout running on the server
+	if ( !con_peers.empty() && con_peers.begin()->ID == myid ) {	// only want one handle_timeout running on the server
 		if ( !server.Objects().empty() ) {	// do we have something to update?
-			float time = period_t.usec()/1000000.0;
+			double time = period_t.usec()/1000000.0;
 			time += period_t.sec();
 			server.UpdateObjects(time);			// upate position of all shots
 			std::list<Object_s> objlist = server.Objects();

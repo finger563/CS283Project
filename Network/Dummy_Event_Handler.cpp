@@ -26,7 +26,8 @@ using namespace std;
 Player_c player;
 extern string ip_addr;
 
-ACE_Time_Value period_t (0,50000);
+ACE_Time_Value period_t (0,UPDATE_TIME);
+double prevtime = 0;
 
 
 // constructor (pass a pointer to the reactor). By default we assume
@@ -86,14 +87,20 @@ int Dummy_Event_Handler::open (ACE_TCHAR *argv []) {
 										// in reading data and timout handling
 								ACE_Event_Handler::TIMER_MASK | ACE_Event_Handler::READ_MASK) == -1) {
 		ACE_ERROR ((LM_ERROR,
-					ACE_TEXT ("[%P] Dummy_Event_Handler::open - "),
-					ACE_TEXT ("failed to register handler (%m)\n")));
+					ACE_TEXT ("[%P] Dummy_Event_Handler::open - failed to register handler (%m)\n")));
 		return -1;
 	}
 
 	// disable non blocking I/O
 	this->peer_.disable (ACE_NONBLOCK);
 	
+	struct timespec mytime;
+	if ( ACE_OS::clock_gettime(CLOCK_REALTIME,&mytime) == -1 ) {
+		ACE_ERROR((LM_ERROR,
+				   ACE_TEXT("[%P] Dummy_Event_Handler::open - failed to get current time!\n")));
+	}
+	prevtime = mytime.tv_sec + mytime.tv_nsec/1000000000.0;
+
 	this->reactor()->schedule_timer(this,
 									0,
 									period_t);
@@ -309,16 +316,19 @@ int Dummy_Event_Handler::recv_message(Message& message) {
 }
 
 int Dummy_Event_Handler::handle_timeout (const ACE_Time_Value & current_time, const void * act) {	
-	float currenttime = current_time.usec() / 1000000.0;
+	double currenttime = current_time.usec() / 1000000.0;
 	currenttime += current_time.sec();
 	#if defined(DEBUG)
 	ACE_DEBUG ((LM_DEBUG,
 				ACE_TEXT ("Dummy_Event_Handler::handle_timeout invoked at %f\n"),
 				currenttime));
 	#endif
+
+	double elapsed = currenttime - prevtime;
+	prevtime = currenttime;
 	
 	if ( !player.Objects().empty() ) {
-		float time = period_t.usec()/1000000.0;
+		double time = period_t.usec()/1000000.0;
 		time += period_t.sec();
 		player.Update(time);
 	}

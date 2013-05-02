@@ -7,7 +7,7 @@
 class Camera{
 
 private:
-	float theta,phi;
+	double theta,phi;
 	Vector3D forward;
 	Vector3D up;
 	Vector3D right; 
@@ -23,25 +23,25 @@ public:
 
 	void Translate(const Vector3D& v);
 
-	void Rotate( const float _t, const float _p );
+	void Rotate( const double _t, const double _p );
 
 	Matrix GetWorldToCamera();
 
-	float GetPhi() const { return phi; }
-	float GetTheta() const { return theta; }
-	void SetAngles( const float _t, const float _p );
+	double GetPhi() const { return phi; }
+	double GetTheta() const { return theta; }
+	void SetAngles( const double _t, const double _p );
 
 	Point3D GetPosition() const;
-	void SetPosition(const float x, const float y, const float z);
+	void SetPosition(const double x, const double y, const double z);
 
 	Point3D GetForward() const;
-	void SetForward(const float x, const float y, const float z);
+	void SetForward(const double x, const double y, const double z);
 	
 	Point3D GetUp() const;
-	void SetUp(const float x, const float y, const float z);
+	void SetUp(const double x, const double y, const double z);
 	
 	Point3D GetRight() const;
-	void SetRight(const float x, const float y, const float z);
+	void SetRight(const double x, const double y, const double z);
 	
 	bool operator==(const Camera& c) {
 		if ( phi != c.GetPhi() )

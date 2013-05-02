@@ -1,6 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#define EPSILON     ((float)0.3)
+#define EPSILON     ((double)0.3)
 
 #endif

@@ -24,8 +24,8 @@ bool keyStates[256] = {};				// for regular keyboard keys
 bool keySpecialStates[256] = {};		// for "special" keyboard keys, i.e. arrow keys
 bool mouseLeftClick = false;
 bool mouseRightClick = false;
-float mouseX,mouseY;
-float theta = 0,
+double mouseX,mouseY;
+double theta = 0,
 	  phi = 0;
 void KeyOperations();
 
@@ -160,10 +160,10 @@ int ACE_TMAIN(int argc, ACE_TCHAR *argv[]) {
 	perspectiveProjection.data[3][2] = -1;	// translate z
 	perspectiveProjection.data[2][3] = 1;	// project z
 
-	projectionToPixel.data[3][0] = (float)SIZE_X*0.5;	// translate x
-	projectionToPixel.data[3][1] = (float)SIZE_Y*0.5;	// translate y
-	projectionToPixel.data[0][0] = (float)SIZE_X*0.5;	// scale x
-	projectionToPixel.data[1][1] = (float)SIZE_Y*0.5;	// scale y
+	projectionToPixel.data[3][0] = (double)SIZE_X*0.5;	// translate x
+	projectionToPixel.data[3][1] = (double)SIZE_Y*0.5;	// translate y
+	projectionToPixel.data[0][0] = (double)SIZE_X*0.5;	// scale x
+	projectionToPixel.data[1][1] = (double)SIZE_Y*0.5;	// scale y
 
 	userName = string(player.Info().name) + ":";
 
@@ -734,8 +734,8 @@ void mouseMotionCB(int x, int y) {
 
 void mousePassiveMotionCB(int x, int y) {
 	if ( !warped ) {
-		theta = (float)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((float)GLUT_WINDOW_WIDTH);
-		phi = -(float)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((float)GLUT_WINDOW_HEIGHT);
+		theta = (double)(x - glutGet(GLUT_WINDOW_WIDTH)/2.0)/((double)GLUT_WINDOW_WIDTH);
+		phi = -(double)(y - glutGet(GLUT_WINDOW_HEIGHT)/2.0)/((double)GLUT_WINDOW_HEIGHT);
 		if ( theta > 2.0*3.141592 ) {
 			theta = theta - 2.0*3.141592;
 		}

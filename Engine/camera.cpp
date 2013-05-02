@@ -16,8 +16,8 @@ void Camera::Translate( const Vector3D& v) {
 }
 
 void Camera::ComputeAxes() {
-	float r = cos(phi);
-	float x = r*sin(theta),
+	double r = cos(phi);
+	double x = r*sin(theta),
 		  y = sin(phi),
 		  z = r*cos(theta);
 	forward = normalize(Vector3D(x,y,z));
@@ -26,7 +26,7 @@ void Camera::ComputeAxes() {
 	up = normalize(Cross(forward,right));
 }
 
-void Camera::SetAngles( const float _t, const float _p ) {
+void Camera::SetAngles( const double _t, const double _p ) {
 	theta = _t;
 	if ( theta > 2.0*3.141592 ) {
 		theta = theta - 2.0*3.141592;
@@ -44,7 +44,7 @@ void Camera::SetAngles( const float _t, const float _p ) {
 	ComputeAxes();
 }
 
-void Camera::Rotate ( const float _t, const float _p ) {
+void Camera::Rotate ( const double _t, const double _p ) {
 	theta += _t;
 	if ( theta > 2.0*3.141592 ) {
 		theta = theta - 2.0*3.141592;
@@ -80,7 +80,7 @@ Point3D Camera::GetPosition() const {
 	return position;
 }
 
-void Camera::SetPosition( const float x, const float y, const float z ) {
+void Camera::SetPosition( const double x, const double y, const double z ) {
 	position.x = x;
 	position.y = y;
 	position.z = z;
@@ -90,7 +90,7 @@ Point3D Camera::GetForward() const {
 	return forward;
 }
 
-void Camera::SetForward( const float x, const float y, const float z) {
+void Camera::SetForward( const double x, const double y, const double z) {
 	forward.x = x;
 	forward.y = y;
 	forward.z = z;
@@ -100,7 +100,7 @@ Point3D Camera::GetUp() const {
 	return up;
 }
 
-void Camera::SetUp( const float x, const float y, const float z) {
+void Camera::SetUp( const double x, const double y, const double z) {
 	up.x = x;
 	up.y = y;
 	up.z = z;
@@ -110,7 +110,7 @@ Point3D Camera::GetRight() const {
 	return right;
 }
 
-void Camera::SetRight( const float x, const float y, const float z) {
+void Camera::SetRight( const double x, const double y, const double z) {
 	right.x = x;
 	right.y = y;
 	right.z = z;

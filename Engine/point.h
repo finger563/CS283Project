@@ -15,10 +15,10 @@
 class Point3D
 {
 public:
-    float x,y,z,w;	// 3D coords of point
+    double x,y,z,w;	// 3D coords of point
     Point3D() {x=y=z=0;w=1;}
-    Point3D(const float _x,const float _y,const float _z) { x = _x; y = _y; z = _z; w = 1; }
-    Point3D(const float _x,const float _y,const float _z,const float _w) { x = _x; y = _y; z = _z; w = _w; }
+    Point3D(const double _x,const double _y,const double _z) { x = _x; y = _y; z = _z; w = 1; }
+    Point3D(const double _x,const double _y,const double _z,const double _w) { x = _x; y = _y; z = _z; w = _w; }
     ~Point3D(){}
 
     void Print() {}
@@ -27,11 +27,11 @@ public:
 
     Point3D& operator= (const Point3D& rhs);
     
-    Point3D operator* (const float rhs) const;
+    Point3D operator* (const double rhs) const;
     
-    Point3D operator/ (const float rhs) const;
+    Point3D operator/ (const double rhs) const;
 
-    float operator* (const Point3D& rhs) const;
+    double operator* (const Point3D& rhs) const;
 
     Point3D operator+ (const Point3D& rhs) const;
 
@@ -50,12 +50,12 @@ inline static Vector3D Cross(const Vector3D& a, const Vector3D& b) {
 
 inline static Vector3D normalize(const Vector3D& rhs)
 {
-  float mag = sqrt(rhs.x*rhs.x + rhs.y*rhs.y + rhs.z*rhs.z);
+  double mag = sqrt(rhs.x*rhs.x + rhs.y*rhs.y + rhs.z*rhs.z);
 
     return Vector3D(rhs.x/mag,rhs.y/mag,rhs.z/mag);
 }
 
-inline static float magnitude(const Vector3D& rhs)
+inline static double magnitude(const Vector3D& rhs)
 {
 	return sqrt(rhs.x*rhs.x + rhs.y*rhs.y + rhs.z*rhs.z);
 }
@@ -68,10 +68,10 @@ inline static Vector3D crossProduct(const Vector3D& a, const Vector3D& b)
 class Point2D
 {
 public:
-    float x,y,w;	// 2D coords of point
+    double x,y,w;	// 2D coords of point
     Point2D() {x=y=0;w=1;}
-    Point2D(const float _x,const float _y) { x = _x; y = _y; w = 1; }
-    Point2D(const float _x,const float _y,const float _w) { x = _x; y = _y; w = _w; }
+    Point2D(const double _x,const double _y) { x = _x; y = _y; w = 1; }
+    Point2D(const double _x,const double _y,const double _w) { x = _x; y = _y; w = _w; }
     ~Point2D(){}
 
     void Print() {}
@@ -80,11 +80,11 @@ public:
 
     Point2D& operator= (const Point2D& rhs);
     
-    Point2D operator* (const float rhs) const;
+    Point2D operator* (const double rhs) const;
     
-    Point2D operator/ (const float rhs) const;
+    Point2D operator/ (const double rhs) const;
 
-    float operator* (const Point2D& rhs) const;
+    double operator* (const Point2D& rhs) const;
 
     Point2D operator+ (const Point2D& rhs) const;
 
@@ -93,7 +93,7 @@ public:
 
 typedef Point2D Vector2D;
 
-inline static float magnitude(const Vector2D& rhs)
+inline static double magnitude(const Vector2D& rhs)
 {
 	return sqrt(rhs.x*rhs.x + rhs.y*rhs.y);
 }

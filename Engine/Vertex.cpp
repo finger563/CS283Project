@@ -22,7 +22,7 @@ void Vertex::Translate( const Vector3D& _v ) {
 	z += _v.z;
 }
 
-void Vertex::Translate( const float _x, const float _y, const float _z ) {
+void Vertex::Translate( const double _x, const double _y, const double _z ) {
 	x += _x;
 	y += _y;
 	z += _z;
@@ -60,7 +60,7 @@ void Vertex::TransformToPerspective( const Matrix& _m ) {
 }
 
 void Vertex::HomogeneousDivide( ) {
-	float tmp = 1/w;
+	double tmp = 1/w;
 	for (int i=0;i<NUM_VERTEX_DATA;i++)
 		data[i] = data[i]*tmp;
 }
@@ -103,16 +103,16 @@ Vertex Vertex::operator+ (const Vertex& rhs) const {
 	return v;
 }
 
-Vertex Vertex::operator* (const float rhs) const {
+Vertex Vertex::operator* (const double rhs) const {
 	Vertex v;
 	for (int i=0;i<NUM_VERTEX_DATA;i++)
 		v[i] = data[i]*rhs;
 	return v;
 }
 
-Vertex Vertex::operator/ (const float rhs) const {
+Vertex Vertex::operator/ (const double rhs) const {
 	Vertex v;
-	float tmp = 1/rhs;
+	double tmp = 1/rhs;
 	for (int i=0;i<NUM_VERTEX_DATA;i++)
 		v[i] = data[i]*tmp;
 	return v;

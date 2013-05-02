@@ -12,6 +12,7 @@
 #define _CS283_PLAYER_H_
 
 #include <list>
+#include "ace\High_Res_Timer.h"
 #include "Message.h"
 #include "..\Engine\chat.h"
 #include "..\Engine\camera.h"
@@ -19,6 +20,7 @@
 
 extern Camera tempeye;					// for update from server and input handling
 extern std::list<Object> objectlist;	// for update from server
+const int		UPDATE_TIME = 40000;	// measured in microseconds
 
 class Player_c {
 private:
@@ -96,7 +98,7 @@ public:
 		}
 	}
 
-	void Update(const float time) {
+	void Update(const double time) {
 		for (std::list<Object_s>::iterator it = objects.begin(); it!= objects.end(); it++) {
 			if ( it->type != PLAYER ) {
 				it->Update(time);
