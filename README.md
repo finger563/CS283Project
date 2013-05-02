@@ -19,7 +19,7 @@ The rendering code for this projet is written from scratch, and only uses a smal
 subset of OpenGL in order to have access to a pixel buffer.  The vector/matrix 
 manipulation, the polygon transformations and rasterizations, and all of the 
 camera and object code is entirely written from scratch.  As such, this graphics
-library (contained within ./src/Engine) is portable to any device which has a C++ 
+library (contained within ./Engine) is portable to any device which has a C++ 
 compiler.  Modifications to the code to work in a C only environment are not difficult.
 
 README Contents
@@ -33,6 +33,7 @@ README Contents
 * Getting the project files
 * Running the Server
 * Running the game (client)
+* Methods
 * Results
 
 Overall Game Design
@@ -66,6 +67,12 @@ For reference, the message types are listed here:
  * MOVE: Server sends MOVE message when a created object needs to be moved (i.e. shot update, player update, etc.). Players send MOVE messages to the server when the player needs to move (i.e. keyboard/mouse input)
  * LEAVE: Player sends LEAVE message when they disconnect from the server
  * REMOVE: Then the server removes the player from it's list and sends REMOVE to remove the object from other players' games
+
+The messaging format (and all objects contained in messages) are defined in ./Network/Message.h.  ./Network/Message.cpp implements the cdr stream input and output operators as well as the length definition for the message types.  
+
+The server network code is primarily contained in ./Network/Dummy_Data_Handler.cpp which handles the connection creation when a client connects to the server.  Each client connection runs in its own thread and therefore each thread runs the callback handlers which are defined in ./Network/Dummy_Data_Handler.cpp (e.g. handle_timeout, handle_input, handle_close).  The server data structures are stored as lists in a Server_c class object, which is defined and implemented in ./Network/Server.{h,cpp}.
+
+The client network code is primarily contained in ./Network/Dummy_Event_Handler.cpp.  Each client runs a thread whih handles the connection to the server and deals with incoming data and network periodic timer timeouts.  The data structures associated with the player (and the network objects) are contained within ./Network/Player.h.  
 
 Graphics System Design
 ----------------------
