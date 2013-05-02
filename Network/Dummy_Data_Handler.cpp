@@ -75,9 +75,6 @@ int Dummy_Data_Handler::open (void)
 	}
   
 	myid = numPlayers++;
-	
-	ACE_Time_Value temptime = ACE_OS::gettimeofday();
-	prevtime = temptime.sec() + temptime.usec()/1000000.0;
 
 	this->reactor()->schedule_timer(this,
 									0,
@@ -188,8 +185,7 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 		// we need to handle this case since it would mean that the connection is
 		// closed from the other side.  So it is time for this handler to go too.
 		ACE_DEBUG ((LM_DEBUG,
-					ACE_TEXT ("Dummy_Data_Handler::handle_input - 0 bytes received")
-					ACE_TEXT (" => peer closed connection\n")));
+					ACE_TEXT ("Dummy_Data_Handler::handle_input - 0 bytes received => peer closed connection\n")));
 
 		// we let the reactor trigger the handle close by returning a -1 to
 		// the reactor
@@ -226,6 +222,10 @@ int Dummy_Data_Handler::handle_input (ACE_HANDLE h) {
 				SendObjects();					// send all current objects to the new player
 				peer_s newpeer = peer_s(&(this->peer()),myid);	// Have finished updating all clients
 				con_peers.push_back(newpeer);					// now add the new peer to our list
+				if ( con_peers.begin()->ID == myid ) {
+					ACE_Time_Value temptime = ACE_OS::gettimeofday();
+					prevtime = temptime.sec() + temptime.usec()/1000000.0;
+				}
 			}
 			break;
 		case CHAT:	// don't mind if players who are unregistered chat (we'll pretend they're spectators)
@@ -349,13 +349,12 @@ int Dummy_Data_Handler::handle_timeout (const ACE_Time_Value& current_time, cons
 	ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("Dummy_Data_Handler::handle_timeout invoked\n")));
 	#endif
 
-	double elapsed = currenttime - prevtime;
-	prevtime = currenttime;
-
 	Message mymessage;
 	Player_s myplayer;
 	Object_s myobject;
 	if ( !con_peers.empty() && con_peers.begin()->ID == myid ) {	// only want one handle_timeout running on the server
+		double elapsed = currenttime - prevtime;
+		prevtime = currenttime;
 		if ( !server.Objects().empty() ) {	// do we have something to update?
 			double time = period_t.usec()/1000000.0;
 			time += period_t.sec();

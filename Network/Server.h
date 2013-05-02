@@ -22,11 +22,11 @@ using namespace std;
 #include "..\Engine\Object.h"
 #include "..\Engine\world.h"
 
-const double		SHOTDAMAGE = 20.0;
-const double		SHOTOFFSET = 6.0;
+const double	SHOTDAMAGE = 20.0;
+const double	SHOTOFFSET = 6.0;
 const int		SHOTSPEED = 30;
-const double		SHOTLIFE = 5.0;			// measured in seconds
-const double		PLAYERLIFE = 100.0;		// measured in HP
+const double	SHOTLIFE = 5.0;			// measured in seconds
+const double	PLAYERLIFE = 100.0;		// measured in HP
 const int		UPDATE_TIME = 40000;	// measured in microseconds
 
 class Server_c {
