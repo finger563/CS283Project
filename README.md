@@ -4,7 +4,9 @@ CS283Project : Super Block Fighter Extreme
 CS 283 Networked 3D Game Project
 
 This project is written by William Emfinger and Paul McNeil for Vanderbilt's 
-spring 2013 CS283 Computer Networks class.
+spring 2013 CS283 Computer Networks class. Though extensive, this project was completely coded
+by the two of us during the length of this course. Completing it successfully required that we met
+at least once a week from the beginning of the semester.
 
 The program is a networked 3D first person game in which the player can use the 
 mouse and keyboard to move and look and shoot in a 3D virtual environment.  The player can
@@ -224,7 +226,7 @@ Methods
 The program was tested on two tiers: localized testing and intranet testing.
 
 Localized testing occurred often throughout the development of the program. Each time a new feature was added, 
-it was intergrated into the system to ensure continuity. These changes were tested on at least two different systems. 
+it was integrated into the system to ensure continuity. These changes were tested on at least two different systems. 
 Following the localized testing, intranet testing occurred to evaluate the messaging protocol and state synchronization.
 
 Intranet testing occurred on the ISIS and Featheringhill intranets. It consisted of running the program on two independent systems.
@@ -234,10 +236,30 @@ player and object movements, and players entrance/exit from a game.
 Results
 -------------------
 Localized testing served to eliminate many client-side inconsistencies in the code. Issues such as visual glitches and 
-rotation limitations were corrected to these tests. Locailized state synchronization testing revealed latencies as well
-as messaginng errors. As a result of repetitive testing, the game properly implements all of the client-size functionality 
+rotation limitations were corrected to these tests. Localized state synchronization testing revealed latencies as well
+as messaging errors. As a result of repetitive testing, the game properly implements all of the client-size functionality 
 
 Intranet testing served to eliminate the remaining errors that could not be tested locally such as router delays.
 Testing on the ISIS network was unsuccessful due to its firewall and other security protocols. However, testing on the 
 Featheringill network was successful. Player and object movements synchronized reasonible across the intranet as did 
-inter-player messaging. 
+inter-player messaging. The program was tested on two tiers: localized testing and intranet testing.
+
+Localized testing occurred often throughout the development of the program. Each time a new feature was added, 
+it was integrated into the system to ensure continuity. These changes were tested on at least two different systems. 
+Following the localized testing, intranet testing occurred to evaluate the messaging protocol and state synchronization.
+
+Intranet testing occurred on the ISIS and Featheringhill intranets. It consisted of running the program on two independent systems.
+The systems would then join to test the functionality of each game feature. Special attention was paid to the chat,
+player and object movements, and players entrance/exit from a game.
+
+Results
+-------------------
+Localized testing served to eliminate many client-side inconsistencies in the code. Issues such as visual glitches and 
+rotation limitations were corrected to these tests. Localized state synchronization testing revealed latencies as well
+as messaging errors. As a result of repetitive testing, the game properly implements all of the client-size functionality 
+
+Intranet testing served to eliminate the remaining errors that could not be tested locally such as router delays.
+Testing on the ISIS network was unsuccessful due to its firewall and other security protocols. However, testing on the 
+Featheringill network was successful. Player and object movements synchronized reasonable across the intranet as did 
+inter-player messaging.
+
